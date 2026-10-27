@@ -103,7 +103,7 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Analiza los supuestos detrás de las proyecciones macroeconómicas para ${currentCountry.name} en 2026-2028. ¿Cuáles son los principales riesgos de cola (tail risks)?`)}
+          onClick={() => onOpenCopilotWithPrompt(`Evalúa qué datos y validaciones se necesitan para pronosticar la economía de ${currentCountry.name}; no presentes las curvas de demostración como pronóstico real.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
           <Sparkles className="w-4 h-4" /> Evaluar Supuestos con Copilot
