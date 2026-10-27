@@ -197,35 +197,35 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">ProvenanceEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">EconometricEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">DigitalTwinEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">ForecastEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">FaiiEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">AnomalyEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">CopilotEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">OrchestratorEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                 </div>
               </div>
@@ -305,7 +305,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
               <div className="flex items-center justify-between p-3.5 bg-slate-950 border border-slate-800 rounded-xl">
                 <div>
                   <h4 className="text-sm font-bold text-slate-100">Batería de Pruebas Unitarias, Econométricas &amp; de Integración</h4>
-                  <p className="text-xs text-slate-400">Ejecución en tiempo real sobre los 12 motores del sistema.</p>
+                  <p className="text-xs text-slate-400">Ejecución local de pruebas de lógica; no verifica despliegue, datos en vivo ni telemetría de producción.</p>
                 </div>
                 <div className="flex items-center gap-4 text-right">
                   <div>
