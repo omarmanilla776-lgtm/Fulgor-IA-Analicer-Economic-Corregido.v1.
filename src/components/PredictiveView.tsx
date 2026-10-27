@@ -179,14 +179,14 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 
                 {/* Confidence Bounds */}
-                <Area type="monotone" dataKey="p90" name="Intervalo Superior (P90)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="url(#fanSpread)" />
-                <Area type="monotone" dataKey="p10" name="Intervalo Inferior (P10)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="transparent" />
+                <Area type="monotone" dataKey="p90" name="Banda superior ilustrativa (no percentil validado)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="url(#fanSpread)" />
+                <Area type="monotone" dataKey="p10" name="Banda inferior ilustrativa (no percentil validado)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="transparent" />
 
                 {/* Scenarios */}
                 <Line type="monotone" dataKey="optimistic" name="Escenario Optimista" stroke="#34d399" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="base" name="Escenario Base" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
                 <Line type="monotone" dataKey="conservative" name="Escenario Conservador" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="observed" name="Dato Histórico Observado" stroke="#f8fafc" strokeWidth={3.5} dot={{ r: 5 }} />
+                <Line type="monotone" dataKey="observed" name="Serie de demostración (sin observaciones verificadas)" stroke="#f8fafc" strokeWidth={3.5} dot={{ r: 5 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
