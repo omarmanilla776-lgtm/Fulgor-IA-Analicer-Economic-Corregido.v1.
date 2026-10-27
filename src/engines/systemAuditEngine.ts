@@ -394,7 +394,7 @@ export class SystemAuditEngine {
       observabilityStatus: 'PARCIAL — uptime y memoria del proceso pueden medirse; latencia, sesiones, tasa de error y auditoría criptográfica no están verificadas.',
       i18nStatus: 'COMPLETO — 8 idiomas (ES, EN, PT, FR, DE, IT, ZH, JA) y 5 monedas (USD, MXN, EUR, BRL, GBP) con formateo local desacoplado.',
       documentationStatus: 'DOCUMENTACIÓN EN LA APLICACIÓN; revisión metodológica y verificación de fuentes pendientes.',
-      releaseBlockers: allPassed ? [] : ['Validar fuentes y fechas de datos', 'Validar fuentes y fechas de datos', 'Validar inferencia estadística y causal reproducible', 'Completar revisión de seguridad de autenticación y permisos', 'Configurar autenticación de API y secretos en servidor', 'Conectar observabilidad real antes de publicar', 'Ejecutar pruebas de aceptación en el alojamiento objetivo'],
+      releaseBlockers: allPassed ? [] : ['Validar fuentes y fechas de datos', 'Validar inferencia estadística y causal reproducible', 'Completar revisión de seguridad de autenticación y permisos', 'Configurar autenticación de API y secretos en servidor', 'Conectar observabilidad real antes de publicar', 'Ejecutar pruebas de aceptación en el alojamiento objetivo'],
       executiveSummary: allPassed 
         ? 'La plataforma no está certificada para publicación; las pruebas pendientes deben completarse y documentarse.'
         : 'Se han detectado inconsistencias en uno o más Gates de validación. Revise los detalles técnicos antes de proceder.'
