@@ -175,8 +175,8 @@ export class EconometricEngine {
 
     return {
       treatmentEffect: Number(treatmentEffect.toFixed(2)),
-      standardError: se,
-      tStat: Number(tStat.toFixed(2)),
+      standardError: reportedStandardError,
+      tStat,
       pValue,
       ciLower95: ciLower,
       ciUpper95: ciUpper,
