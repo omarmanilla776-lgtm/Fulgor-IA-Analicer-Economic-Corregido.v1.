@@ -11,7 +11,8 @@ import {
   ShieldCheck, 
   Cpu, 
   CheckCircle2, 
-  ExternalLink 
+  ExternalLink,
+  Database 
 } from 'lucide-react';
 
 interface EcosystemViewProps {
@@ -44,10 +45,10 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Calcula el ROI estimado de implementar la suite completa de Fulgor IA (Creador, Ingeniero y Logística) para una empresa de 150 empleados en el sector manufacturero y de exportación.`)}
+          onClick={() => onOpenCopilotWithPrompt(`Diseña una metodología para medir el ROI de Fulgor IA sin inventar cifras; enumera datos, línea base, periodo y evidencia necesarios.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
-          <Sparkles className="w-4 h-4" /> Calcular ROI para mi Empresa
+          <Sparkles className="w-4 h-4" /> Preparar medición de ROI
         </button>
       </div>
 
