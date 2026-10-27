@@ -79,14 +79,14 @@ export class SystemAuditEngine {
       const x = [1, 2, 3, 4, 5];
       const y = [2, 4, 6, 8, 10]; // Perfect linear relationship
       const ols = EconometricEngine.calculateOLS(x, y);
-      const passed = Math.abs(ols.slope - 2) < 0.001 && Math.abs(ols.rSquared - 1.0) < 0.001 && ols.isStatisticallySignificant;
+      const passed = Math.abs(ols.slope - 2) < 0.001 && Math.abs(ols.rSquared - 1.0) < 0.001 && ols.pValue === null && !ols.isStatisticallySignificant;
       tests.push({
         testId: 'TEST-ECON-03',
         name: 'EconometricEngine: Regresión Lineal OLS y Pearson (R² = 1.0)',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.5,
-        details: `Pendiente: ${ols.slope}, R²: ${ols.rSquared}, p-value: ${ols.pValue}.`
+        details: `Pendiente: ${ols.slope}, R²: ${ols.rSquared}, p-value: ${ols.pValue ?? 'no calculado'}; significancia no declarada sin inferencia válida.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-ECON-03', name: 'EconometricEngine OLS', category: 'STATISTICAL', passed: false, durationMs: 1.2, details: e.message });
@@ -96,14 +96,14 @@ export class SystemAuditEngine {
     try {
       const did = EconometricEngine.calculateDiD(10, 30, 10, 15, 2.0, 500);
       // diffTreat = 20, diffControl = 5 -> effect = 15
-      const passed = Math.abs(did.treatmentEffect - 15) < 0.01 && did.tStat > 3 && did.parallelTrendsVerified;
+      const passed = Math.abs(did.treatmentEffect - 15) < 0.01 && did.tStat > 3 && did.pValue === null && did.parallelTrendsVerified === false && did.parallelTrendsFTestPValue === null;
       tests.push({
         testId: 'TEST-DID-04',
         name: 'EconometricEngine: Difference-in-Differences 2x2 & Test de Tendencias Paralelas',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.1,
-        details: `Efecto estimado: ${did.treatmentEffect}, t-stat: ${did.tStat}, tendencias paralelas: ${did.parallelTrendsVerified ? 'VÁLIDAS' : 'FALLIDAS'}.`
+        details: `Efecto estimado: ${did.treatmentEffect}, t-stat: ${did.tStat}, tendencias paralelas verificadas: ${did.parallelTrendsVerified ? 'SÍ' : 'NO'}; inferencia no certificada.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-DID-04', name: 'EconometricEngine DiD', category: 'STATISTICAL', passed: false, durationMs: 1.0, details: e.message });
