@@ -210,7 +210,7 @@ DIRECTIVAS CRÍTICAS DE RIGOR CIENTÍFICO:
 
     if (ai) {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
+        model: 'gemini-3.8-flash',
         contents: `Contexto País: ${contextCountry || 'General / Global'}
 Sector activo: ${activeSector || 'Multisectorial'}
 
