@@ -385,7 +385,7 @@ export class EconomicIntelligenceOrchestrator {
       modelCheckNotes,
       statisticalCheckPassed,
       statisticalCheckNotes,
-      epistemicCheckPassed: true,
+      epistemicCheckPassed: ruleOfGoldCompliance,
       epistemicCategoryAssigned,
       confidenceScore: finalConfidence,
       confidenceDegraded,
