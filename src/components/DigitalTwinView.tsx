@@ -171,7 +171,7 @@ export const DigitalTwinView: React.FC<DigitalTwinViewProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Boxes className="w-4 h-4 text-amber-400" /> ECONOMIC DIGITAL TWIN (GEMELO DIGITAL ECONÓMICO)
+              <Boxes className="w-4 h-4 text-amber-400" /> GEMELO DIGITAL ECONÓMICO — SIMULACIÓN ILUSTRATIVA
             </span>
             <EpistemicBadge type="PROJECTION" size="sm" />
           </div>
@@ -344,7 +344,7 @@ export const DigitalTwinView: React.FC<DigitalTwinViewProps> = ({
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
                 <div>
-                  <span className="text-xs font-mono text-amber-400">Resultado del Gemelo Digital</span>
+                  <span className="text-xs font-mono text-amber-400">Resultado ilustrativo del Gemelo Digital</span>
                   <h3 className="text-base font-bold text-slate-100">{simulationResult.scenarioName}</h3>
                 </div>
 
@@ -443,7 +443,7 @@ export const DigitalTwinView: React.FC<DigitalTwinViewProps> = ({
                   <ShieldAlert className="w-3.5 h-3.5" /> Cláusula de Transparencia de Simulación:
                 </div>
                 <p>
-                  Esta simulación del Gemelo Digital es un modelo matemático de equilibrio parcial calibrado con supuestos explícitos. <strong>No representa una predicción garantizada</strong> ni compromete resultados fácticos futuros.
+                  Esta simulación usa fórmulas y valores de base ilustrativos no calibrados con datos económicos verificados. <strong>No es una predicción ni una estimación empírica</strong> y no debe usarse para decisiones económicas reales.
                 </p>
               </div>
 
