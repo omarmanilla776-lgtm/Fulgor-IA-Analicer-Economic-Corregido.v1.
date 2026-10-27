@@ -52,7 +52,7 @@ export class AnomalyEngine {
       observedDelta: Number((currentValue - historicalMean).toFixed(2)),
       thresholdZ,
       severity,
-      epistemicType: 'OBSERVED_DATA',
+      epistemicType: 'MODEL_ESTIMATE',
       suggestedAction: isAnomaly 
         ? 'Activar protocolo de revisión analítica y validar consistencia con fuentes cruzadas.'
         : 'Parámetros dentro del intervalo de variación normal.'
