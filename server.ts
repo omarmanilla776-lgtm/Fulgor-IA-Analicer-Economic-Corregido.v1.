@@ -333,7 +333,10 @@ app.get('/api/v1/countries', (req, res) => {
 });
 
 app.post('/api/v1/simulate', (req, res) => {
-  const { aiAdoptionDelta = 25, rdIncentivePercentage = 15 } = req.body;
+  const { aiAdoptionDelta = 25, rdIncentivePercentage = 15 } = req.body ?? {};
+  if ([aiAdoptionDelta, rdIncentivePercentage].some((value) => typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 100)) {
+    return res.status(400).json({ error: 'aiAdoptionDelta y rdIncentivePercentage deben ser números finitos entre 0 y 100.' });
+  }
   res.json({
     version: 'v1',
     status: 'illustrative_simulation_only',
@@ -342,7 +345,7 @@ app.post('/api/v1/simulate', (req, res) => {
     scenario: `Digital Twin (+${aiAdoptionDelta}% AI, +${rdIncentivePercentage}% R&D)`,
     gdpBonusPct: Number((aiAdoptionDelta * 0.074).toFixed(2)),
     productivityLiftAnnual: Number((aiAdoptionDelta * 0.052).toFixed(2)),
-    epistemicType: 'PROJECTION',
+    epistemicType: 'ILLUSTRATIVE_DEMO_ONLY',
     uncertaintyBand: 'No calibrado — no interpretar como intervalo de confianza'
   });
 });
@@ -355,6 +358,9 @@ app.post('/api/v1/correlation', (req, res) => {
       return res.status(400).json({ error: 'x e y deben ser arreglos numéricos finitos del mismo tamaño (2 a 10000 pares).' });
     }
     const n = x.length;
+    if (new Set(x).size < 2 || new Set(y).size < 2) {
+      return res.status(400).json({ error: 'La correlación no está definida cuando alguna variable no presenta variación.' });
+    }
     
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
     for (let i = 0; i < n; i++) {
@@ -395,12 +401,11 @@ app.post('/api/v1/correlation', (req, res) => {
 
 app.post('/api/v1/did', (req, res) => {
   try {
-    const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2, se = 2.45 } = req.body ?? {};
-    if ([preTreat, postTreat, preControl, postControl, se].some((value) => typeof value !== 'number' || !Number.isFinite(value)) || se <= 0) {
-      return res.status(400).json({ error: 'Los valores DiD deben ser números finitos y el error estándar debe ser positivo.' });
+    const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2 } = req.body ?? {};
+    if ([preTreat, postTreat, preControl, postControl].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      return res.status(400).json({ error: 'Los cuatro valores DiD deben ser números finitos.' });
     }
     const effect = (postTreat - preTreat) - (postControl - preControl);
-    const tStat = effect / se;
     const pValue = null;
     
     res.json({
