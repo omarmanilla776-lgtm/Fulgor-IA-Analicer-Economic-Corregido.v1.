@@ -102,7 +102,7 @@ export const FulgorIndexView: React.FC<FulgorIndexViewProps> = ({ onOpenCopilotW
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Explica detalladamente la fórmula del índice FAII (Fulgor AI Impact Index), por qué penaliza las fricciones de transición laboral y cuál es el desglose para ${selectedItem.countryName}.`)}
+          onClick={() => onOpenCopilotWithPrompt(`Explica los supuestos y datos que se necesitarían para validar el índice FAII para ${selectedItem.countryName}; no trates la puntuación demostrativa como una medición real.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
           <Sparkles className="w-4 h-4" /> Auditar Metodología con Copilot
