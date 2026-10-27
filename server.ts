@@ -10,7 +10,30 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '256kb' }));
+
+// Protected API routes fail closed unless a server-side bearer secret is configured.
+// Never send FULGOR_API_KEY to browser code.
+function requireConfiguredBearer(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const configuredKey = process.env.FULGOR_API_KEY;
+  if (!configuredKey || configuredKey.length < 32) {
+    return res.status(503).json({ error: 'Servicio API no disponible: falta configurar un secreto de servidor válido.' });
+  }
+  const authorization = req.headers.authorization || '';
+  const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  const supplied = Buffer.from(suppliedKey);
+  const expected = Buffer.from(configuredKey);
+  if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
+    return res.status(401).json({ error: 'Autenticación requerida.' });
+  }
+  next();
+}
+
+// Protect legacy endpoints too: they can trigger model costs or return computed outputs.
+// The public demo UI must not embed the secret; use a trusted server-side session/proxy for live access.
+app.use('/api/copilot', requireConfiguredBearer);
+app.use('/api/digital-twin', requireConfiguredBearer);
+app.use('/api/causal', requireConfiguredBearer);
 
 // Lazy Google GenAI Client
 let aiClient: GoogleGenAI | null = null;
@@ -35,17 +58,20 @@ app.get('/api/health', (req, res) => {
     service: 'FULGOR IA ANALICER ECONOMIC API',
     timestamp: new Date().toISOString(),
     version: '1.0.0-PRO',
-    hasGeminiKey: !!process.env.GEMINI_API_KEY,
   });
 });
 
 // 2. AI Economic Copilot Endpoint
 app.post('/api/copilot/chat', async (req, res) => {
   try {
-    const { prompt, contextCountry, activeSector, history } = req.body;
+    const { prompt, contextCountry, activeSector } = req.body;
 
-    if (!prompt || typeof prompt !== 'string') {
-      return res.status(400).json({ error: 'Prompt es requerido y debe ser texto.' });
+    if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 8000) {
+      return res.status(400).json({ error: 'Prompt requerido; debe contener entre 1 y 8000 caracteres.' });
+    }
+    if ((contextCountry !== undefined && (typeof contextCountry !== 'string' || contextCountry.length > 120)) ||
+        (activeSector !== undefined && (typeof activeSector !== 'string' || activeSector.length > 120))) {
+      return res.status(400).json({ error: 'Los campos de contexto deben ser texto de hasta 120 caracteres.' });
     }
 
     const ai = getGenAI();
@@ -111,22 +137,35 @@ ${prompt}`,
 app.post('/api/digital-twin/simulate', (req, res) => {
   try {
     const {
-      countryCode = 'MX',
-      aiAdoptionDelta = 25, // +25%
+      aiAdoptionDelta = 25,
       rdIncentivePercentage = 15,
       automationCapitalElasticity = 0.35,
       laborUpskillingSpeed = 3,
       tradeTechOpenness = 75,
       regulatoryFriction = 30,
-      baseGDP = 1845.2, // Billions USD for Mexico, or dynamic
-    } = req.body;
+      baseGDP = 1845.2,
+    } = req.body ?? {};
 
-    const delta = Number(aiAdoptionDelta) || 25;
-    const rd = Number(rdIncentivePercentage) || 15;
-    const elast = Number(automationCapitalElasticity) || 0.35;
-    const upskilling = Number(laborUpskillingSpeed) || 3;
-    const openness = Number(tradeTechOpenness) || 75;
-    const friction = Number(regulatoryFriction) || 30;
+    const numericInputs = { aiAdoptionDelta, rdIncentivePercentage, automationCapitalElasticity, laborUpskillingSpeed, tradeTechOpenness, regulatoryFriction, baseGDP };
+    if (Object.values(numericInputs).some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      return res.status(400).json({ error: 'Todos los parámetros deben ser números finitos.' });
+    }
+    if (aiAdoptionDelta < 0 || aiAdoptionDelta > 100 ||
+        rdIncentivePercentage < 0 || rdIncentivePercentage > 100 ||
+        automationCapitalElasticity < 0 || automationCapitalElasticity > 2 ||
+        laborUpskillingSpeed < 0 || laborUpskillingSpeed > 10 ||
+        tradeTechOpenness < 0 || tradeTechOpenness > 100 ||
+        regulatoryFriction < 0 || regulatoryFriction > 100 ||
+        baseGDP <= 0 || baseGDP > 1_000_000) {
+      return res.status(400).json({ error: 'Uno o más parámetros están fuera de los rangos permitidos.' });
+    }
+
+    const delta = aiAdoptionDelta;
+    const rd = rdIncentivePercentage;
+    const elast = automationCapitalElasticity;
+    const upskilling = laborUpskillingSpeed;
+    const openness = tradeTechOpenness;
+    const friction = regulatoryFriction;
 
     // Structural Economic Simulation Model (Cobb-Douglas augmented with Total Factor Productivity dividend)
     // TFP_lift = alpha * ln(1 + delta/100) * (openness/100) * (1 - friction/200) + (rd * 0.02)
@@ -198,25 +237,28 @@ app.post('/api/digital-twin/simulate', (req, res) => {
       ]
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'No fue posible ejecutar la simulación.' });
   }
 });
 
 // 4. Causal Difference-in-Differences Calculation API
 app.post('/api/causal/did-analysis', (req, res) => {
-  const { preTreatmentDiff = 0.2, postTreatmentDiff = 21.6, standardError = 2.76 } = req.body;
+  const { preTreatmentDiff = 0.2, postTreatmentDiff = 21.6, standardError = 2.76 } = req.body ?? {};
+  if ([preTreatmentDiff, postTreatmentDiff, standardError].some((value) => typeof value !== 'number' || !Number.isFinite(value)) ||
+      standardError <= 0) {
+    return res.status(400).json({ error: 'Las diferencias deben ser números finitos y el error estándar debe ser positivo.' });
+  }
   const treatmentEffect = postTreatmentDiff - preTreatmentDiff;
-  const tStat = treatmentEffect / standardError;
   const pValue = null;
-  const ciLower = Number((treatmentEffect - 1.96 * standardError).toFixed(2));
-  const ciUpper = Number((treatmentEffect + 1.96 * standardError).toFixed(2));
+  const ciLower = null;
+  const ciUpper = null;
 
   res.json({
     method: 'Difference-in-Differences (DiD)',
     treatmentEffect: Number(treatmentEffect.toFixed(2)),
-    confidenceInterval95: [ciLower, ciUpper],
-    standardError,
-    tStatistic: Number(tStat.toFixed(2)),
+    confidenceInterval95: null,
+    standardError: null,
+    tStatistic: null,
     pValue,
     isStatisticallySignificant: false,
     epistemicStatus: 'EXPLORATORIO — no se calculó un p-valor inferencial válido',
@@ -254,11 +296,6 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 app.get('/api/v1/indicators', (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader && req.query.key !== 'demo') {
-    // Allows preview with demo parameter or bearer token
-  }
-  
   res.json({
     version: 'v1',
     epistemicStandard: 'Rule of Gold — provenance not yet independently verified',
@@ -344,7 +381,7 @@ app.post('/api/v1/correlation', (req, res) => {
       ruleOfGoldCaveat: 'Correlación no implica causalidad.'
     });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'No fue posible procesar el cálculo solicitado.' });
   }
 });
 
