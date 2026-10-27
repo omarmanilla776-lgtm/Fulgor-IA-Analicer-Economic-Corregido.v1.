@@ -233,7 +233,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Efecto (Beta)</span>
-                  <span className="text-emerald-400 font-bold">{activeExperiment.estimatedTreatmentEffect === null ? "No validado" : `${activeExperiment.estimatedTreatmentEffect}% (no verificado)`}</span>
+                  <span className="text-amber-300 font-bold">{activeExperiment.estimatedTreatmentEffect === null ? "No validado" : `${activeExperiment.estimatedTreatmentEffect}% (no verificado)`}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Estadístico t</span>
@@ -345,7 +345,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 
                 <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5 text-xs">
                   <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Supuestos no verificados
+                    <AlertTriangle className="w-3.5 h-3.5" /> Supuestos no verificados
                   </span>
                   <ul className="list-disc list-inside text-slate-400 text-[11px] space-y-1 leading-relaxed">
                     {activeExperiment.assumptions.map((assump, idx) => (
