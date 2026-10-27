@@ -16,10 +16,10 @@ export const EPISTEMIC_SEALS: Record<EpistemicType, EpistemicVerificationSeal> =
     sealId: 'SEAL_OBS_01',
     category: 'OBSERVED_DATA',
     label: 'DATO DECLARADO OBSERVADO — NO VERIFICADO',
-    badgeColorHex: '#10b981',
-    badgeBorderHex: 'rgba(16, 185, 129, 0.4)',
-    bgHex: 'rgba(16, 185, 129, 0.1)',
-    ruleExplanation: 'La etiqueta no acredita conexión, descarga ni validación independiente de una fuente oficial.'
+    badgeColorHex: '#f59e0b',
+    badgeBorderHex: 'rgba(245, 158, 11, 0.4)',
+    bgHex: 'rgba(245, 158, 11, 0.1)',
+    ruleExplanation: 'La etiqueta no acredita conexión, descarga ni validación independiente de una fuente oficial.',
     evidenceRequirement: 'Identificador oficial de serie, URL institucional y ficha técnica.'
   },
   CORRELATION: {
