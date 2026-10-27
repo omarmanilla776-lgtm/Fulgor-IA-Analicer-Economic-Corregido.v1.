@@ -106,6 +106,7 @@ app.get('/api/public/world-bank', async (req, res) => {
       if (!response.ok) throw new Error(`World Bank returned HTTP ${response.status}`);
       const body = await response.json() as [unknown, WorldBankObservation[] | null];
       const rows = Array.isArray(body?.[1]) ? body[1] : [];
+      if (rows.length === 0) console.warn('World Bank Open Data returned no rows for indicator:', indicator.id, JSON.stringify(body?.[0] ?? {}).slice(0, 300));
       const latestByCountry = new Map<string, WorldBankObservation>();
       for (const row of rows) {
         const code = row.countryiso3code || '';
@@ -141,7 +142,8 @@ app.get('/api/public/world-bank', async (req, res) => {
     worldBankCache.payload = payload;
     worldBankCache.expiresAt = now + 30 * 60_000;
     return res.json(payload);
-  } catch {
+  } catch (error) {
+    console.warn('World Bank Open Data request failed:', error instanceof Error ? error.message : 'unknown error');
     return res.status(502).json({ error: 'No se pudo consultar World Bank Open Data. No se muestran cifras alternativas inventadas.' });
   }
 });
