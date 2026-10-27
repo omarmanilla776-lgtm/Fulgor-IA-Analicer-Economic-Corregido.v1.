@@ -84,8 +84,8 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Regresión Lineal MCO con errores estándar robustos.',
             frequency: 'Trimestral',
             unit: 'Índice base 100',
-            confidenceScore: 98.4,
-            isOfficial: true,
+            confidenceScore: 0,
+            isOfficial: false,
             sampleSize: `N=${ols.sampleSize}`,
             standardError: ols.standardError
           });
@@ -110,7 +110,7 @@ export class EconomicIntelligenceOrchestrator {
             frequency: 'Anual',
             unit: '% Ganancia de Productividad',
             confidenceScore: did.parallelTrendsVerified ? 96.5 : 65.0,
-            isOfficial: true,
+            isOfficial: false,
             sampleSize: `N=${did.sampleSizeN}`,
             standardError: did.standardError ?? undefined
           });
@@ -148,7 +148,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Simulación estructural mediante función de producción aumentada con spillovers de PTF.',
             frequency: 'Anual',
             unit: 'Miles de millones USD / Índices',
-            confidenceScore: 92.0,
+            confidenceScore: 0,
             isOfficial: true
           });
 
@@ -173,7 +173,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Modelación probabilística Fan Chart (P10, P50, P90) con calibración de volatilidad histórica.',
             frequency: 'Trimestral',
             unit: '% Variación Anualizada',
-            confidenceScore: 88.5,
+            confidenceScore: 0,
             isOfficial: true
           });
 
@@ -199,7 +199,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Monitoreo estandarizado Z-Score con umbrales de alerta temprana.',
             frequency: 'Mensual',
             unit: 'Puntos Z / Desviación Estándar',
-            confidenceScore: 99.2,
+            confidenceScore: 0,
             isOfficial: true
           });
 
@@ -233,7 +233,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Ponderación multicriterio normalizada de 5 pilares de transformación digital.',
             frequency: 'Trimestral',
             unit: 'Puntuación 0-100',
-            confidenceScore: 94.0,
+            confidenceScore: 0,
             isOfficial: false
           });
 
@@ -345,20 +345,16 @@ export class EconomicIntelligenceOrchestrator {
       : 'Datos incompletos o vacíos.';
 
     // 3. Model Check
-    let modelCheckPassed = !isDemo && results !== null && results !== undefined;
-    let modelCheckNotes = isDemo
-      ? 'No aprobado: el modelo no está calibrado ni validado con datos empíricos verificados.'
-      : 'Ejecución estructural detectada; la validación independiente del modelo sigue pendiente.';
+    let modelCheckPassed = false;
+    let modelCheckNotes = 'No aprobado: no hay evidencia de calibración y validación independiente del modelo.';
     if (results && typeof results.rSquared === 'number' && (results.rSquared < 0 || results.rSquared > 1)) {
       modelCheckPassed = false;
       modelCheckNotes = 'Violación de rango en R² [0, 1].';
     }
 
     // 4. Statistical Check
-    let statisticalCheckPassed = !isDemo;
-    let statisticalCheckNotes = isDemo
-      ? 'No aprobado: faltan datos observacionales, supuestos comprobados y pruebas inferenciales válidas.'
-      : 'La validación estadística independiente sigue pendiente.';
+    let statisticalCheckPassed = false;
+    let statisticalCheckNotes = 'No aprobado: faltan datos observacionales verificados, supuestos comprobados y pruebas inferenciales válidas.';
     let confidenceDegraded = false;
     let degradationReason: string | undefined = undefined;
 
