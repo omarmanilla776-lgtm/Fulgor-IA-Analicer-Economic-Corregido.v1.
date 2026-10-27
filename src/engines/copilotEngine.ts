@@ -78,27 +78,22 @@ export class CopilotEngine {
     } catch (err: any) {
       console.warn('Copilot query error, using local fallback:', err);
       return {
-        reply: `### [ANÁLISIS MACROECONÓMICO FULGOR IA - FALLBACK LOCAL]
+        reply: `### [MODO LOCAL — SIN DATOS VERIFICADOS]
 **Contexto**: ${contextCountry || 'Global'} | **Sector**: ${activeSector || 'Multisectorial'}
 
-1. 🟢 **[DATO OBSERVADO]**:
-   - Tasa de penetración tecnológica y variables macroeconómicas consultadas en INEGI, FRED y OCDE.AI Observatory.
-2. 🔵 **[CORRELACIÓN ESTADÍSTICA]**:
-   - Coeficiente de correlación observado entre adopción de software e incremento de productividad horaria (r = 0.68, p < 0.01).
-3. 🔴 **[INFERENCIA CAUSAL (DiD)]**:
-   - Estimación cuasi-experimental indica una ganancia neta causal de entre +17.8% y +24.5% en velocidad de resolución analítica.
-4. 🟣 **[PRONÓSTICO PROBABILÍSTICO]**:
-   - Escenario base proyecta una contribución anual de +0.4% a +0.7% al crecimiento del PIB potencial para 2026-2028.`,
-        sourcesCited: ['INEGI BIE', 'Federal Reserve Economic Data (FRED)', 'OECD.AI Policy Observatory'],
-        epistemicLevel: 'Modo Analítico Local Desacoplado',
+No fue posible consultar el servicio de análisis. Para evitar presentar cifras inventadas como evidencia, este modo no genera estadísticas, correlaciones, efectos causales ni pronósticos.
+
+Para continuar, proporciona una serie de datos con fuente, periodo, unidades y observaciones, o vuelve a intentarlo cuando el servicio esté disponible. Cualquier resultado posterior deberá distinguir datos observados, estimaciones del modelo y supuestos.`,
+        sourcesCited: [],
+        epistemicLevel: 'No verificado — servicio no disponible',
         audit: {
-          containsObservedFacts: true,
-          containsCorrelations: true,
-          containsModelEstimates: true,
-          containsCausalClaims: true,
-          containsProjections: true,
-          confidenceLevel: 'Condicional a supuestos',
-          epistemicDisclaimer: 'Respuesta generada con el motor econométrico local de reserva.'
+          containsObservedFacts: false,
+          containsCorrelations: false,
+          containsModelEstimates: false,
+          containsCausalClaims: false,
+          containsProjections: false,
+          confidenceLevel: 'Baja',
+          epistemicDisclaimer: 'Sin acceso al servicio y sin datos de entrada no se emiten afirmaciones cuantitativas.'
         }
       };
     }
