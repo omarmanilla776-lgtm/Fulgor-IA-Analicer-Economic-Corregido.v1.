@@ -90,10 +90,10 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`¿Cuáles son los sectores con mayor retorno de inversión y ganancia de productividad laboral tras adoptar herramientas de IA en 2026?`)}
+          onClick={() => onOpenCopilotWithPrompt(`Diseña un método para medir el retorno y la productividad de la adopción de IA por sector; enumera datos, línea base, muestra y supuestos necesarios sin inventar resultados.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
-          <Sparkles className="w-4 h-4" /> Diagnóstico Sectorial IA
+          <Sparkles className="w-4 h-4" /> Diseñar medición sectorial
         </button>
       </div>
 
