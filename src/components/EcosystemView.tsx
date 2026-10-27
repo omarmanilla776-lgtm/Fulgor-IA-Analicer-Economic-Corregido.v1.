@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { FulgorProductImpact } from '../types/economic';
 import { FULGOR_ECOSYSTEM_PRODUCTS } from '../data/economicData';
 import { EpistemicBadge } from './EpistemicBadge';
 import { 
