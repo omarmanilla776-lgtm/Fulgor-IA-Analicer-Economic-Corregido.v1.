@@ -521,27 +521,28 @@ export const SECTORS_IMPACT_DATA: SectorImpact[] = [
 export const DID_EXPERIMENTS: DiDExperiment[] = [
   {
     id: 'EXP_DID_TECH_SECTOR_2023',
-    title: 'Impacto Causal de la Adopción de IA Generativa en Productividad de Software (2022-2025)',
+    title: 'Escenario ilustrativo de adopción de IA en software (no estudio empírico)',
     targetSector: 'Desarrollo de Software y Servicios Digitales',
     interventionYear: 2023,
-    treatmentGroupName: 'Cohorte de Empresas con Adopción Temprana de IA (N=1,420)',
-    controlGroupName: 'Cohorte de Empresas sin Adopción (Control Cuasi-Experimental N=1,380)',
-    parallelTrendsVerified: true,
-    parallelTrendsPValue: 0.42, // > 0.05, no se rechaza la hipótesis nula de tendencias paralelas pre-tratamiento
-    estimatedTreatmentEffect: 21.4, // +21.4% de valor agregado por empleado
-    confidenceInterval95: [17.8, 25.0],
-    tStatistic: 7.82,
-    rSquared: 0.79,
-    sampleSize: 2800,
+    treatmentGroupName: 'Grupo simulado con adopción temprana de IA',
+    controlGroupName: 'Grupo de control simulado',
+    parallelTrendsVerified: false,
+    parallelTrendsPValue: null,
+    estimatedTreatmentEffect: null,
+    confidenceInterval95: null,
+    tStatistic: null,
+    rSquared: null,
+    sampleSize: null,
     assumptions: [
-      'Tendencias paralelas en productividad durante el periodo 2020-2022 validadas (F-test p=0.42).',
-      'Ausencia de shocks exógenos asimétricos específicos a la cohorte tratada distintos de la adopción de IA.',
-      'Efecto derrame (spillover) controlado mediante exclusión de competidores directos en la misma sub-industria local.'
+      'Las trayectorias son datos simulados; no hay una serie observacional conectada.',
+      'Las tendencias paralelas no se han probado.',
+      'No existe una estimación causal validada ni un error estándar estimado.'
     ],
     caveats: [
-      'El efecto puede incluir un sesgo de auto-selección parcial por capacidades gerenciales preexistentes.',
-      'Los retornos marginales decrecientes no están completamente capturados en una ventana de 36 meses.'
+      'No interpretar las curvas como resultados observados.',
+      'No usar este escenario para atribuir efectos de IA ni tomar decisiones económicas.'
     ],
+    dataStatus: 'DEMO_INFERENCE_NOT_VALIDATED',
     seriesData: [
       { year: 2020, treatmentActual: 100.0, treatmentCounterfactual: 100.0, controlGroup: 100.0 },
       { year: 2021, treatmentActual: 102.5, treatmentCounterfactual: 102.5, controlGroup: 102.3 },
@@ -554,26 +555,27 @@ export const DID_EXPERIMENTS: DiDExperiment[] = [
   },
   {
     id: 'EXP_DID_CUSTOMER_OPS_2024',
-    title: 'Evaluación Cuasi-Experimental en Centros de Servicios y Atención a Clientes',
+    title: 'Escenario ilustrativo de IA en atención a clientes (no estudio empírico)',
     targetSector: 'Atención al Cliente & BPO',
     interventionYear: 2024,
-    treatmentGroupName: 'Firmas con Asistentes Autónomos de IA Integrados (N=650)',
-    controlGroupName: 'Firmas Tradicionales con Flujos Manuales (N=650)',
-    parallelTrendsVerified: true,
-    parallelTrendsPValue: 0.38,
-    estimatedTreatmentEffect: 34.2, // Reducción de tiempo de resolución
-    confidenceInterval95: [28.9, 39.5],
-    tStatistic: 8.94,
-    rSquared: 0.83,
-    sampleSize: 1300,
+    treatmentGroupName: 'Grupo simulado con asistentes de IA',
+    controlGroupName: 'Grupo de control simulado',
+    parallelTrendsVerified: false,
+    parallelTrendsPValue: null,
+    estimatedTreatmentEffect: null,
+    confidenceInterval95: null,
+    tStatistic: null,
+    rSquared: null,
+    sampleSize: null,
     assumptions: [
-      'Volumen de tickets pre-tratamiento con varianza idéntica entre grupos.',
-      'Mismo estándar de evaluación de satisfacción CSAT.'
+      'Las trayectorias son datos simulados; no hay una serie observacional conectada.',
+      'No se han comprobado varianzas, comparabilidad de grupos ni tendencias paralelas.'
     ],
     caveats: [
-      'Posible curva de fatiga del cliente no observada a largo plazo.',
-      'Requiere capacitación inicial del personal para supervisión activa.'
+      'No hay datos reales de empresas o tickets conectados.',
+      'No usar este escenario para atribuir efectos ni estimar ROI.'
     ],
+    dataStatus: 'DEMO_INFERENCE_NOT_VALIDATED',
     seriesData: [
       { year: 2021, treatmentActual: 100.0, treatmentCounterfactual: 100.0, controlGroup: 100.0 },
       { year: 2022, treatmentActual: 101.8, treatmentCounterfactual: 101.8, controlGroup: 101.6 },
