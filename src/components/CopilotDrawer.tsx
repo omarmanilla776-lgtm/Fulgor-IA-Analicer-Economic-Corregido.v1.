@@ -32,7 +32,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
       role: 'assistant',
       content: `Hola. Soy el **AI Economic Copilot** de **FULGOR IA ANALICER ECONOMIC**.\n\nPuedo ayudarte a razonar sobre economía y explicar métodos analíticos. En esta demo no hay fuentes económicas en vivo conectadas; no presentaré cifras ilustrativas como hechos verificados.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      epistemicType: 'OBSERVED_DATA'
+      epistemicType: 'MODEL_ESTIMATE'
     }
   ]);
   const [input, setInput] = useState('');
@@ -104,16 +104,16 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err: any) {
-      // Fallback response with epistemic rigor
-      const fallbackMsg: Message = {
+    } catch (err: unknown) {
+      // Never fabricate economic figures when the AI service is unavailable.
+      const errorMsg: Message = {
         id: `err-${Date.now()}`,
         role: 'assistant',
-        content: `**Diagnóstico Económico Fulgor:** Basado en la base de datos oficial y los modelos econométricos calibrados:\n\n1. **Datos Observados:** En México y EE.UU., los sectores de servicios financieros y desarrollo tecnológico muestran las mayores tasas de penetración de IA (48% y 54% respectivamente).\n2. **Inferencia Causal (DiD):** Los estudios cuasi-experimentales confirman una ganancia neta en valor agregado bruto de +14.2% en firmas manufactureras con adopción madura (p-value = 0.004).\n3. **Proyección:** El índice FAII estima una aceleración de la productividad multifactorial de +1.8% anual en escenarios base.`,
+        content: '**Copiloto no disponible en este momento.** La solicitud no pudo completarse porque el servicio de IA o su autenticación no están configurados para el acceso público. No se generó un análisis económico. Puedes seguir explorando los módulos de demostración; sus cifras no están verificadas.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         epistemicType: 'MODEL_ESTIMATE'
       };
-      setMessages((prev) => [...prev, fallbackMsg]);
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -132,7 +132,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
         role: 'assistant',
         content: 'Conversación reiniciada. ¿Qué consulta o hipótesis económica deseas analizar?',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        epistemicType: 'OBSERVED_DATA'
+        epistemicType: 'MODEL_ESTIMATE'
       }
     ]);
   };
