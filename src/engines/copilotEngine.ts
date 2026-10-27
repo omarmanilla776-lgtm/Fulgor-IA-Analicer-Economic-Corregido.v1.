@@ -63,16 +63,16 @@ export class CopilotEngine {
       const data = await response.json();
       return {
         reply: data.reply,
-        sourcesCited: data.sourcesCited || ['INEGI', 'FRED', 'Eurostat', 'OECD'],
-        epistemicLevel: data.epistemicLevel || 'Clasificación Epistémica Completa',
+        sourcesCited: Array.isArray(data.sourcesCited) ? data.sourcesCited : [],
+        epistemicLevel: data.epistemicLevel || 'No verificado — clasificación automática no disponible',
         audit: {
-          containsObservedFacts: data.reply.includes('DATO OBSERVADO') || data.reply.includes('INEGI') || data.reply.includes('FRED'),
-          containsCorrelations: data.reply.includes('CORRELACIÓN') || data.reply.includes('r ='),
-          containsModelEstimates: data.reply.includes('ESTIMACIÓN') || data.reply.includes('Modelo'),
-          containsCausalClaims: data.reply.includes('CAUSAL') || data.reply.includes('DiD'),
-          containsProjections: data.reply.includes('PRONÓSTICO') || data.reply.includes('Proyección'),
-          confidenceLevel: 'Alta',
-          epistemicDisclaimer: 'Análisis generado bajo la Regla de Oro Epistémica de Fulgor IA.'
+          containsObservedFacts: false,
+          containsCorrelations: false,
+          containsModelEstimates: false,
+          containsCausalClaims: false,
+          containsProjections: false,
+          confidenceLevel: 'No evaluada',
+          epistemicDisclaimer: 'La presencia de etiquetas o términos no verifica las fuentes ni la validez del análisis.'
         }
       };
     } catch (err: any) {
