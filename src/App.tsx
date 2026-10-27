@@ -79,7 +79,7 @@ export default function App() {
         onDisableDemoMode={() => handleToggleDemoMode()} 
       />
 
-      {/* Real-time Macro Ticker Feed */}
+      {/* Static macro ticker clearly labeled as demo values */}
       <MacroHeaderTicker />
 
       {/* Primary Global Navigation */}
