@@ -151,7 +151,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     service: 'FULGOR IA ANALICER ECONOMIC API',
     timestamp: new Date().toISOString(),
-    version: '1.0.0-PRO',
+    version: '1.0.0-DEMO',
   });
 });
 
