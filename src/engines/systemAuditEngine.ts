@@ -44,7 +44,7 @@ export class SystemAuditEngine {
       const countries = DataEngine.getCountries();
       const indicators = DataEngine.getIndicators();
       const sources = DataEngine.getSourcesCatalog();
-      const passed = countries.length >= 5 && indicators.length >= 6 && sources.length >= 5;
+      const passed = countries.length >= 5 && indicators.length >= 5 && sources.length >= 5 && sources.every(source => source.trustScore === null && source.trustScoreStatus === 'NOT_ASSESSED');
       tests.push({
         testId: 'TEST-DATA-01',
         name: 'DataEngine: catálogo estático de fuentes declaradas (no conectadas)',
