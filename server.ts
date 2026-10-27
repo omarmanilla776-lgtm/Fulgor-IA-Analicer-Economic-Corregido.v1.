@@ -68,8 +68,8 @@ DIRECTIVAS CRÍTICAS DE RIGOR CIENTÍFICO:
 4. Explica con claridad matemática pero en un tono profesional, objetivo, sobrio y analítico.`;
 
     let assistantResponseText = '';
-    let sourcesCited: string[] = ['INEGI BIE', 'Federal Reserve Bank of St. Louis (FRED)', 'OECD.AI Observatory', 'Eurostat / BCE'];
-    let epistemicLevel = 'Alta precisión con separación empírica';
+    let sourcesCited: string[] = [];
+    let epistemicLevel = 'La clasificación epistémica no verifica automáticamente las fuentes';
 
     if (ai) {
       const response = await ai.models.generateContent({
@@ -189,12 +189,12 @@ app.post('/api/digital-twin/simulate', (req, res) => {
         'Modelo basado en función de producción Cobb-Douglas expandida con spillovers de productividad digital.',
         'Se asume transmisión salarial con un retardo de 6 a 12 meses respecto a las ganancias de productividad.',
         'Coste de re-entrenamiento (upskilling) absorbido de forma mixta (50% público con incentivos fiscales, 50% privado).',
-        'Elasticidad de sustitución capital-trabajo calibrada con micro-datos de la OCDE.'
+        'Elasticidades ilustrativas; no existe calibración empírica validada en esta simulación.'
       ],
       riskFactors: [
-        { risk: 'Rigidez regulatoria o barreras de interoperabilidad', severity: friction > 40 ? 'ALTA' : 'MEDIA', probability: '35%' },
-        { risk: 'Brecha de competencias de talento especializado', severity: upskilling < 3 ? 'ALTA' : 'BAJA', probability: '42%' },
-        { risk: 'Concentración de mercado en proveedores de infraestructura tecnológica', severity: 'MEDIA', probability: '55%' }
+        { risk: 'Rigidez regulatoria o barreras de interoperabilidad', severity: friction > 40 ? 'ALTA' : 'MEDIA', probability: 'NO ESTIMADA' },
+        { risk: 'Brecha de competencias de talento especializado', severity: upskilling < 3 ? 'ALTA' : 'BAJA', probability: 'NO ESTIMADA' },
+        { risk: 'Concentración de mercado en proveedores de infraestructura tecnológica', severity: 'MEDIA', probability: 'NO ESTIMADA' }
       ]
     });
   } catch (error: any) {
@@ -301,7 +301,7 @@ app.post('/api/v1/simulate', (req, res) => {
     gdpBonusPct: Number((aiAdoptionDelta * 0.074).toFixed(2)),
     productivityLiftAnnual: Number((aiAdoptionDelta * 0.052).toFixed(2)),
     epistemicType: 'PROJECTION',
-    uncertaintyBand: '±0.45% (90% Confidence)'
+    uncertaintyBand: 'No calibrado — no interpretar como intervalo de confianza'
   });
 });
 
