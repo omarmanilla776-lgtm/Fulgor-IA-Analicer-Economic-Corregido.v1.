@@ -338,7 +338,7 @@ app.post('/api/v1/simulate', (req, res) => {
     status: 'illustrative_simulation_only',
     dataStatus: 'DEMO_MODEL_NOT_CALIBRATED',
     epistemicWarning: 'Resultados generados por fórmulas ilustrativas no calibradas con datos reales; no son pronósticos ni estimaciones económicas validadas.',
-    scenario: `Digital Twin (+${aiAdoptionDelta}% AI, +${rdIncentivePercentage}% R&D)`
+    scenario: `Digital Twin (+${aiAdoptionDelta}% AI, +${rdIncentivePercentage}% R&D)`,
     gdpBonusPct: Number((aiAdoptionDelta * 0.074).toFixed(2)),
     productivityLiftAnnual: Number((aiAdoptionDelta * 0.052).toFixed(2)),
     epistemicType: 'PROJECTION',
