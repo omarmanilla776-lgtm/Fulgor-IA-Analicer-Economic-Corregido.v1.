@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
+import { timingSafeEqual } from 'node:crypto';
 import { GoogleGenAI } from '@google/genai';
 
 dotenv.config();
@@ -236,7 +237,7 @@ app.use('/api/v1', (req, res, next) => {
   const authorization = req.headers.authorization || '';
   const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
   if (!suppliedKey || suppliedKey.length !== configuredKey.length ||
-      !require('node:crypto').timingSafeEqual(Buffer.from(suppliedKey), Buffer.from(configuredKey))) {
+      !timingSafeEqual(Buffer.from(suppliedKey), Buffer.from(configuredKey))) {
     return res.status(401).json({ error: 'Autenticación requerida.' });
   }
   next();
