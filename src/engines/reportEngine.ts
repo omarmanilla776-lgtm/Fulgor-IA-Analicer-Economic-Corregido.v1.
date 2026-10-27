@@ -79,7 +79,7 @@ export interface FullSystemAuditResult {
 export class ReportEngine {
   public static readonly PLATFORM_NAME = 'FULGOR IA ANALICER ECONOMIC';
   public static readonly VERSION = '1.0.0-PRO';
-  public static readonly COMPLIANCE_STANDARD = 'ISO/IEC 27001 • NIST AI RMF • Metrological Epistemic Standard';
+  public static readonly COMPLIANCE_STANDARD = 'Criterios internos de evaluación; no es certificación externa';
 
   /**
    * Generates standard tabular CSV export of indicators
@@ -98,6 +98,7 @@ export class ReportEngine {
   public static generateJSON(config: ReportConfig): string {
     return JSON.stringify({
       reportTitle: config.title,
+      dataStatus: 'DEMO_DATA_NOT_VERIFIED',
       generatedAt: new Date().toISOString(),
       platform: this.PLATFORM_NAME,
       version: this.VERSION,
@@ -119,7 +120,7 @@ export class ReportEngine {
   public static generateMarkdown(config: ReportConfig): string {
     return `# ${config.title}
 **Plataforma**: ${this.PLATFORM_NAME} v${this.VERSION}
-**Fecha de Emisión**: ${new Date().toLocaleDateString()}
+**Fecha de Emisión**: ${new Date().toLocaleDateString()}\n**Estado de datos**: DEMO_DATA_NOT_VERIFIED — fuentes y cifras no verificadas
 **País de Enfoque**: ${config.country.name} (${config.country.id})
 
 ---
@@ -457,6 +458,7 @@ ${config.indicators.map(ind => `- **${ind.name}** (${ind.code}): ${ind.currentVa
       module.healthScorePct = 0;
       module.integritySeal = 'NOT_INDEPENDENTLY_VERIFIED';
       module.verifiedFeatures = [];
+      module.metrics = { dataStatus: 'DEMO_DATA_NOT_VERIFIED', verificationStatus: 'NOT_INDEPENDENTLY_VERIFIED' };
     }
     for (const criterion of ruleOfGoldCriteria) {
       criterion.status = 'NON_COMPLIANT';
@@ -590,21 +592,21 @@ ${audit.testSuite.tests.map(t => `| \`${t.testId}\` | **${t.name}** | \`${t.cate
 
 ## 5. 🔒 SEGURIDAD, OBSERVABILIDAD Y PRIVACIDAD DE DATOS
 
-- **Seguridad de Credenciales**: Las claves del SDK de Google GenAI y variables sensibles operan exclusivamente en servidor. 0 secretos en bundle de cliente.
+- **Seguridad de Credenciales**: la clave FULGOR_API_KEY no debe incluirse en el frontend. Un escaneo independiente del bundle de producción sigue pendiente.
 - **Trazabilidad & Proveniencia**: la huella generada es demostrativa y no constituye una firma criptográfica ni prueba de procedencia.
 - **Privacidad y Cumplimiento**: no se ha verificado certificación ISO/IEC 27701 ni conformidad GDPR.
 - **Observabilidad Operativa**: métricas de producción y pruebas de carga pendientes.
 
 ---
 
-## 6. ✍️ FIRMA Y SELLO CRIPTOGRÁFICO DE CONFORMIDAD
+## 6. RESUMEN DE AUDITORÍA INTERNA (NO CERTIFICADO)
 
 \`\`\`
 ================================================================================
-CERTIFICADO DE SALUD DEL SISTEMA Y RIGOR METODOLÓGICO
+INFORME INTERNO DE ESTADO DEL SISTEMA (NO CERTIFICADO)
 EMISOR: FULGOR IA ANALICER ECONOMIC AUDIT ENGINE
-ESTÁNDAR: ISO/IEC 27001 • NIST AI RMF • FULGOR METHODOLOGICAL STANDARD
-HASH DE AUDITORÍA: ${audit.auditHash}
+ESTÁNDAR: criterios internos; no constituye certificación externa
+HUELLA DEMOSTRATIVA (NO CRIPTOGRÁFICA): ${audit.auditHash}
 VEREDICTO: ${audit.overallStatus} (NO CERTIFICADO)
 ================================================================================
 \`\`\`
