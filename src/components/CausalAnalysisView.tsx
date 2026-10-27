@@ -504,20 +504,20 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 {targetEngineType === 'causal' && (
                   <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Efecto Tratamiento DiD</span>
-                      <span className="text-emerald-400 text-sm font-bold">+{orchestratedResult.analyticalResult.treatmentEffect}%</span>
+                      <span className="text-slate-400 block text-[10px]">Contraste descriptivo DiD</span>
+                      <span className="text-amber-300 text-sm font-bold">{orchestratedResult.analyticalResult.treatmentEffect} (unidades de entrada)</span>
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[10px]">Estadístico t</span>
-                      <span className="text-slate-200 text-sm font-bold">{orchestratedResult.analyticalResult.tStat}</span>
+                      <span className="text-slate-200 text-sm font-bold">{orchestratedResult.analyticalResult.tStat ?? "No calculado"}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Intervalo de Confianza (95%)</span>
-                      <span className="text-slate-200 text-sm font-bold">[{orchestratedResult.analyticalResult.ciLower95}%, {orchestratedResult.analyticalResult.ciUpper95}%]</span>
+                      <span className="text-slate-400 block text-[10px]">IC 95% (no disponible)</span>
+                      <span className="text-slate-200 text-sm font-bold">{orchestratedResult.analyticalResult.ciLower95 === null || orchestratedResult.analyticalResult.ciUpper95 === null ? "No calculado" : `[${orchestratedResult.analyticalResult.ciLower95}, ${orchestratedResult.analyticalResult.ciUpper95}]`}</span>
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[10px]">Tendencias Paralelas</span>
-                      <span className="text-emerald-400 text-sm font-bold">{orchestratedResult.analyticalResult.parallelTrendsVerified ? 'VERIFICADAS' : 'FALLIDAS'}</span>
+                      <span className="text-amber-300 text-sm font-bold">{orchestratedResult.analyticalResult.parallelTrendsVerified ? 'VERIFICADAS' : 'NO VERIFICADAS'}</span>
                     </div>
                   </div>
                 )}
