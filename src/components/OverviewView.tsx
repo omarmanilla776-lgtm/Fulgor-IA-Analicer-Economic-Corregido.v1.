@@ -7,6 +7,7 @@ import {
 } from '../types/economic';
 import { EpistemicBadge } from './EpistemicBadge';
 import { ProvenanceCard } from './ProvenanceCard';
+import { LiveEconomicData } from './LiveEconomicData';
 import { PROVENANCE_REGISTRY } from '../data/economicData';
 import { 
   ResponsiveContainer, 
@@ -83,6 +84,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
   return (
     <div className="space-y-6">
+      <LiveEconomicData />
       
       {/* Top Banner: Epistemic & Methodological Principle */}
       <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
