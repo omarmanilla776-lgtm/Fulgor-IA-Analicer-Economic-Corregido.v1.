@@ -72,7 +72,7 @@ export class ProvenanceEngine {
   }
 
   public static generateCitationString(provenance: DataSourceProvenance): string {
-    return `${provenance.sourceName} (${provenance.agency}). "${provenance.datasetName}". Corte: ${provenance.cutoffDate}. Frecuencia: ${provenance.frequency}. Unidad: ${provenance.unit}. Confianza: ${provenance.confidenceScore}%.`;
+    return `${provenance.sourceName} (${provenance.agency}). "${provenance.datasetName}". Corte: ${provenance.cutoffDate}. Frecuencia: ${provenance.frequency}. Unidad: ${provenance.unit}. Confianza declarada (no verificada): ${provenance.confidenceScore}%.`;
   }
 
   /**
