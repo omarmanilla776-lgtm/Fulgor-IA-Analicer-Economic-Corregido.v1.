@@ -23,6 +23,7 @@ Esta rama contiene una versión de trabajo de la interfaz y un servidor API en d
 ## Requisitos para ejecución local
 - Node.js 22 recomendado
 - npm
+- El servidor respeta `PORT` cuando lo define el alojamiento. Configure `TRUST_PROXY=1` solo si el servicio está detrás de un proxy inverso confiable y la topología del alojamiento está documentada.
 
 ```bash
 npm install
