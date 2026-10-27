@@ -68,7 +68,8 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
             country: currentCountry,
             indicators: primaryIndicators,
             sectors: sectors,
-            epistemicCompliance: "ISO-like Fulgor Methodological Standard verified (Rule of Gold)"
+            dataStatus: "DEMO_DATA_NOT_VERIFIED",
+            epistemicCompliance: "No verificado; no constituye certificación ni validación de fuentes"
           }, null, 2));
           const downloadAnchor = document.createElement('a');
           downloadAnchor.setAttribute("href", dataStr);
@@ -79,7 +80,7 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
         } else if (reportFormat === 'csv') {
           const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,OfficialSource\n";
           const rows = primaryIndicators.map(i => 
-            `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}"`
+            `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","DEMO_DATA_NOT_VERIFIED"`
           ).join("\n");
           const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);
           const downloadAnchor = document.createElement('a');
