@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EconomicIndicator, CountryEconomicProfile } from '../types/economic';
 import { EpistemicBadge } from './EpistemicBadge';
 import { ProvenanceCard } from './ProvenanceCard';
+import { LiveEconomicData } from './LiveEconomicData';
 import { 
   ResponsiveContainer, 
   LineChart, 
@@ -74,6 +75,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
 
   return (
     <div className="space-y-6">
+      <LiveEconomicData />
       
       {/* Header with Search and Category Pills */}
       <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-4">
@@ -84,7 +86,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
               Explorador de indicadores macroeconómicos (demo)
             </h2>
             <p className="text-xs text-slate-400">
-              Catálogo estático con fuentes declaradas. No hay conexiones en vivo ni auditoría independiente de cifras.
+              El catálogo inferior contiene valores de demostración y no se actualiza con el panel World Bank mostrado arriba.
             </p>
           </div>
 
