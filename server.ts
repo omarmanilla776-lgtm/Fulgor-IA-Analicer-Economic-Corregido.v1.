@@ -273,8 +273,8 @@ app.post('/api/causal/did-analysis', (req, res) => {
 app.use('/api/v1', (req, res, next) => {
   if (req.path === '/health') return next();
   const configuredKey = process.env.FULGOR_API_KEY;
-  if (!configuredKey) {
-    return res.status(503).json({ error: 'API protegida no disponible: configura FULGOR_API_KEY en el servidor.' });
+  if (!configuredKey || configuredKey.length < 32) {
+    return res.status(503).json({ error: 'API protegida no disponible: configura un FULGOR_API_KEY de al menos 32 caracteres en el servidor.' });
   }
   const authorization = req.headers.authorization || '';
   const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
