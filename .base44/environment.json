@@ -1,0 +1,17 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/api/health",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "GEMINI_API_KEY",
+      "description": "Google Gemini API key (Google AI Studio -> API keys). Needed by the Copilot analysis endpoint POST /api/copilot/chat. Optional to boot: without it the server answers with an explicit 'no verified data' message instead of generated figures.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "FULGOR_API_KEY",
+      "description": "Server-side bearer secret of at least 32 characters (any strong random value). Unlocks the protected /api/v1/* and legacy /api/* endpoints. Optional to boot: without it those endpoints answer 503. Never expose this value to browser code.",
+      "requiredAtBoot": false
+    }
+  ]
+}
