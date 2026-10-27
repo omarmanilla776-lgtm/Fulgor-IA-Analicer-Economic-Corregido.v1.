@@ -112,7 +112,7 @@ export class EconomicIntelligenceOrchestrator {
             confidenceScore: did.parallelTrendsVerified ? 96.5 : 65.0,
             isOfficial: true,
             sampleSize: `N=${did.sampleSizeN}`,
-            standardError: did.standardError
+            standardError: did.standardError ?? undefined
           });
 
           if (!did.parallelTrendsVerified) {
