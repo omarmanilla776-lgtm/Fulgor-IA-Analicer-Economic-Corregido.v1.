@@ -15,8 +15,8 @@ export interface DiDCalculationResult {
   treatmentEffect: number; // Beta_3
   standardError: number;
   tStat: number;
-  pValue: number;
-  ciLower95: number;
+  pValue: number | null;
+  ciLower95: number | null;
   ciUpper95: number;
   parallelTrendsFTestPValue: number | null;
   parallelTrendsVerified: boolean;
@@ -39,7 +39,7 @@ export class EconometricEngine {
         spearmanRho: 0,
         standardError: 0,
         tStatistic: 0,
-        pValue: 1,
+        pValue: null,
         sampleSize: n,
         isStatisticallySignificant: false
       };
@@ -128,9 +128,10 @@ export class EconometricEngine {
 
     const tStat = treatmentEffect / se;
     // No raw panel data or validated variance estimator is available here; inferential p-value is not established.
-    const pValue = 1;
-    const ciLower = Number((treatmentEffect - 1.96 * se).toFixed(2));
-    const ciUpper = Number((treatmentEffect + 1.96 * se).toFixed(2));
+    const pValue = null;
+    // A valid confidence interval needs a validated standard-error estimator and sampling assumptions.
+    const ciLower = null;
+    const ciUpper = null;
 
     // Parallel trends cannot be tested from four group means alone.
     const parallelTrendsPValue = null;
