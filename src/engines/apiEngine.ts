@@ -10,14 +10,13 @@ export interface ApiEndpointDoc {
 }
 
 export class ApiEngine {
-  private static apiKey: string = 'flg_live_99a84b3e02f1889c09d_prod';
-
+  // API credentials must be configured and validated server-side; never embed them in the client.
   public static getApiKey(): string {
-    return this.apiKey;
+    return '';
   }
 
-  public static setApiKey(key: string): void {
-    this.apiKey = key;
+  public static setApiKey(_key: string): void {
+    // Intentionally no-op: client-side API key storage is not supported.
   }
 
   public static getEndpointsCatalog(): ApiEndpointDoc[] {
@@ -96,8 +95,8 @@ export class ApiEngine {
         sampleResponse: {
           treatmentEffect: 21.4,
           tStatistic: 7.75,
-          pValue: 0.001,
-          isStatisticallySignificant: true
+          pValue: null,
+          isStatisticallySignificant: false
         }
       },
       {
