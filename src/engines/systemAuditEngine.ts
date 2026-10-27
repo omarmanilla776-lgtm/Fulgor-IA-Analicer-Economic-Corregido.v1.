@@ -405,7 +405,7 @@ export class SystemAuditEngine {
       documentationStatus: 'PUBLICADO — Metodología matemática interactiva, fórmulas formales, supuestos de identificación y catálogo de fuentes verificable.',
       releaseBlockers: allPassed ? [] : ['Validar fuentes y fechas de datos', 'Implementar inferencia estadística y causal reproducible', 'Ejecutar pruebas de seguridad y build', 'Configurar autenticación de API y secretos en servidor', 'Conectar observabilidad real antes de publicar'],
       executiveSummary: allPassed 
-        ? 'La plataforma está 100% LISTA PARA PUBLICACIÓN.'
+        ? 'La plataforma no está certificada para publicación; las pruebas pendientes deben completarse y documentarse.'
         : 'Se han detectado inconsistencias en uno o más Gates de validación. Revise los detalles técnicos antes de proceder.'
     };
 
