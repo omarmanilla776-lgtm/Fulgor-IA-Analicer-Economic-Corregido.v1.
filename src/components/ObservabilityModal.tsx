@@ -263,17 +263,17 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
           {/* TAB 2: AUDIT GATES (G1 to G7) */}
           {activeSubTab === 'audit-gates' && auditResult && (
             <div className="space-y-4">
-              <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between">
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between">
                 <div>
-                  <h4 className="text-emerald-300 font-bold text-sm flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    CERTIFICADO DE RIGOR METODOLÓGICO — {auditResult.report.overallStatus}
+                  <h4 className="text-amber-300 font-bold text-sm flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-400" />
+                    DICTAMEN DE AUDITORÍA INTERNA — {auditResult.report.overallStatus}
                   </h4>
                   <p className="text-xs text-slate-300 mt-1">{auditResult.report.executiveSummary}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-xl font-black text-emerald-400 font-mono">7 / 7</span>
-                  <p className="text-[10px] text-slate-400">Compuertas Superadas</p>
+                  <span className="text-xl font-black text-amber-300 font-mono">{auditResult.gates.filter((gate) => gate.status === 'PASSED').length} / {auditResult.gates.length}</span>
+                  <p className="text-[10px] text-slate-400">Compuertas superadas (sin certificación externa)</p>
                 </div>
               </div>
 
@@ -285,7 +285,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
                         <span className="font-mono text-xs font-bold text-amber-400">{gate.gateId}</span>
                         <span className="text-xs font-bold text-slate-100">{gate.name}</span>
                       </div>
-                      <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded">
+                      <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-500/10 text-amber-200 border border-amber-500/30 rounded">
                         {gate.status}
                       </span>
                     </div>
