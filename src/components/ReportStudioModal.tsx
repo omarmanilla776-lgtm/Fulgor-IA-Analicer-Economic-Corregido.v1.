@@ -48,12 +48,25 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
           document.body.appendChild(downloadAnchor);
           downloadAnchor.click();
           downloadAnchor.remove();
-        } else if (reportFormat === 'markdown' || reportFormat === 'csv') {
+        } else if (reportFormat === 'markdown') {
           const mdContent = ReportEngine.generateSystemHealthReport('markdown');
           const dataStr = "data:text/markdown;charset=utf-8," + encodeURIComponent(mdContent);
           const downloadAnchor = document.createElement('a');
           downloadAnchor.setAttribute("href", dataStr);
           downloadAnchor.setAttribute("download", `fulgor-system-health-report-${Date.now()}.md`);
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          downloadAnchor.remove();
+        } else if (reportFormat === 'csv') {
+          const escapeCsv = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+          const header = ['RecordType', 'ID', 'Name', 'Status', 'Details', 'DataStatus'];
+          const gateRows = auditPreview.releaseGates.map(gate => ['release_gate', gate.gateId, gate.name, gate.status, gate.details, 'DEMO_DATA_NOT_VERIFIED']);
+          const testRows = auditPreview.testSuite.tests.map(test => ['test', test.testId, test.name, test.passed ? 'PASS' : 'FAIL', test.details, 'DEMO_DATA_NOT_VERIFIED']);
+          const csvContent = [header, ...gateRows, ...testRows].map(row => row.map(escapeCsv).join(',')).join('\\n');
+          const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.setAttribute("href", dataStr);
+          downloadAnchor.setAttribute("download", `fulgor-system-health-report-${Date.now()}.csv`);
           document.body.appendChild(downloadAnchor);
           downloadAnchor.click();
           downloadAnchor.remove();
