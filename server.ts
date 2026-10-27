@@ -85,23 +85,10 @@ ${prompt}`,
       });
       assistantResponseText = response.text || 'Sin respuesta del modelo.';
     } else {
-      // Fallback analytical response when offline or key unavailable
-      assistantResponseText = `### [ANÁLISIS MACROECONÓMICO FULGOR IA]
-**Contexto seleccionado**: ${contextCountry || 'Global'} | **Sector**: ${activeSector || 'Multisectorial'}
-
-1. **[DATO OBSERVADO]**:
-   - En economías avanzadas (EE.UU., Alemania), la adopción empresarial de soluciones de IA generativa alcanzó entre el 41% y el 54% hacia 2025-2026 (Fuente: OCDE.AI Observatory, Banco de la Reserva Federal de St. Louis).
-   - En América Latina (México, Brasil, Chile), la penetración se concentra en servicios financieros, centros de contacto y manufactura avanzada (23% - 28% de firmas medianas/grandes, Fuente: INEGI / CEPAL).
-
-2. **[CORRELACIÓN ESTADÍSTICA (r = 0.68, p < 0.01)]**:
-   - Existe una correlación positiva moderada-alta entre inversión en capital tecnológico digital y el crecimiento del Valor Agregado Bruto (VAB) por hora trabajada. *Nota metodológica: Esta correlación no demuestra que la tecnología sea la única causa motriz, dado que firmas más productivas tienen mayor capacidad financiera de adopción previa.*
-
-3. **[INFERENCIA CAUSAL (Difference-in-Differences / Cuasi-experimental)]**:
-   - Estudios controlados con grupo de comparación sintético muestran un incremento causal neto de entre +17.8% y +24.5% en la velocidad de ejecución de tareas cognitivas repetitivas (código, atención al cliente, documentación).
-
-4. **[PRONÓSTICO PROBABILÍSTICO (Horizonte 2026-2028)]**:
-   - **Escenario Base**: Aumento anual del 0.4% al 0.7% en la Productividad Total de los Factores (PTF) en sectores de alta intensidad digital.
-   - **Riesgos**: Fricciones temporales de recualificación laboral y cuellos de botella energéticos en infraestructura de centros de datos.`;
+      // Fail closed epistemically: no fabricated statistics when the AI provider is unavailable.
+      assistantResponseText = '### MODO SIN DATOS VERIFICADOS\n\nEl servicio de análisis no está configurado. No se generaron cifras, correlaciones, efectos causales ni pronósticos. Configura GEMINI_API_KEY o proporciona datos verificables para continuar.';
+      sourcesCited = [];
+      epistemicLevel = 'No verificado — proveedor no disponible';
     }
 
     res.json({
@@ -114,7 +101,7 @@ ${prompt}`,
     console.error('Error in /api/copilot/chat:', error);
     res.status(500).json({
       error: 'Error al procesar el análisis económico en el Copilot.',
-      details: error.message || String(error),
+      details: 'Revisa los registros del servidor; no se exponen detalles internos al cliente.',
     });
   }
 });
@@ -240,6 +227,21 @@ app.post('/api/causal/did-analysis', (req, res) => {
 // VERSIONED API (v1 / v2) - Enterprise REST
 // ==========================================
 
+app.use('/api/v1', (req, res, next) => {
+  if (req.path === '/health') return next();
+  const configuredKey = process.env.FULGOR_API_KEY;
+  if (!configuredKey) {
+    return res.status(503).json({ error: 'API protegida no disponible: configura FULGOR_API_KEY en el servidor.' });
+  }
+  const authorization = req.headers.authorization || '';
+  const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  if (!suppliedKey || suppliedKey.length !== configuredKey.length ||
+      !require('node:crypto').timingSafeEqual(Buffer.from(suppliedKey), Buffer.from(configuredKey))) {
+    return res.status(401).json({ error: 'Autenticación requerida.' });
+  }
+  next();
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -258,11 +260,12 @@ app.get('/api/v1/indicators', (req, res) => {
   
   res.json({
     version: 'v1',
-    epistemicStandard: 'Rule of Gold - ISO Provenance Verified',
+    epistemicStandard: 'Rule of Gold — provenance not yet independently verified',
+    dataStatus: 'DEMO_DATA_NOT_VERIFIED',
     count: 12,
     timestamp: new Date().toISOString(),
     indicators: [
-      { code: 'MX_GDP_Q', name: 'PIB Trimestral México', country: 'México', value: 2.1, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'INEGI' },
+      { code: 'MX_GDP_Q', name: 'PIB Trimestral México', country: 'México', value: 2.1, unit: '% YoY', epistemicType: 'MODEL_ESTIMATE', source: 'INEGI' },
       { code: 'MX_CPI_YOY', name: 'Inflación General Anual INPC', country: 'México', value: 4.42, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'INEGI / Banxico' },
       { code: 'US_GDP_Q', name: 'US Real GDP Growth Rate', country: 'Estados Unidos', value: 2.8, unit: '% Annualized', epistemicType: 'OBSERVED_DATA', source: 'BEA / FRED' },
       { code: 'US_CPI_CORE', name: 'US Core CPI', country: 'Estados Unidos', value: 3.1, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'BLS / FRED' },
@@ -334,8 +337,9 @@ app.post('/api/v1/correlation', (req, res) => {
       rSquared: Number(rSquared.toFixed(4)),
       pearsonR: Number(pearsonR.toFixed(3)),
       sampleSize: n,
-      pValue: 0.001,
-      isStatisticallySignificant: true,
+      pValue: null,
+      isStatisticallySignificant: false,
+      inferenceStatus: 'DESCRIPTIVE_ONLY — p-value not calculated',
       ruleOfGoldCaveat: 'Correlación no implica causalidad.'
     });
   } catch (err: any) {
@@ -348,7 +352,7 @@ app.post('/api/v1/did', (req, res) => {
     const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2, se = 2.45 } = req.body;
     const effect = (postTreat - preTreat) - (postControl - preControl);
     const tStat = effect / se;
-    const pValue = Math.abs(tStat) > 2.58 ? 0.01 : (Math.abs(tStat) > 1.96 ? 0.05 : 0.12);
+    const pValue = null;
     
     res.json({
       version: 'v1',
@@ -358,8 +362,9 @@ app.post('/api/v1/did', (req, res) => {
       confidenceInterval95: [Number((effect - 1.96 * se).toFixed(2)), Number((effect + 1.96 * se).toFixed(2))],
       tStatistic: Number(tStat.toFixed(2)),
       pValue,
-      parallelTrendsVerified: true,
-      parallelTrendsPValue: 0.42,
+      parallelTrendsVerified: false,
+      parallelTrendsPValue: null,
+      inferenceStatus: 'EXPLORATORY_ONLY — parallel trends not tested',
       isStatisticallySignificant: pValue <= 0.05
     });
   } catch (err: any) {
@@ -413,20 +418,20 @@ app.get('/api/v1/system-audit', (req, res) => {
   res.json({
     status: 'ok',
     version: 'v1.0.0-PRO',
-    auditResult: 'READY FOR RELEASE',
-    gatesPassed: '7/7 (G1 a G7 Superados)',
+    auditResult: 'NOT READY FOR RELEASE',
+    gatesPassed: 'No verificado — auditoría automatizada y evidencia externa pendientes',
     timestamp: new Date().toISOString(),
     ruleOfGoldActive: true,
-    epistemicChecks: '100% Enforced'
+    epistemicChecks: 'No verificado en ejecución; requiere pruebas independientes'
   });
 });
 
 
 app.get('/api/v1/observability', (req, res) => {
   res.json({
-    status: 'HEALTHY',
-    uptimeSeconds: Math.floor(process.uptime()) + 7420,
-    apiLatencyMs: 38,
+    status: 'DEGRADED',
+    uptimeSeconds: Math.floor(process.uptime()),
+    apiLatencyMs: null,
     memoryUsageMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
     activeConnections: 148,
     errorRate: '0.02%',
