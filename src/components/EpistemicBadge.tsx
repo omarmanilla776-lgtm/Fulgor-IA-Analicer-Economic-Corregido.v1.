@@ -17,6 +17,15 @@ export const EPISTEMIC_CONFIG: Record<EpistemicType, {
   borderClass: string;
   icon: React.ReactNode;
 }> = {
+  DEMO_DATA: {
+    label: 'DATO ILUSTRATIVO DE DEMOSTRACIÓN',
+    shortLabel: 'DEMO',
+    description: 'Valor estático de demostración; no procede de una observación económica verificada.',
+    colorClass: 'text-amber-300',
+    bgClass: 'bg-amber-950/40',
+    borderClass: 'border-amber-500/40',
+    icon: <Info className="w-3.5 h-3.5 text-amber-300" />
+  },
   OBSERVED_DATA: {
     label: 'DATO DECLARADO OBSERVADO (NO VERIFICADO)',
     shortLabel: 'NO VERIFICADO',
@@ -69,7 +78,7 @@ export const EpistemicBadge: React.FC<EpistemicBadgeProps> = ({
   size = 'md',
   showDetail = false 
 }) => {
-  const config = EPISTEMIC_CONFIG[type] || EPISTEMIC_CONFIG.OBSERVED_DATA;
+  const config = EPISTEMIC_CONFIG[type] || EPISTEMIC_CONFIG.DEMO_DATA;
 
   const sizeClasses = {
     sm: 'text-[10px] px-2 py-0.5 gap-1',
