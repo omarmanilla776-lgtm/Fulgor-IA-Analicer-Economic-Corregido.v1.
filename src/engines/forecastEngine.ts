@@ -27,7 +27,7 @@ export class ForecastEngine {
     const points: FanChartBandPoint[] = [];
     let currentVal = baseValue;
 
-    // Past 4 quarters (Observed historical)
+    // Past-period illustration derived from the supplied base value; not observed historical data.
     for (let q = -4; q < 0; q++) {
       const histVal = baseValue * (1 + historicalGrowth * (q / 4));
       points.push({
@@ -37,11 +37,11 @@ export class ForecastEngine {
         p50: Number(histVal.toFixed(2)),
         p70: Number(histVal.toFixed(2)),
         p90: Number(histVal.toFixed(2)),
-        observed: true,
+        observed: false,
       });
     }
 
-    // Future Quarters (Probabilistic Forecast with widening confidence fan)
+    // Future-period illustration with widening spread; not a calibrated probabilistic forecast.
     for (let q = 0; q <= horizonQuarters; q++) {
       currentVal *= (1 + historicalGrowth / 4);
       const uncertaintySpread = Math.sqrt(q + 1) * volatilitySigma * currentVal;
