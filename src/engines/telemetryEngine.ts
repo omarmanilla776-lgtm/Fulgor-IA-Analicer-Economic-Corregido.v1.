@@ -22,8 +22,9 @@ export class TelemetryEngine {
       totalCostSavingsUSD: totalSavings,
       averageProductivityLiftPct: Number(avgLift.toFixed(1)),
       totalTasksProcessed: totalTasks,
-      anonymizedDeployments: 41100,
-      complianceStandard: 'ISO/IEC 27701 & GDPR Anonymized Aggregate Analytics'
+      anonymizedDeployments: null,
+      dataStatus: 'DEMO_ESTIMATES_NOT_VERIFIED',
+      complianceStandard: 'No se ha verificado una certificación ISO/IEC 27701 ni una auditoría GDPR en tiempo de ejecución'
     };
   }
 }
