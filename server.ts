@@ -278,8 +278,9 @@ app.use('/api/v1', (req, res, next) => {
   }
   const authorization = req.headers.authorization || '';
   const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-  if (!suppliedKey || suppliedKey.length !== configuredKey.length ||
-      !timingSafeEqual(Buffer.from(suppliedKey), Buffer.from(configuredKey))) {
+  const supplied = Buffer.from(suppliedKey);
+  const expected = Buffer.from(configuredKey);
+  if (!suppliedKey || supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
     return res.status(401).json({ error: 'Autenticación requerida.' });
   }
   next();
