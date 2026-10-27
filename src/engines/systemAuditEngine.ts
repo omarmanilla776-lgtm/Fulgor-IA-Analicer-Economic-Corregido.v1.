@@ -126,11 +126,11 @@ export class SystemAuditEngine {
       const passed = sim.yearlyTrajectory.length === 5 && sim.summary.gdpExtraGrowthCumulative > 0 && sim.uncertaintyScore >= 0 && sim.uncertaintyScore <= 100;
       tests.push({
         testId: 'TEST-TWIN-05',
-        name: 'DigitalTwinEngine: Simulación Cobb-Douglas y Crecimiento Estructural del PIB',
+        name: 'DigitalTwinEngine: ejecución aritmética de escenario ilustrativo no calibrado',
         category: 'UNIT',
         passed,
         durationMs: 2.1,
-        details: `PIB extra proyectado: +${sim.summary.gdpExtraGrowthCumulative}%, Score incertidumbre: ${sim.uncertaintyScore}/100.`
+        details: `Resultado ilustrativo: +${sim.summary.gdpExtraGrowthCumulative}%; no es una proyección validada ni un score empírico de incertidumbre.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-TWIN-05', name: 'DigitalTwinEngine', category: 'UNIT', passed: false, durationMs: 1.5, details: e.message });
@@ -144,11 +144,11 @@ export class SystemAuditEngine {
       const passed = fan.length === 13 && allMonotonic && risks.length >= 4;
       tests.push({
         testId: 'TEST-FCST-06',
-        name: 'ForecastEngine: Conos Probabilísticos Fan Chart (P10 ≤ P50 ≤ P90)',
+        name: 'ForecastEngine: orden de bandas de escenario ilustrativo',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.8,
-        details: `Generados ${fan.length} periodos con orden estocástico estricto y ${risks.length} factores de riesgo.`
+        details: `Generados ${fan.length} periodos ilustrativos con bandas ordenadas y ${risks.length} factores de riesgo no calibrados.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-FCST-06', name: 'ForecastEngine', category: 'STATISTICAL', passed: false, durationMs: 1.2, details: e.message });
@@ -161,7 +161,7 @@ export class SystemAuditEngine {
       const passed = !normal.isAnomaly && critical.isAnomaly && critical.severity === 'CRITICAL';
       tests.push({
         testId: 'TEST-ANOM-07',
-        name: 'AnomalyEngine: Detección Z-Score y Gradación de Severidad',
+        name: 'AnomalyEngine: cálculo Z-Score con entradas de prueba sintéticas',
         category: 'UNIT',
         passed,
         durationMs: 0.9,
