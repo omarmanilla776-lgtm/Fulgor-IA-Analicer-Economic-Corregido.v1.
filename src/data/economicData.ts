@@ -249,7 +249,7 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     previousValue: 2.1,
     changeYoy: 0.2,
     unit: '% YoY',
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     provenance: PROVENANCE_REGISTRY.INEGI_BIE,
     notes: 'Datos ajustados por estacionalidad. Se observa impulso en nearshoring y manufactura avanzada.',
     historical: [
@@ -302,7 +302,7 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     previousValue: 4.52,
     changeYoy: -0.24,
     unit: '% Anual',
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     provenance: PROVENANCE_REGISTRY.INEGI_BIE,
     notes: 'Desaceleración paulatina en mercancías; presiones persistentes en el sector servicios.',
     historical: [
@@ -390,7 +390,7 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     previousValue: 2.3,
     changeYoy: 0.5,
     unit: '% Crecimiento Anual',
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     provenance: PROVENANCE_REGISTRY.BEA_FRED,
     notes: 'Fuerte aceleración atribuible a automatización de tareas cognitivas y optimización logística.',
     historical: [
@@ -412,7 +412,7 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     previousValue: 5.25,
     changeYoy: -0.50,
     unit: '% Tasa Objetivo',
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     provenance: PROVENANCE_REGISTRY.BEA_FRED,
     notes: 'Ciclo de normalización monetaria gradual tras convergencia inflacionaria.',
     historical: [
@@ -840,7 +840,7 @@ export const INITIAL_ECONOMIC_ALERTS: EconomicAlert[] = [
     impactArea: 'Crecimiento',
     urgencyLevel: 'Monitoreo 24h',
     confidenceScore: 0,
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     observedDelta: '+4.2% QoQ vs media histórica +1.1%',
     historicalAnomalyZScore: 3.42,
     suggestedAction: 'Verificar si el aumento refleja gains de eficiencia genuinos o sub-registro de horas remotas mediante el modelo de control econométrico.'
@@ -858,7 +858,7 @@ export const INITIAL_ECONOMIC_ALERTS: EconomicAlert[] = [
     impactArea: 'Adopción IA',
     urgencyLevel: 'Tendencia Semanal',
     confidenceScore: 0,
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     observedDelta: '+38.5% YoY en subsector 5182 (Procesamiento de datos)',
     historicalAnomalyZScore: 2.85,
     suggestedAction: 'Incorporar la nueva capacidad de cómputo en el Gemelo Digital Económico de México para proyectar el multiplicador de empleo calificado.'
@@ -894,7 +894,7 @@ export const INITIAL_ECONOMIC_ALERTS: EconomicAlert[] = [
     impactArea: 'Productividad',
     urgencyLevel: 'Monitoreo 24h',
     confidenceScore: 0,
-    epistemicType: 'OBSERVED_DATA',
+    epistemicType: 'DEMO_DATA',
     observedDelta: '+6.8% YoY en VAB sectorial',
     historicalAnomalyZScore: 1.95,
     suggestedAction: 'Evaluar sostenibilidad del margen frente a incrementos en costes energéticos.'
