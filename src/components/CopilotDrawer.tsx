@@ -32,7 +32,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
       role: 'assistant',
       content: `Hola. Soy el **AI Economic Copilot** de **FULGOR IA ANALICER ECONOMIC**.\n\nPuedo ayudarte a razonar sobre economía y explicar métodos analíticos. En esta demo no hay fuentes económicas en vivo conectadas; no presentaré cifras ilustrativas como hechos verificados.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      epistemicType: 'MODEL_ESTIMATE'
+      epistemicType: 'DEMO_DATA'
     }
   ]);
   const [input, setInput] = useState('');
@@ -111,7 +111,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
         role: 'assistant',
         content: '**Copiloto no disponible en este momento.** La solicitud no pudo completarse porque el servicio de IA o su autenticación no están configurados para el acceso público. No se generó un análisis económico. Puedes seguir explorando los módulos de demostración; sus cifras no están verificadas.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        epistemicType: 'MODEL_ESTIMATE'
+        epistemicType: 'DEMO_DATA'
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
@@ -132,7 +132,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
         role: 'assistant',
         content: 'Conversación reiniciada. ¿Qué consulta o hipótesis económica deseas analizar?',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        epistemicType: 'MODEL_ESTIMATE'
+        epistemicType: 'DEMO_DATA'
       }
     ]);
   };
