@@ -40,7 +40,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
       if (res.ok) {
         const data = await res.json();
         setMetrics({
-          serverStatus: data.status === 'ok' ? 'DEGRADED' : 'DEGRADED',
+          serverStatus: 'DEGRADED',
           uptimeSeconds: Number.isFinite(data.uptimeSeconds) ? data.uptimeSeconds : 0,
           apiLatencyMs: Number.isFinite(data.apiLatencyMs) ? data.apiLatencyMs : 0,
           memoryUsageMb: Number.isFinite(data.memoryUsageMb) ? data.memoryUsageMb : 0,
