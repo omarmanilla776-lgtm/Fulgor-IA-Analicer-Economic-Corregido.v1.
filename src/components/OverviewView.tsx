@@ -247,10 +247,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <span className="text-xs font-semibold text-slate-200">
-                  Tasa de Adopción Empresarial de IA (%) vs Crecimiento PIB (%)
+                  Puntos sintéticos de adopción IA vs. crecimiento del PIB
                 </span>
                 <span className="text-[11px] text-amber-400 block font-mono">
-                  Coeficiente de Correlación de Pearson: r = +0.64 (p-value = 0.012)
+                  Coeficiente y p-value: no disponibles; no calculados con una muestra verificada
                 </span>
               </div>
               <EpistemicBadge type="CORRELATION" size="sm" showDetail />
@@ -268,13 +268,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
                     formatter={(val: any, name: string) => [`${val}`, name]}
                   />
-                  <Scatter name="Economías Analizadas" data={scatterData} fill="#f59e0b" shape="circle" />
+                  <Scatter name="Puntos de demostración" data={scatterData} fill="#f59e0b" shape="circle" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
 
             <div className="p-3 bg-amber-950/20 border border-amber-500/30 rounded-lg text-xs text-amber-200/90 leading-relaxed">
-              <strong>Advertencia Epistemológica Fulgor IA:</strong> Aunque se observa una asociación positiva (r = 0.64), esto <em>NO</em> implica que la adopción de IA sea la causa directa exclusiva del crecimiento macroeconómico general. Las economías con mayores rentas per cápita cuentan con mayor capital disponible para invertir en I+D. Para una inferencia causal rigurosa con grupos de control, consulta el <strong>Módulo de Inferencia Causal (DiD)</strong>.
+              <strong>Advertencia Epistemológica Fulgor IA:</strong> Los puntos de esta gráfica son demostrativos, no observaciones económicas verificadas. No se reporta correlación ni significancia estadística. Para estimar una asociación real se requieren series compatibles, fuente, periodo y método reproducible; una correlación tampoco demuestra causalidad.
             </div>
           </div>
         )}
