@@ -53,12 +53,12 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Bell className="w-4 h-4 text-rose-400" /> SISTEMA DE ALERTAS TEMPRANAS & ANOMALÍAS ECONÓMICAS
+              <Bell className="w-4 h-4 text-rose-400" /> ALERTAS DE DEMOSTRACIÓN — SIN FEED EN VIVO
             </span>
             <EpistemicBadge type="OBSERVED_DATA" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Detección de Desviaciones Estadísticas & Puntos Críticos de Fricción
+            Ejemplos de alertas económicas (no son alertas actuales verificadas)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
             Algoritmos continuos de detección de outliers (Z-Score &gt; 2.0σ) en variables de inversión, costos energéticos, desacoplamiento salarios-productividad y cuellos de botella tecnológicos.
@@ -112,7 +112,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
         {/* Left Column: Alert List */}
         <div className="lg:col-span-5 space-y-3">
           <div className="text-xs font-semibold text-slate-400 flex items-center justify-between">
-            <span>Alertas Activas Detectadas ({filteredAlerts.length})</span>
+            <span>Ejemplos de alertas ({filteredAlerts.length}); no monitorizan datos en vivo</span>
             <span className="text-[10px] text-slate-500 font-mono">Motor Heurístico Z-Score</span>
           </div>
 
