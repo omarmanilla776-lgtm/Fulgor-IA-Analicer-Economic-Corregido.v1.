@@ -151,9 +151,12 @@ export class EconometricEngine {
     postTreatMean: number,
     preControlMean: number,
     postControlMean: number,
-    se: number = 2.45,
-    sampleSize: number = 420
+    _legacyStandardError?: number,
+    _legacySampleSize?: number
   ): DiDCalculationResult {
+    if ([preTreatMean, postTreatMean, preControlMean, postControlMean].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      throw new RangeError('DiD requiere cuatro medias de grupo finitas.');
+    }
     const diffTreat = postTreatMean - preTreatMean;
     const diffControl = postControlMean - preControlMean;
     const treatmentEffect = diffTreat - diffControl;
