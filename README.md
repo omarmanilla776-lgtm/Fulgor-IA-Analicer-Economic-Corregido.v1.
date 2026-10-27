@@ -14,7 +14,7 @@ Esta rama contiene una versión de trabajo de la interfaz y un servidor API en d
 - Los conjuntos de datos, indicadores, rankings, parámetros y escenarios incluidos en el código pueden ser valores ilustrativos. No son prueba de una conexión a INEGI, FRED, Eurostat, OCDE, FMI u otra fuente.
 - La ficha de una fuente y su enlace no acreditan que se haya descargado, validado o actualizado una serie.
 - La inferencia causal, los intervalos, los pronósticos y las simulaciones requieren validación metodológica independiente y datos adecuados; no deben tratarse como resultados empíricos certificados.
-- Los endpoints heredados `/api/copilot/chat`, `/api/digital-twin/simulate` y `/api/causal/did-analysis` no forman parte de la protección Bearer de `/api/v1/*`. Antes de alojar el servidor públicamente se debe decidir y probar una estrategia de autenticación, control de abuso y límites de consumo para ellos.
+- Los endpoints heredados `/api/copilot/chat`, `/api/digital-twin/simulate` y `/api/causal/did-analysis` también exigen el Bearer `FULGOR_API_KEY` en el servidor. El frontend público no debe incluir ese secreto; se necesita una sesión confiable o proxy del lado servidor para habilitar estas funciones sin exponer la clave. Antes de alojar el servidor públicamente deben probarse autenticación, control de abuso y límites de consumo.
 - La configuración de secretos, el alojamiento, la privacidad, la observabilidad operativa y las pruebas de seguridad de despliegue siguen pendientes.
 - Stripe/Mercado Pago y la gestión real de suscripciones no están conectados.
 
