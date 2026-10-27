@@ -73,14 +73,17 @@ export class ProvenanceEngine {
     return `${provenance.sourceName} (${provenance.agency}). "${provenance.datasetName}". Corte: ${provenance.cutoffDate}. Frecuencia: ${provenance.frequency}. Unidad: ${provenance.unit}. Confianza: ${provenance.confidenceScore}%.`;
   }
 
+  /**
+   * Returns an explicitly non-cryptographic fingerprint for legacy UI compatibility.
+   * It must not be used as proof of integrity, authenticity, or source verification.
+   * Replace with a SHA-256 digest over a canonical payload before production use.
+   */
   public static generateAuditHash(seriesId: string, timestamp: string): string {
+    const input = `${seriesId}::${timestamp}::FULGOR_NON_CRYPTOGRAPHIC_FINGERPRINT`;
     let hash = 0;
-    const str = `${seriesId}::${timestamp}::FULGOR_AUDIT_STANDARD_ISO`;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash |= 0;
+    for (let i = 0; i < input.length; i++) {
+      hash = (Math.imul(hash, 31) + input.charCodeAt(i)) | 0;
     }
-    return `FLG-AUDIT-${Math.abs(hash).toString(16).toUpperCase().padStart(8, '0')}`;
+    return `FLG-DEMO-FINGERPRINT-${(hash >>> 0).toString(16).toUpperCase().padStart(8, '0')}`;
   }
 }
