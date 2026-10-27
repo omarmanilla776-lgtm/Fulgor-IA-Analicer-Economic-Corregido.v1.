@@ -47,11 +47,11 @@ export class SystemAuditEngine {
       const passed = countries.length >= 5 && indicators.length >= 6 && sources.length >= 5;
       tests.push({
         testId: 'TEST-DATA-01',
-        name: 'DataEngine: Catálogo de Fuentes Oficiales y Normalización',
+        name: 'DataEngine: catálogo estático de fuentes declaradas (no conectadas)',
         category: 'UNIT',
         passed,
         durationMs: 1.2,
-        details: `Cargados ${countries.length} países, ${indicators.length} indicadores y ${sources.length} fuentes oficiales.`
+        details: `Cargados ${countries.length} perfiles, ${indicators.length} indicadores y ${sources.length} referencias de fuente; no demuestra conexiones oficiales en vivo.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-DATA-01', name: 'DataEngine', category: 'UNIT', passed: false, durationMs: 1.0, details: e.message });
@@ -64,7 +64,7 @@ export class SystemAuditEngine {
       const passed = hash.startsWith('FLG-DEMO-FINGERPRINT-') && seal.label.includes('OBSERVADO');
       tests.push({
         testId: 'TEST-PROV-02',
-        name: 'ProvenanceEngine: Generación de Audit Hashes y Sellos Epistémicos',
+        name: 'ProvenanceEngine: huella demostrativa y etiqueta epistemológica',
         category: 'UNIT',
         passed,
         durationMs: 0.8,
@@ -184,7 +184,7 @@ export class SystemAuditEngine {
       const passed = rankings.length >= 5 && customScore > 0;
       tests.push({
         testId: 'TEST-FAII-08',
-        name: 'FaiiEngine: Fulgor AI Impact Index & Ponderación Multicriterio',
+        name: 'FaiiEngine: cálculo sobre rankings estáticos de demostración',
         category: 'UNIT',
         passed,
         durationMs: 1.3,
@@ -218,11 +218,11 @@ export class SystemAuditEngine {
       const passed = analysisId.startsWith('ANL-2026-MX-');
       tests.push({
         testId: 'TEST-ORCH-10',
-        name: 'OrchestratorEngine: Flujo Completo y Pipeline de Trazabilidad ISO',
+        name: 'OrchestratorEngine: formato de ID de análisis (sin prueba end-to-end)',
         category: 'INTEGRATION',
         passed,
         durationMs: 2.2,
-        details: `Analysis ID: ${analysisId}, Flujo verificado: USER -> ORCHESTRATOR -> ENGINES -> AUDIT -> REPORT.`
+        details: `ID generado: ${analysisId}. Esta comprobación valida solo el formato del identificador, no el pipeline completo.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-ORCH-10', name: 'Orchestrator Pipeline', category: 'INTEGRATION', passed: false, durationMs: 1.5, details: e.message });
@@ -235,11 +235,11 @@ export class SystemAuditEngine {
       const passed = csv.includes('Code,Name,Country') && csv.split('\n').length >= 4;
       tests.push({
         testId: 'TEST-REP-11',
-        name: 'ReportEngine: Exportación Certificada CSV, JSON y Health Report',
+        name: 'ReportEngine: exportación CSV de datos de demostración',
         category: 'INTEGRATION',
         passed,
         durationMs: 1.1,
-        details: `ReportEngine validado con generación tabular e integración de metadatos de auditoría.`
+        details: `CSV generado con estado de datos no verificados; no es un informe certificado.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-REP-11', name: 'ReportEngine Export', category: 'INTEGRATION', passed: false, durationMs: 1.0, details: e.message });
