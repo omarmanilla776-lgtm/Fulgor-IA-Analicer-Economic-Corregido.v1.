@@ -184,7 +184,7 @@ export const DigitalTwinView: React.FC<DigitalTwinViewProps> = ({
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Evalúa esta simulación del Gemelo Digital para ${currentCountry.name}: Aumento del ${aiAdoptionDelta}% en adopción de IA, ${rdIncentive}% en I+D y velocidad de recualificación nivel ${upskillingSpeed}. ¿Qué políticas públicas maximizarían el beneficio neto?`)}
+          onClick={() => onOpenCopilotWithPrompt(`Analiza los supuestos de este escenario ilustrativo para ${currentCountry.name} y enumera qué datos empíricos hacen falta antes de recomendar políticas; no afirmes resultados económicos validados.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
           <Sparkles className="w-4 h-4" /> Interpretar con Copilot
