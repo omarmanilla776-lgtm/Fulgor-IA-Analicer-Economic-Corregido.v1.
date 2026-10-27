@@ -5,7 +5,7 @@ export interface OLSResult {
   pearsonR: number;
   spearmanRho: number;
   standardError: number;
-  tStatistic: number;
+  tStatistic: number | null;
   pValue: number | null;
   sampleSize: number;
   isStatisticallySignificant: boolean;
@@ -57,7 +57,11 @@ export class EconometricEngine {
    * Calculates Ordinary Least Squares (OLS) Linear Regression, Pearson (r), and Spearman (rho)
    */
   public static calculateOLS(xValues: number[], yValues: number[]): OLSResult {
-    const n = Math.min(xValues.length, yValues.length);
+    if (!Array.isArray(xValues) || !Array.isArray(yValues) || xValues.length !== yValues.length || xValues.length < 2 ||
+        [...xValues, ...yValues].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      throw new RangeError('OLS requiere arreglos numéricos finitos, de igual longitud y con al menos dos observaciones.');
+    }
+    const n = xValues.length;
     if (n < 2) {
       return {
         slope: 0,
@@ -114,8 +118,8 @@ export class EconometricEngine {
     // Degrees of freedom
     const df = n - 2;
     const standardError = df > 0 ? Math.sqrt(ssRes / df) : 0;
-    const seSlope = denominator > 0 && df > 0 ? Math.sqrt((ssRes / df) / denominator) : 0.001;
-    const tStat = seSlope > 0 ? slope / seSlope : 0;
+    const seSlope = denominator > 0 && df > 0 ? Math.sqrt((ssRes / df) / denominator) : null;
+    const tStat = seSlope !== null && seSlope > 0 ? slope / seSlope : null;
 
     // This implementation does not calculate the exact Student-t tail probability.
     // Do not fabricate a p-value or claim statistical significance from coarse thresholds.
@@ -131,7 +135,7 @@ export class EconometricEngine {
       pearsonR: Number(pearsonR.toFixed(3)),
       spearmanRho,
       standardError: Number(standardError.toFixed(4)),
-      tStatistic: Number(tStat.toFixed(2)),
+      tStatistic: tStat === null ? null : Number(tStat.toFixed(2)),
       pValue,
       sampleSize: n,
       isStatisticallySignificant: false
