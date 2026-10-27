@@ -135,8 +135,8 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
               <FileText className="w-4 h-4 text-amber-400" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-100 text-sm">Estudio de Reportes Oficiales & Auditoría</h3>
-              <p className="text-[10px] text-slate-400">Genera informes ejecutivos certificados y el System Health Report de la plataforma.</p>
+              <h3 className="font-bold text-slate-100 text-sm">Estudio de Reportes de Demostración & Auditoría Interna</h3>
+              <p className="text-[10px] text-slate-400">Exporta informes de demostración. Los datos y la auditoría no están certificados ni verificados de forma independiente.</p>
             </div>
           </div>
 
