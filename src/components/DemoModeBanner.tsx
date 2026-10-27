@@ -20,15 +20,15 @@ export const DemoModeBanner: React.FC<DemoModeBannerProps> = ({ isDemoMode, onDi
             <AlertTriangle className="w-4 h-4" />
           </div>
           <span className="tracking-wide">
-            [MODO DEMO ACTIVADO] — Los datos presentados son sintéticos para fines de simulación y demostración. No constituyen registros empíricos oficiales.
+            [MODO DEMO ACTIVADO] — Los datos son demostrativos y no están conectados a fuentes oficiales en vivo. No deben usarse para decisiones económicas reales.
           </span>
         </div>
 
         <button
-          onClick={onDisableDemoMode}
+          disabled
           className="px-2.5 py-0.5 rounded bg-slate-950 text-amber-300 hover:bg-slate-900 text-[11px] font-bold transition-colors whitespace-nowrap"
         >
-          Volver a Datos Reales
+          Fuentes reales aún no conectadas
         </button>
       </div>
     </div>
