@@ -253,22 +253,22 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     provenance: PROVENANCE_REGISTRY.INEGI_BIE,
     notes: 'Datos ajustados por estacionalidad. Se observa impulso en nearshoring y manufactura avanzada.',
     historical: [
-      { date: '2022-Q1', value: 2.1, observed: true },
-      { date: '2022-Q2', value: 2.4, observed: true },
-      { date: '2022-Q3', value: 3.1, observed: true },
-      { date: '2022-Q4', value: 3.6, observed: true },
-      { date: '2023-Q1', value: 3.7, observed: true },
-      { date: '2023-Q2', value: 3.5, observed: true },
-      { date: '2023-Q3', value: 3.3, observed: true },
-      { date: '2023-Q4', value: 2.8, observed: true },
-      { date: '2024-Q1', value: 2.0, observed: true },
-      { date: '2024-Q2', value: 2.1, observed: true },
-      { date: '2024-Q3', value: 2.2, observed: true },
-      { date: '2024-Q4', value: 2.3, observed: true },
-      { date: '2025-Q1', value: 2.4, observed: true },
-      { date: '2025-Q2', value: 2.3, observed: true },
-      { date: '2025-Q3', value: 2.2, observed: true },
-      { date: '2025-Q4', value: 2.3, observed: true }
+      { date: '2022-Q1', value: 2.1, observed: false },
+      { date: '2022-Q2', value: 2.4, observed: false },
+      { date: '2022-Q3', value: 3.1, observed: false },
+      { date: '2022-Q4', value: 3.6, observed: false },
+      { date: '2023-Q1', value: 3.7, observed: false },
+      { date: '2023-Q2', value: 3.5, observed: false },
+      { date: '2023-Q3', value: 3.3, observed: false },
+      { date: '2023-Q4', value: 2.8, observed: false },
+      { date: '2024-Q1', value: 2.0, observed: false },
+      { date: '2024-Q2', value: 2.1, observed: false },
+      { date: '2024-Q3', value: 2.2, observed: false },
+      { date: '2024-Q4', value: 2.3, observed: false },
+      { date: '2025-Q1', value: 2.4, observed: false },
+      { date: '2025-Q2', value: 2.3, observed: false },
+      { date: '2025-Q3', value: 2.2, observed: false },
+      { date: '2025-Q4', value: 2.3, observed: false }
     ],
     forecasts: {
       conservative: [
@@ -306,18 +306,18 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     provenance: PROVENANCE_REGISTRY.INEGI_BIE,
     notes: 'Desaceleración paulatina en mercancías; presiones persistentes en el sector servicios.',
     historical: [
-      { date: '2023-Q1', value: 7.46, observed: true },
-      { date: '2023-Q2', value: 5.67, observed: true },
-      { date: '2023-Q3', value: 4.64, observed: true },
-      { date: '2023-Q4', value: 4.66, observed: true },
-      { date: '2024-Q1', value: 4.40, observed: true },
-      { date: '2024-Q2', value: 4.98, observed: true },
-      { date: '2024-Q3', value: 4.58, observed: true },
-      { date: '2024-Q4', value: 4.45, observed: true },
-      { date: '2025-Q1', value: 4.38, observed: true },
-      { date: '2025-Q2', value: 4.31, observed: true },
-      { date: '2025-Q3', value: 4.40, observed: true },
-      { date: '2025-Q4', value: 4.28, observed: true }
+      { date: '2023-Q1', value: 7.46, observed: false },
+      { date: '2023-Q2', value: 5.67, observed: false },
+      { date: '2023-Q3', value: 4.64, observed: false },
+      { date: '2023-Q4', value: 4.66, observed: false },
+      { date: '2024-Q1', value: 4.40, observed: false },
+      { date: '2024-Q2', value: 4.98, observed: false },
+      { date: '2024-Q3', value: 4.58, observed: false },
+      { date: '2024-Q4', value: 4.45, observed: false },
+      { date: '2025-Q1', value: 4.38, observed: false },
+      { date: '2025-Q2', value: 4.31, observed: false },
+      { date: '2025-Q3', value: 4.40, observed: false },
+      { date: '2025-Q4', value: 4.28, observed: false }
     ],
     forecasts: {
       conservative: [
@@ -355,11 +355,11 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     provenance: PROVENANCE_REGISTRY.OECD_AI_OBSERVATORY,
     notes: 'Firmas con despliegue de modelos generativos o aprendizaje supervisado en procesos clave de negocio.',
     historical: [
-      { date: '2021', value: 14.2, observed: true },
-      { date: '2022', value: 21.0, observed: true },
-      { date: '2023', value: 34.5, observed: true },
-      { date: '2024', value: 44.0, observed: true },
-      { date: '2025', value: 54.2, observed: true }
+      { date: '2021', value: 14.2, observed: false },
+      { date: '2022', value: 21.0, observed: false },
+      { date: '2023', value: 34.5, observed: false },
+      { date: '2024', value: 44.0, observed: false },
+      { date: '2025', value: 54.2, observed: false }
     ],
     forecasts: {
       conservative: [
@@ -394,11 +394,11 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     provenance: PROVENANCE_REGISTRY.BEA_FRED,
     notes: 'Fuerte aceleración atribuible a automatización de tareas cognitivas y optimización logística.',
     historical: [
-      { date: '2021', value: 1.1, observed: true },
-      { date: '2022', value: -1.2, observed: true },
-      { date: '2023', value: 1.8, observed: true },
-      { date: '2024', value: 2.4, observed: true },
-      { date: '2025', value: 2.8, observed: true }
+      { date: '2021', value: 1.1, observed: false },
+      { date: '2022', value: -1.2, observed: false },
+      { date: '2023', value: 1.8, observed: false },
+      { date: '2024', value: 2.4, observed: false },
+      { date: '2025', value: 2.8, observed: false }
     ]
   },
   {
@@ -416,10 +416,10 @@ export const PRIMARY_INDICATORS: EconomicIndicator[] = [
     provenance: PROVENANCE_REGISTRY.BEA_FRED,
     notes: 'Ciclo de normalización monetaria gradual tras convergencia inflacionaria.',
     historical: [
-      { date: '2022-Q4', value: 4.50, observed: true },
-      { date: '2023-Q4', value: 5.50, observed: true },
-      { date: '2024-Q4', value: 5.00, observed: true },
-      { date: '2025-Q4', value: 4.75, observed: true }
+      { date: '2022-Q4', value: 4.50, observed: false },
+      { date: '2023-Q4', value: 5.50, observed: false },
+      { date: '2024-Q4', value: 5.00, observed: false },
+      { date: '2025-Q4', value: 4.75, observed: false }
     ]
   }
 ];
