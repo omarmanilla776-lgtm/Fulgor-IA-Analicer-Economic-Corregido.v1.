@@ -25,13 +25,13 @@ export const TierModal: React.FC<TierModalProps> = ({
       name: 'Free Starter',
       price: '$0',
       period: 'por siempre',
-      description: 'Acceso esencial a indicadores macroeconómicos oficiales y series históricas básicas.',
+      description: 'Acceso a la interfaz y datos ilustrativos; las fuentes económicas oficiales aún no están conectadas.',
       features: [
-        'Indicadores macroeconómicos principales',
-        'Series históricas de hasta 3 años',
+        'Indicadores de demostración no verificados',
+        'Series históricas ilustrativas, sin verificación de fuente',
         'Visualización de gráficos estándar',
-        'AI Copilot (5 consultas diarias)',
-        'Epistemic Badges básicos'
+        'Copiloto no disponible hasta habilitar un servicio autenticado',
+        'Etiquetas con estado de verificación explícito'
       ],
       badge: 'Básico',
       isPopular: false,
@@ -108,7 +108,7 @@ export const TierModal: React.FC<TierModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-slate-100 text-base">Planes de Suscripción & Acceso a la API</h3>
-              <p className="text-xs text-slate-400">Modo de demostración. Los precios son referenciales; suscripciones y pagos aún no están conectados.</p>
+              <p className="text-xs text-slate-400">Demo técnica. Los precios son referenciales y las funciones son objetivos de producto; no hay pagos, suscripciones ni prestaciones Pro activas.</p>
             </div>
           </div>
 
