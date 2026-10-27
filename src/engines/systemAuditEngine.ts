@@ -364,9 +364,16 @@ export class SystemAuditEngine {
       }
     ];
 
+    // These gates currently rely on demo data and contain checks that are not independently verified.
+    // Keep release blocked until real source, security, statistical and build checks are supplied.
+    for (const gate of gates) {
+      gate.status = 'WARNING';
+      gate.details = 'Pendiente: requiere evidencia reproducible y validación independiente; los valores de demostración no certifican este gate.';
+    }
+
     const passedGates = gates.filter(g => g.status === 'PASSED').length;
     const failedGates = gates.filter(g => g.status === 'FAILED').length;
-    const allPassed = failedGates === 0 && testSuiteResult.summary.failed === 0;
+    const allPassed = gates.every(g => g.status === 'PASSED') && failedGates === 0 && testSuiteResult.summary.failed === 0;
 
     const report: SystemHealthAuditReport = {
       generatedAt: new Date().toISOString(),
@@ -392,11 +399,11 @@ export class SystemAuditEngine {
         '/api/v1/health', '/api/v1/indicators', '/api/v1/countries', '/api/v1/analysis',
         '/api/v1/simulate', '/api/v1/causal', '/api/v1/alerts', '/api/v1/observability', '/api/copilot/chat'
       ],
-      securityStatus: 'SEGURO — Cero secretos en cliente, API proxy server-side con Google GenAI SDK v2.4, validación de esquemas y sanitización de inputs.',
-      observabilityStatus: 'ÓPTIMO — Monitor de uptime, latencia <45ms, tracking de memoria heap y registro criptográfico de auditoría ISO.',
+      securityStatus: 'PENDIENTE — requiere revisión independiente de autenticación, secretos, validación de entradas y permisos.',
+      observabilityStatus: 'PARCIAL — uptime y memoria del proceso pueden medirse; latencia, sesiones, tasa de error y auditoría criptográfica no están verificadas.',
       i18nStatus: 'COMPLETO — 8 idiomas (ES, EN, PT, FR, DE, IT, ZH, JA) y 5 monedas (USD, MXN, EUR, BRL, GBP) con formateo local desacoplado.',
       documentationStatus: 'PUBLICADO — Metodología matemática interactiva, fórmulas formales, supuestos de identificación y catálogo de fuentes verificable.',
-      releaseBlockers: allPassed ? [] : ['Corregir pruebas estadísticas o dependencias pendientes'],
+      releaseBlockers: allPassed ? [] : ['Validar fuentes y fechas de datos', 'Implementar inferencia estadística y causal reproducible', 'Ejecutar pruebas de seguridad y build', 'Configurar autenticación de API y secretos en servidor', 'Conectar observabilidad real antes de publicar'],
       executiveSummary: allPassed 
         ? 'FULGOR IA ANALICER ECONOMIC v1.0 ha superado satisfactoriamente los 7 Gates de Integridad Científica y Producción (G1 a G7). Todos los engines se encuentran desacoplados, los modelos econométricos y causales están matemáticamente verificados y la Regla de Oro Epistémica se encuentra activa transversalmente. La plataforma está 100% LISTA PARA PUBLICACIÓN.'
         : 'Se han detectado inconsistencias en uno o más Gates de validación. Revise los detalles técnicos antes de proceder.'
