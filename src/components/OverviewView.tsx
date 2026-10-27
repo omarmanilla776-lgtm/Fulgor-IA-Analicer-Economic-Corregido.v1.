@@ -94,10 +94,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <EpistemicBadge type="OBSERVED_DATA" size="sm" />
           </div>
           <h2 className="text-base sm:text-lg font-bold text-slate-100">
-            Inteligencia Macroeconómica Verificada & Medición Causal del Impacto Tecnológico
+            Panel macroeconómico de demostración
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            La confiabilidad está por encima del espectáculo. Cada métrica separa estrictamente 
+            La clasificación epistémica indica el tipo de resultado, no su verificación. En esta demo los valores no están conectados a fuentes en vivo. Las vistas distinguen 
             <strong className="text-emerald-300"> dato observado</strong>, 
             <strong className="text-amber-300"> correlación estadística</strong>, 
             <strong className="text-sky-300"> estimación modelada</strong>, 
@@ -225,9 +225,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                   <Line type="monotone" dataKey="US" name="Estados Unidos (BEA)" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="MX" name="México (INEGI)" stroke="#34d399" strokeWidth={2.5} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="ES" name="España (INE)" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="DE" name="Alemania (Destatis)" stroke="#c084fc" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="MX" name="México (ejemplo)" stroke="#34d399" strokeWidth={2.5} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="ES" name="España (ejemplo)" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="DE" name="Alemania (ejemplo)" stroke="#c084fc" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -235,7 +235,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <div className="p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-xs text-slate-400 flex items-start gap-2">
               <HelpCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>
-                <strong>Lectura metodológica:</strong> Datos extraídos de Cuentas Nacionales oficiales. La recuperación post-2021 muestra dinámicas dispares en Europa central por costos energéticos versus la resiliencia impulsada por inversión productiva en Norteamérica.
+                <strong>Lectura metodológica:</strong> Las curvas son valores estáticos de demostración, no datos extraídos de cuentas nacionales ni una comparación empírica verificada.
               </span>
             </div>
           </div>
@@ -333,7 +333,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
         </div>
 
-        {/* Real-time Economic Alerts */}
+        {/* Demo economic alerts */}
         <div className="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
