@@ -7,11 +7,13 @@ Esta rama contiene una versión de trabajo de la interfaz y un servidor API en d
 ## Estado verificado
 - CI: instalación de dependencias, comprobación TypeScript, compilación y prueba básica de servidor/API.
 - La API versionada `/api/v1/*` requiere `FULGOR_API_KEY`, excepto `/api/v1/health`.
+- `GET /api/public/world-bank` consulta World Bank Open Data para crecimiento del PIB real, inflación y desempleo en México, EE. UU., España y Alemania; muestra el año de cada observación, aplica caché de 30 minutos y límite básico de solicitudes. Es una fuente pública conectada, no un feed en tiempo real ni una auditoría independiente de las cifras.
 - El modo de demostración permanece activado en la interfaz.
 - Los planes pagados están deshabilitados; no hay cobros configurados en esta rama.
 
 ## Limitaciones y bloqueos antes de producción
-- Los conjuntos de datos, indicadores, rankings, parámetros y escenarios incluidos en el código pueden ser valores ilustrativos. No son prueba de una conexión a INEGI, FRED, Eurostat, OCDE, FMI u otra fuente.
+- Los indicadores y rankings estáticos, parámetros y escenarios incluidos en el código pueden ser valores ilustrativos. La conexión World Bank es independiente y solo alimenta el nuevo panel de datos; no reemplaza automáticamente las cifras estáticas de los otros módulos.
+- No hay todavía conexión verificada a INEGI, FRED, Eurostat, OCDE o FMI dentro de esta rama.
 - La ficha de una fuente y su enlace no acreditan que se haya descargado, validado o actualizado una serie.
 - La inferencia causal, los intervalos, los pronósticos y las simulaciones requieren validación metodológica independiente y datos adecuados; no deben tratarse como resultados empíricos certificados.
 - Los endpoints heredados `/api/copilot/chat`, `/api/digital-twin/simulate` y `/api/causal/did-analysis` también exigen el Bearer `FULGOR_API_KEY` en el servidor. El frontend público no debe incluir ese secreto; se necesita una sesión confiable o proxy del lado servidor para habilitar estas funciones sin exponer la clave. Antes de alojar el servidor públicamente deben probarse autenticación, control de abuso y límites de consumo.
@@ -34,6 +36,7 @@ Configure los secretos solo en el entorno del servidor o en un gestor de secreto
 
 ## Endpoints y autenticación
 - `GET /api/v1/health`: health check público.
+- `GET /api/public/world-bank`: consulta pública, limitada y cacheada de las últimas observaciones no nulas disponibles en World Bank Open Data; puede devolver `502` si la fuente no responde.
 - Los demás endpoints `/api/v1/*`: requieren `Authorization: Bearer <FULGOR_API_KEY>`.
 - Los endpoints heredados `/api/*` requieren revisión de seguridad antes de exponerlos públicamente.
 
