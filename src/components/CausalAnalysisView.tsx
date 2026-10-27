@@ -100,10 +100,10 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             <EpistemicBadge type="CAUSAL_INFERENCE" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Diferenciación Estricta: Correlación Estadística vs. Causalidad Inequívoca
+            Correlación vs. inferencia causal: los supuestos deben verificarse
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Implementación de métodos cuasi-experimentales (Difference-in-Differences, controles sintéticos y variables instrumentales) con validación obligatoria de supuestos de tendencias paralelas.
+            Interfaz de demostración para explorar conceptos de inferencia causal. Los datos, parámetros y resultados no están calibrados ni validados; no certifica tendencias paralelas ni efectos causales.
           </p>
         </div>
 
@@ -113,10 +113,10 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             className="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
           >
             <Play className="w-3.5 h-3.5" />
-            {activeTab === 'did' ? 'Modo Orquestador Interactivo' : 'Ver Estudios Calibrados'}
+            {activeTab === 'did' ? 'Modo Orquestador Interactivo' : 'Ver ejemplos de demostración'}
           </button>
           <button
-            onClick={() => onOpenCopilotWithPrompt(`Explica detalladamente la metodología Difference-in-Differences (DiD), cómo se verifica el supuesto de tendencias paralelas y por qué un p-value de ${activeExperiment.parallelTrendsPValue} valida la inferencia causal en este caso.`)}
+            onClick={() => onOpenCopilotWithPrompt(`Explica la metodología Difference-in-Differences (DiD), qué datos hacen falta para evaluar tendencias paralelas y por qué este ejemplo de demostración no permite certificar inferencia causal.`)}
             className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Copilot
@@ -139,7 +139,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10px] font-bold text-emerald-400">NIVEL 1</span>
-              <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1 rounded">100% Certeza</span>
+              <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1 rounded">Requiere fuente y fecha verificadas</span>
             </div>
             <h4 className="font-bold text-slate-100 text-xs">Dato Observado</h4>
             <p className="text-[11px] text-slate-300">Medición empírica histórica directa por agencias oficiales (INEGI, FRED, Eurostat).</p>
@@ -151,7 +151,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               <span className="text-[10px] bg-amber-950 text-amber-300 px-1 rounded">Asociación (r)</span>
             </div>
             <h4 className="font-bold text-slate-100 text-xs">Correlación</h4>
-            <p className="text-[11px] text-slate-300">Dos variables se mueven juntas. <strong className="text-amber-300">Nunca</strong> prueba que una sea la causa de la otra.</p>
+            <p className="text-[11px] text-slate-300">Dos variables pueden moverse juntas; la correlación por sí sola no demuestra causalidad.</p>
           </div>
 
           <div className="p-3 rounded-lg bg-sky-950/20 border border-sky-500/30 space-y-1.5">
