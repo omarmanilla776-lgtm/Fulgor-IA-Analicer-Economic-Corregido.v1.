@@ -85,7 +85,7 @@ export class ReportEngine {
    * Generates standard tabular CSV export of indicators
    */
   public static generateCSV(indicators: EconomicIndicator[]): string {
-    const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,OfficialSource,CutoffDate,ConfidenceScore\n";
+    const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,DeclaredSource,DeclaredCutoffDate,DataStatus\n";
     const rows = indicators.map(i => 
       `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","${i.provenance.cutoffDate}",${i.provenance.confidenceScore},"DEMO_DATA_NOT_VERIFIED"`
     ).join("\n");
