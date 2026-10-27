@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, KeyRound, Sparkles, Shield, Zap, Building2, Copy } from 'lucide-react';
+import { X, Check, KeyRound, Sparkles, Shield, Zap, Building2 } from 'lucide-react';
 import { UserPlanTier } from '../types/economic';
 
 interface TierModalProps {
@@ -15,7 +15,6 @@ export const TierModal: React.FC<TierModalProps> = ({
   currentTier,
   onSelectTier,
 }) => {
-  const [copiedApiKey, setCopiedApiKey] = useState(false);
   const mockApiKey = 'No hay una clave API configurada';
 
   if (!isOpen) return null;
@@ -90,11 +89,6 @@ export const TierModal: React.FC<TierModalProps> = ({
     },
   ];
 
-  const handleCopyKey = () => {
-    navigator.clipboard.writeText(mockApiKey);
-    setCopiedApiKey(true);
-    setTimeout(() => setCopiedApiKey(false), 2000);
-  };
 
   return (
     <div 
@@ -208,18 +202,12 @@ export const TierModal: React.FC<TierModalProps> = ({
             </div>
 
             <button
-              onClick={handleCopyKey}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+              type="button"
+              disabled
+              aria-label="No hay clave API configurada"
+              className="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-500 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 self-start sm:self-auto cursor-not-allowed"
             >
-              {copiedApiKey ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Copiada
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" /> Copiar API Key
-                </>
-              )}
+              No hay clave configurada
             </button>
           </div>
 
