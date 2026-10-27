@@ -94,10 +94,10 @@ export const FulgorIndexView: React.FC<FulgorIndexViewProps> = ({ onOpenCopilotW
             <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Índice de Impacto Económico Agregado de la Adopción de IA & Tecnología
+            FAII: índice experimental de demostración (no validado)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Metodología 100% transparente y configurable. Mide la absorción tecnológica, dividendos de productividad, intensidad de capital y fricciones de transición.
+            Fórmula configurable aplicada a puntuaciones sintéticas. No hay series de entrada verificadas ni validación externa; los rankings no son oficiales ni deben usarse para comparar economías reales.
           </p>
         </div>
 
@@ -224,7 +224,7 @@ export const FulgorIndexView: React.FC<FulgorIndexViewProps> = ({ onOpenCopilotW
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
               <Trophy className="w-4 h-4 text-amber-400" />
-              Ranking de Economías por Índice FAII Recalibrado
+              Ranking ilustrativo FAII (no validado con datos empíricos)
             </h3>
             <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
