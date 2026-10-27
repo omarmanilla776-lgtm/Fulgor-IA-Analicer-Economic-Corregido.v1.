@@ -197,14 +197,14 @@ export class SystemAuditEngine {
     try {
       const health = ObservabilityEngine.getSystemHealth();
       const telemetry = TelemetryEngine.getAggregatedImpact();
-      const passed = health.serverStatus === 'DEGRADED' && health.provenanceVerificationRate === 0 && telemetry.totalHoursSavedHours >= 0;
+      const passed = health.serverStatus === 'DEGRADED' && health.provenanceVerificationRate === 0 && telemetry.dataStatus === 'DEMO_ESTIMATES_NOT_VERIFIED' && telemetry.totalHoursSavedHours === null;
       tests.push({
         testId: 'TEST-OBS-09',
         name: 'Observability & Telemetry: Métricas de Producción y Privacidad',
         category: 'SECURITY',
         passed,
         durationMs: 1.4,
-        details: `Estado: ${health.serverStatus}; trazabilidad no verificada; métricas de impacto de demostración.`
+        details: `Estado: ${health.serverStatus}; trazabilidad no verificada; impacto no medido en producción.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-OBS-09', name: 'Observability/Telemetry', category: 'SECURITY', passed: false, durationMs: 1.0, details: e.message });
