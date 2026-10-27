@@ -30,7 +30,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
     {
       id: 'welcome-msg',
       role: 'assistant',
-      content: `Hola. Soy el **AI Economic Copilot** de **FULGOR IA ANALICER ECONOMIC**.\n\nMi objetivo es convertir datos macroeconómicos y métricas de impacto de IA en inteligencia clara y fundamentada para la toma de decisiones.\n\n*Nota de rigor científico:* Cada afirmación separa estrictamente datos empíricos observados, correlaciones estadísticas, estimaciones paramétricas, inferencias causales y proyecciones. ¿En qué análisis económico o simulación puedo ayudarte hoy?`,
+      content: `Hola. Soy el **AI Economic Copilot** de **FULGOR IA ANALICER ECONOMIC**.\n\nPuedo ayudarte a razonar sobre economía y explicar métodos analíticos. En esta demo no hay fuentes económicas en vivo conectadas; no presentaré cifras ilustrativas como hechos verificados.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       epistemicType: 'OBSERVED_DATA'
     }
@@ -83,12 +83,9 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: query,
-          conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
-          context: {
-            country: selectedCountry,
-            timestamp: new Date().toISOString()
-          }
+          prompt: query,
+          contextCountry: selectedCountry,
+          activeSector: 'Multisectorial'
         })
       });
 
