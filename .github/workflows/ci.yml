@@ -55,6 +55,14 @@ jobs:
           done
           test "$ready" -eq 1
           node -e "const h=require('/tmp/fulgor-health.json'); if(h.status!=='ok') process.exit(1)"
+          curl --silent --show-error --dump-header /tmp/fulgor-health-headers.txt --output /dev/null http://127.0.0.1:3000/api/v1/health
+          grep -qi '^X-Content-Type-Options: nosniff' /tmp/fulgor-health-headers.txt
+          grep -qi '^X-Frame-Options: DENY' /tmp/fulgor-health-headers.txt
+          if grep -qi '^X-Powered-By:' /tmp/fulgor-health-headers.txt; then echo "X-Powered-By must not be exposed"; exit 1; fi
+
+          unknown_api_status=$(curl --silent --output /tmp/fulgor-unknown-api.json --write-out '%{http_code}' http://127.0.0.1:3000/api/unknown-route)
+          test "$unknown_api_status" = "404"
+          node -e "const d=require('/tmp/fulgor-unknown-api.json'); if(typeof d.error!=='string') process.exit(1)"
 
           unauth_status=$(curl --silent --output /tmp/fulgor-unauth.json --write-out '%{http_code}' http://127.0.0.1:3000/api/v1/indicators)
           test "$unauth_status" = "401"
