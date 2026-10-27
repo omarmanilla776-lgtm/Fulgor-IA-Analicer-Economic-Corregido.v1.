@@ -77,3 +77,14 @@ jobs:
 
           legacy_health_key_status=$(curl --silent --output /tmp/fulgor-short-key.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test' -H 'Content-Type: application/json' -d '{"prompt":"test"}' http://127.0.0.1:3000/api/copilot/chat)
           test "$legacy_health_key_status" = "401"
+
+          # The public source endpoint must either return validated source data or an explicit upstream-unavailable error; never fabricated fallback values.
+          public_feed_status=$(curl --silent --max-time 20 --output /tmp/fulgor-world-bank.json --write-out '%{http_code}' http://127.0.0.1:3000/api/public/world-bank)
+          if [ "$public_feed_status" = "200" ]; then
+            node -e "const d=require('/tmp/fulgor-world-bank.json'); if(d.status!=='WORLD_BANK_DATA_RETRIEVED' || !Array.isArray(d.observations) || d.observations.length===0) process.exit(1)"
+          elif [ "$public_feed_status" = "502" ]; then
+            node -e "const d=require('/tmp/fulgor-world-bank.json'); if(typeof d.error!=='string' || d.observations!==undefined) process.exit(1)"
+          else
+            echo "Unexpected World Bank endpoint status: $public_feed_status"
+            exit 1
+          fi
