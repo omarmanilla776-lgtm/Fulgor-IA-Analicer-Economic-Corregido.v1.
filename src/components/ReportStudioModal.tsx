@@ -62,7 +62,7 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
           const header = ['RecordType', 'ID', 'Name', 'Status', 'Details', 'DataStatus'];
           const gateRows = auditPreview.releaseGates.map(gate => ['release_gate', gate.gateId, gate.name, gate.status, gate.details, 'DEMO_DATA_NOT_VERIFIED']);
           const testRows = auditPreview.testSuite.tests.map(test => ['test', test.testId, test.name, test.passed ? 'PASS' : 'FAIL', test.details, 'DEMO_DATA_NOT_VERIFIED']);
-          const csvContent = [header, ...gateRows, ...testRows].map(row => row.map(escapeCsv).join(',')).join('\\n');
+          const csvContent = [header, ...gateRows, ...testRows].map(row => row.map(escapeCsv).join(',')).join('\n');
           const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
           const downloadAnchor = document.createElement('a');
           downloadAnchor.setAttribute("href", dataStr);
