@@ -53,7 +53,7 @@ export const MacroHeaderTicker: React.FC = () => {
 
       <div className="hidden lg:flex items-center gap-2 shrink-0 pl-3 border-l border-slate-800 text-[11px] text-slate-400">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-        <span>Fuentes en vivo no conectadas</span>
+        <span>Ticker estático · no es feed en vivo</span>
       </div>
     </div>
   );
