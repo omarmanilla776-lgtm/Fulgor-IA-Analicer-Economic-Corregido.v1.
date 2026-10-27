@@ -169,7 +169,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               <span className="text-[10px] bg-purple-950 text-purple-300 px-1 rounded">Cuasi-Experimento</span>
             </div>
             <h4 className="font-bold text-slate-100 text-xs">Inferencia Causal</h4>
-            <p className="text-[11px] text-slate-300">Efecto tratamiento medido contra un grupo de control sintético contrafactual verificado.</p>
+            <p className="text-[11px] text-slate-300">Ejemplo ilustrativo: no hay un contrafactual verificado ni datos empíricos conectados.</p>
           </div>
 
           <div className="p-3 rounded-lg bg-rose-950/20 border border-rose-500/30 space-y-1.5">
@@ -477,7 +477,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                   </div>
                   <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Audit Hash: {orchestratedResult.auditHash.substring(0, 18)}...</span>
+                    <span>Huella demostrativa (no criptográfica): {orchestratedResult.auditHash.substring(0, 18)}...</span>
                   </div>
                 </div>
 
@@ -485,19 +485,23 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">SOURCE CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className={orchestratedResult.qualityAudit.sourceCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.sourceCheckPassed ? "PASS" : "NOT VERIFIED"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">DATA CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className="text-amber-300 font-bold">{orchestratedResult.qualityAudit.dataCheckPassed ? "STRUCTURE PRESENT — NOT VERIFIED" : "MISSING"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">MODEL CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className={orchestratedResult.qualityAudit.modelCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.modelCheckPassed ? "VALIDATED" : "NOT VALIDATED"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">STATISTICAL CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className={orchestratedResult.qualityAudit.statisticalCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.statisticalCheckPassed ? "VALIDATED" : "NOT VALIDATED"}</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-900 border border-slate-800">
+                    <span className="text-[10px] text-slate-500 block">EPISTEMIC CHECK</span>
+                    <span className={orchestratedResult.qualityAudit.epistemicCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.epistemicCheckPassed ? "PASS" : "NOT VERIFIED"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">CONFIDENCE SCORE</span>
