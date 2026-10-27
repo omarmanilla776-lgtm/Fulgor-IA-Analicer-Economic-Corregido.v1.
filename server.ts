@@ -52,6 +52,100 @@ function getGenAI(): GoogleGenAI | null {
 }
 
 // 1. Health check
+type WorldBankObservation = {
+  countryiso3code?: string;
+  country?: { value?: string };
+  date?: string;
+  value?: number | null;
+  indicator?: { id?: string; value?: string };
+};
+
+const worldBankCache: { expiresAt: number; payload: Record<string, unknown> } = {
+  expiresAt: 0,
+  payload: {},
+};
+const publicFeedRate = new Map<string, { count: number; resetAt: number }>();
+const WORLD_BANK_COUNTRIES: Record<string, string> = {
+  MEX: 'México',
+  USA: 'Estados Unidos',
+  ESP: 'España',
+  DEU: 'Alemania',
+};
+const WORLD_BANK_INDICATORS = [
+  { id: 'NY.GDP.MKTP.KD.ZG', label: 'Crecimiento anual del PIB real', unit: '%' },
+  { id: 'FP.CPI.TOTL.ZG', label: 'Inflación anual del IPC', unit: '%' },
+  { id: 'SL.UEM.TOTL.ZS', label: 'Desempleo (% de fuerza laboral; estimación modelada OIT)', unit: '%' },
+] as const;
+
+app.get('/api/public/world-bank', async (req, res) => {
+  const now = Date.now();
+  const clientKey = req.ip || req.socket.remoteAddress || 'unknown';
+  const current = publicFeedRate.get(clientKey);
+  if (!current || current.resetAt <= now) {
+    publicFeedRate.set(clientKey, { count: 1, resetAt: now + 60_000 });
+  } else if (current.count >= 30) {
+    return res.status(429).json({ error: 'Límite temporal de consultas alcanzado. Inténtalo de nuevo en un minuto.' });
+  } else {
+    current.count += 1;
+  }
+  if (publicFeedRate.size > 5000) {
+    for (const [key, value] of publicFeedRate) {
+      if (value.resetAt <= now) publicFeedRate.delete(key);
+    }
+  }
+
+  if (worldBankCache.expiresAt > now && Object.keys(worldBankCache.payload).length > 0) {
+    return res.json(worldBankCache.payload);
+  }
+
+  try {
+    const countryCodes = Object.keys(WORLD_BANK_COUNTRIES).join(';');
+    const responses = await Promise.all(WORLD_BANK_INDICATORS.map(async (indicator) => {
+      const url = `https://api.worldbank.org/v2/country/${countryCodes}/indicator/${indicator.id}?format=json&per_page=1000`;
+      const response = await fetch(url, { signal: AbortSignal.timeout(12_000), headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error(`World Bank returned HTTP ${response.status}`);
+      const body = await response.json() as [unknown, WorldBankObservation[] | null];
+      const rows = Array.isArray(body?.[1]) ? body[1] : [];
+      const latestByCountry = new Map<string, WorldBankObservation>();
+      for (const row of rows) {
+        const code = row.countryiso3code || '';
+        if (!WORLD_BANK_COUNTRIES[code] || row.value === null || row.value === undefined ||
+            !Number.isFinite(Number(row.value)) || !/^\d{4}$/.test(row.date || '')) continue;
+        const prior = latestByCountry.get(code);
+        if (!prior || Number(row.date) > Number(prior.date)) latestByCountry.set(code, row);
+      }
+      return [...latestByCountry.entries()].map(([countryCode, row]) => ({
+        countryCode,
+        countryName: WORLD_BANK_COUNTRIES[countryCode],
+        indicatorCode: indicator.id,
+        indicatorName: indicator.label,
+        value: Number(row.value),
+        unit: indicator.unit,
+        year: row.date,
+        sourceStatus: 'OFFICIAL_SOURCE_VALUE_NOT_INDEPENDENTLY_AUDITED',
+      }));
+    }));
+
+    const observations = responses.flat();
+    if (observations.length === 0) {
+      return res.status(502).json({ error: 'La fuente respondió sin observaciones utilizables; no se sustituyeron con cifras de demostración.' });
+    }
+    const payload = {
+      status: 'WORLD_BANK_DATA_RETRIEVED',
+      source: 'World Bank Open Data',
+      sourceUrl: 'https://api.worldbank.org/',
+      retrievedAt: new Date().toISOString(),
+      note: 'Último dato no nulo disponible por país e indicador. La fecha corresponde al año de la observación, no a tiempo real. Las series no han sido auditadas independientemente por Fulgor.',
+      observations,
+    };
+    worldBankCache.payload = payload;
+    worldBankCache.expiresAt = now + 30 * 60_000;
+    return res.json(payload);
+  } catch {
+    return res.status(502).json({ error: 'No se pudo consultar World Bank Open Data. No se muestran cifras alternativas inventadas.' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
