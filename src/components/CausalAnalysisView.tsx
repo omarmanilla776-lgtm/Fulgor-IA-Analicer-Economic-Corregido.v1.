@@ -335,7 +335,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 <div className="p-3 bg-purple-950/20 border border-purple-500/30 rounded-lg text-xs text-purple-200 leading-relaxed flex items-start gap-2">
                   <FileCheck2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>Efecto Causal Neto:</strong> El diferencial entre la trayectoria real tratada ({activeExperiment.seriesData[activeExperiment.seriesData.length - 1].treatmentActual}) y el contrafactual ({activeExperiment.seriesData[activeExperiment.seriesData.length - 1].treatmentCounterfactual}) representa una ganancia neta estimada de <strong>+{activeExperiment.estimatedTreatmentEffect}%</strong> atribuible con 95% de confianza al despliegue de IA.
+                    <strong>Advertencia:</strong> Las curvas mostradas son ilustrativas y simuladas; no representan datos observados, no verifican un contrafactual y no permiten atribuir un efecto causal.
                   </span>
                 </div>
               </div>
