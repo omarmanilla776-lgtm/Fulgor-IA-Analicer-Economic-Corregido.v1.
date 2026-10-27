@@ -3,15 +3,15 @@ import { TrendingUp, TrendingDown, Cpu, Activity, DollarSign, Fuel, ShieldCheck 
 
 export const MacroHeaderTicker: React.FC = () => {
   const tickerItems = [
-    { label: 'PIB México (YoY)', value: '2.3%', change: '+0.2%', isUp: true, tag: 'INEGI Q4' },
-    { label: 'Inflación MX (IPC)', value: '4.28%', change: '-0.24%', isUp: false, tag: 'Oficial' },
-    { label: 'Tasa Banxico', value: '10.25%', change: '-25 bps', isUp: false, tag: 'Banxico' },
-    { label: 'PIB EE.UU. (QoQ Ann)', value: '2.6%', change: '+0.4%', isUp: true, tag: 'BEA' },
-    { label: 'Fed Funds Rate', value: '4.75%', change: '-25 bps', isUp: false, tag: 'FOMC' },
-    { label: 'Adopción IA Global (Empresas)', value: '38.4%', change: '+8.2%', isUp: true, tag: 'OECD' },
-    { label: 'Índice FAII Agregado', value: '76.8 / 100', change: '+3.1 pts', isUp: true, tag: 'Fulgor' },
-    { label: 'Dólar / Peso (USD/MXN)', value: '$18.42', change: '-0.15 MXN', isUp: false, tag: 'Mercado' },
-    { label: 'Petróleo Brent (USD/bbl)', value: '$78.60', change: '+1.2%', isUp: true, tag: 'Spot' },
+    { label: 'PIB México (YoY)', value: '2.3%', change: '+0.2%', isUp: true, tag: 'DEMO' },
+    { label: 'Inflación MX (IPC)', value: '4.28%', change: '-0.24%', isUp: false, tag: 'DEMO' },
+    { label: 'Tasa Banxico', value: '10.25%', change: '-25 bps', isUp: false, tag: 'DEMO' },
+    { label: 'PIB EE.UU. (QoQ Ann)', value: '2.6%', change: '+0.4%', isUp: true, tag: 'DEMO' },
+    { label: 'Fed Funds Rate', value: '4.75%', change: '-25 bps', isUp: false, tag: 'DEMO' },
+    { label: 'Adopción IA Global (Empresas)', value: '38.4%', change: '+8.2%', isUp: true, tag: 'DEMO' },
+    { label: 'Índice FAII Agregado', value: '76.8 / 100', change: '+3.1 pts', isUp: true, tag: 'DEMO' },
+    { label: 'Dólar / Peso (USD/MXN)', value: '$18.42', change: '-0.15 MXN', isUp: false, tag: 'DEMO' },
+    { label: 'Petróleo Brent (USD/bbl)', value: '$78.60', change: '+1.2%', isUp: true, tag: 'DEMO' },
   ];
 
   return (
@@ -25,7 +25,7 @@ export const MacroHeaderTicker: React.FC = () => {
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
         <span className="font-mono font-bold text-[11px] text-amber-400 uppercase tracking-wider flex items-center gap-1">
-          <Activity className="w-3 h-3 text-amber-400" /> FEED EN TIEMPO REAL
+          <Activity className="w-3 h-3 text-amber-400" /> CIFRAS DE DEMOSTRACIÓN
         </span>
       </div>
 
@@ -53,7 +53,7 @@ export const MacroHeaderTicker: React.FC = () => {
 
       <div className="hidden lg:flex items-center gap-2 shrink-0 pl-3 border-l border-slate-800 text-[11px] text-slate-400">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-        <span>Fuentes Oficiales Validadas</span>
+        <span>Fuentes en vivo no conectadas</span>
       </div>
     </div>
   );
