@@ -316,6 +316,8 @@ app.get('/api/v1/indicators', (req, res) => {
 app.get('/api/v1/countries', (req, res) => {
   res.json({
     version: 'v1',
+    dataStatus: 'DEMO_DATA_NOT_VERIFIED',
+    epistemicWarning: 'Las cifras y puntuaciones de esta respuesta son datos ilustrativos no verificados; no usar para decisiones económicas.',
     count: 7,
     countries: [
       { id: 'MX', name: 'México', region: 'LATAM', gdpNominalBillionUSD: 1845.2, faiiIndexScore: 68.4, aiAdoptionRate: 24.8 },
@@ -333,8 +335,10 @@ app.post('/api/v1/simulate', (req, res) => {
   const { aiAdoptionDelta = 25, rdIncentivePercentage = 15 } = req.body;
   res.json({
     version: 'v1',
-    status: 'simulated_successfully',
-    scenario: `Digital Twin (+${aiAdoptionDelta}% AI, +${rdIncentivePercentage}% R&D)`,
+    status: 'illustrative_simulation_only',
+    dataStatus: 'DEMO_MODEL_NOT_CALIBRATED',
+    epistemicWarning: 'Resultados generados por fórmulas ilustrativas no calibradas con datos reales; no son pronósticos ni estimaciones económicas validadas.',
+    scenario: `Digital Twin (+${aiAdoptionDelta}% AI, +${rdIncentivePercentage}% R&D)`
     gdpBonusPct: Number((aiAdoptionDelta * 0.074).toFixed(2)),
     productivityLiftAnnual: Number((aiAdoptionDelta * 0.052).toFixed(2)),
     epistemicType: 'PROJECTION',
@@ -403,8 +407,9 @@ app.post('/api/v1/did', (req, res) => {
       epistemicType: 'CAUSAL_INFERENCE',
       methodology: 'Difference-in-Differences (DiD) 2x2',
       treatmentEffect: Number(effect.toFixed(2)),
-      confidenceInterval95: [Number((effect - 1.96 * se).toFixed(2)), Number((effect + 1.96 * se).toFixed(2))],
-      tStatistic: Number(tStat.toFixed(2)),
+      confidenceInterval95: null,
+      tStatistic: null,
+      standardError: null,
       pValue,
       parallelTrendsVerified: false,
       parallelTrendsPValue: null,
@@ -417,10 +422,16 @@ app.post('/api/v1/did', (req, res) => {
 });
 
 app.get('/api/v1/forecasts', (req, res) => {
-  const baseValue = Number(req.query.baseValue) || 2.4;
+  const parsedBaseValue = req.query.baseValue === undefined ? 2.4 : Number(req.query.baseValue);
+  if (!Number.isFinite(parsedBaseValue)) {
+    return res.status(400).json({ error: 'baseValue debe ser un número finito.' });
+  }
+  const baseValue = parsedBaseValue;
   res.json({
     version: 'v1',
-    epistemicType: 'PROJECTION',
+    epistemicType: 'ILLUSTRATIVE_DEMO_ONLY',
+    dataStatus: 'DEMO_MODEL_NOT_CALIBRATED',
+    epistemicWarning: 'Valores ilustrativos; no proceden de una serie económica verificada ni de un modelo probabilístico calibrado. No son pronósticos reales.',
     horizon: '8 Trimestres (2026-2028)',
     model: 'Fan Chart Probabilístico Estocástico',
     centralP50: baseValue,
@@ -443,7 +454,9 @@ app.get('/api/v1/faii', (req, res) => {
   res.json({
     version: 'v1',
     indexName: 'Fulgor AI Impact Index (FAII)',
-    epistemicType: 'MODEL_ESTIMATE',
+    epistemicType: 'ILLUSTRATIVE_DEMO_ONLY',
+    dataStatus: 'DEMO_INDEX_NOT_VALIDATED',
+    epistemicWarning: 'Este ranking es una maqueta ilustrativa, no un índice calculado con metodología validada ni fuentes verificadas.',
     rankings: [
       { rank: 1, country: 'Estados Unidos', score: 92.6, tier: 'LÍDER GLOBAL' },
       { rank: 2, country: 'Alemania', score: 84.1, tier: 'ALTA CAPACIDAD' },
