@@ -437,8 +437,8 @@ app.get('/api/v1/forecasts', (req, res) => {
     centralP50: baseValue,
     p10LowerTail: Number((baseValue - 1.25).toFixed(2)),
     p90UpperTail: Number((baseValue + 1.45).toFixed(2)),
-    volatilitySigma: 0.015,
-    epistemicWarning: 'Los pronósticos no son garantías; cono de incertidumbre expansivo.'
+    volatilitySigma: null,
+    uncertaintyStatus: 'No calibrada; no es un intervalo de confianza.'
   });
 });
 
