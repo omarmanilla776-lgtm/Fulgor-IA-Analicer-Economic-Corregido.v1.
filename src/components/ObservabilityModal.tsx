@@ -84,7 +84,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
             <div>
               <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
                 Panel de Observabilidad, QA &amp; Auditoría de Publicación
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono bg-amber-500/10 text-amber-200 px-2 py-0.5 rounded border border-amber-500/30">
                   {auditResult?.report.overallStatus || 'AUDITORÍA PENDIENTE'}
                 </span>
               </h3>
@@ -156,7 +156,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
                 <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
                     <span className="flex items-center gap-1.5"><Server className="w-3.5 h-3.5 text-sky-400" /> Estado Servidor</span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                   </div>
                   <div className="font-mono text-base font-bold text-amber-300">{metrics.serverStatus === 'HEALTHY' ? 'Estado reportado por API' : 'No verificado / demo'}</div>
                   <p className="text-[10px] text-slate-400">Uptime de servidor: no verificado</p>
@@ -180,7 +180,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
 
                 <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
-                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Trazabilidad ISO</span>
+                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Verificación de procedencia</span>
                   </div>
                   <div className="font-mono text-base font-bold text-amber-300">No verificada</div>
                   <p className="text-[10px] text-slate-400">Validación de fuentes pendiente</p>
@@ -189,11 +189,11 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
 
               {/* Engine Status Grid */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-200">Estado Operativo de los 12 Engines Desacoplados:</span>
+                <span className="text-xs font-bold text-slate-200">Estado declarado de motores (sin verificación en producción):</span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">DataEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">⚠ DEMO / NO VERIFICADO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">ProvenanceEngine</span>
