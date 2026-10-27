@@ -1,5 +1,6 @@
 export type EpistemicType = 
-  | 'OBSERVED_DATA'    // Dato factual observado y verificado
+  | 'OBSERVED_DATA'    // Tipo declarado como observado; requiere verificación de fuente
+  | 'DEMO_DATA'        // Valor estático de demostración, no observado ni verificado
   | 'CORRELATION'      // Correlación estadística (r, p-value)
   | 'MODEL_ESTIMATE'   // Estimación econométrica (Beta, R2)
   | 'CAUSAL_INFERENCE' // Posible inferencia causal (DiD, Control Sintético, IV)
