@@ -8,6 +8,8 @@ import { GoogleGenAI } from '@google/genai';
 dotenv.config();
 
 const app = express();
+// Enable only when the deployment platform's reverse proxy is trusted and configured.
+if (process.env.TRUST_PROXY === '1') app.set('trust proxy', 1);
 const configuredPort = process.env.PORT === undefined ? 3000 : Number(process.env.PORT);
 if (!Number.isInteger(configuredPort) || configuredPort < 1 || configuredPort > 65535) {
   throw new Error('PORT debe ser un entero entre 1 y 65535.');
