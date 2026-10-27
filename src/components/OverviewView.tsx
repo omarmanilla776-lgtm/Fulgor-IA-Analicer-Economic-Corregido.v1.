@@ -93,7 +93,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <span className="font-mono text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-400" /> PRINCIPIO DE RIGOR CIENTÍFICO
             </span>
-            <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
+            <EpistemicBadge type="DEMO_DATA" size="sm" />
           </div>
           <h2 className="text-base sm:text-lg font-bold text-slate-100">
             Panel macroeconómico de demostración
@@ -135,7 +135,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   <span className="text-[10px] text-slate-400 font-mono">{country.currency}</span>
                 </div>
               </div>
-              <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
+              <EpistemicBadge type="DEMO_DATA" size="sm" />
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 text-xs">
@@ -213,7 +213,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <span className="text-xs text-slate-400">
                 Valores ilustrativos de variación anual del PIB real (2021–2025; no verificados)
               </span>
-              <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
+              <EpistemicBadge type="DEMO_DATA" size="sm" />
             </div>
 
             <div className="h-72 w-full">
