@@ -47,7 +47,7 @@ export const TierModal: React.FC<TierModalProps> = ({
         'Laboratorio de Inferencia Causal (DiD)',
         'Gemelo Digital (hasta 50 simulaciones/mes)',
         'Pronósticos probabilísticos a 3 años',
-        'AI Copilot ilimitado con Gemini 2.5 Pro',
+        'Copiloto IA sujeto a habilitación segura y límites de uso',
         'Exportación de reportes en PDF y CSV'
       ],
       badge: 'Recomendado',
