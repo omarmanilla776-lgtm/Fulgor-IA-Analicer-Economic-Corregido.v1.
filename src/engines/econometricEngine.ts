@@ -6,7 +6,7 @@ export interface OLSResult {
   spearmanRho: number;
   standardError: number;
   tStatistic: number;
-  pValue: number;
+  pValue: number | null;
   sampleSize: number;
   isStatisticallySignificant: boolean;
 }
@@ -18,7 +18,7 @@ export interface DiDCalculationResult {
   pValue: number;
   ciLower95: number;
   ciUpper95: number;
-  parallelTrendsFTestPValue: number;
+  parallelTrendsFTestPValue: number | null;
   parallelTrendsVerified: boolean;
   rSquared: number;
   sampleSizeN: number;
@@ -91,7 +91,7 @@ export class EconometricEngine {
 
     // This implementation does not calculate the exact Student-t tail probability.
     // Do not fabricate a p-value or claim statistical significance from coarse thresholds.
-    const pValue = 1;
+    const pValue = null;
 
     // Rank correlation (Spearman rho approximation)
     const spearmanRho = Number(pearsonR.toFixed(3));
@@ -106,7 +106,7 @@ export class EconometricEngine {
       tStatistic: Number(tStat.toFixed(2)),
       pValue,
       sampleSize: n,
-      isStatisticallySignificant: pValue <= 0.05
+      isStatisticallySignificant: false
     };
   }
 
@@ -133,7 +133,7 @@ export class EconometricEngine {
     const ciUpper = Number((treatmentEffect + 1.96 * se).toFixed(2));
 
     // Parallel trends cannot be tested from four group means alone.
-    const parallelTrendsPValue = 1;
+    const parallelTrendsPValue = null;
 
     return {
       treatmentEffect: Number(treatmentEffect.toFixed(2)),
