@@ -108,8 +108,9 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
 export class DataEngine {
   private static isDemoMode: boolean = true;
 
-  public static setDemoMode(active: boolean): void {
-    this.isDemoMode = active;
+  public static setDemoMode(_active: boolean): void {
+    // Live source adapters and independent validation are not implemented; demo mode cannot be disabled yet.
+    this.isDemoMode = true;
   }
 
   public static getIsDemoMode(): boolean {
