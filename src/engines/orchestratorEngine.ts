@@ -245,6 +245,26 @@ export class EconomicIntelligenceOrchestrator {
           throw new Error(`Engine no reconocido: ${request.targetEngine}`);
       }
 
+      // Demo fixtures and source labels in code are not evidence of live source access.
+      // Normalize provenance so generated reports cannot present them as official or verified.
+      if (isDemo) {
+        for (const source of dataProvenance) {
+          source.sourceName = 'DEMO — fuente económica no conectada';
+          source.agency = 'No verificado';
+          source.datasetName = 'Valores ilustrativos incluidos en el código';
+          source.lastUpdated = 'No verificado';
+          source.cutoffDate = 'No verificado';
+          source.methodology = 'No hay fuente empírica conectada ni calibración independiente';
+          source.unit = 'Unidades ilustrativas';
+          source.confidenceScore = 0;
+          source.isOfficial = false;
+          delete source.verificationUrl;
+          delete source.sampleSize;
+          delete source.standardError;
+        }
+        limitations.push('MODO DEMO: las fuentes, cifras y parámetros no están conectados ni verificados; no usar como evidencia económica real.');
+      }
+
       // 3. Mandatory Epistemic Quality Gate Validation (Rule of Gold)
       const qualityAudit = this.validateEpistemicQuality(
         dataProvenance,
@@ -310,45 +330,51 @@ export class EconomicIntelligenceOrchestrator {
     isDemo: boolean
   ): EpistemicQualityCheck {
     // 1. Source Check
-    const hasOfficialSources = provenance.some(p => p.isOfficial);
-    const sourceCheckPassed = provenance.length > 0;
-    const sourceCheckNotes = sourceCheckPassed 
-      ? `Fuentes auditadas correctamente (${provenance.map(p => p.agency).join(', ')}).` 
-      : 'Faltan metadatos de procedencia.';
+    const hasOfficialSources = provenance.some(p => p.isOfficial && Boolean(p.verificationUrl));
+    const sourceCheckPassed = !isDemo && provenance.length > 0 && hasOfficialSources;
+    const sourceCheckNotes = isDemo
+      ? 'No aprobado: los datos son demostrativos y no hay fuentes en vivo verificadas.'
+      : sourceCheckPassed
+        ? `Metadatos de fuentes presentes (${provenance.map(p => p.agency).join(', ')}); verificación independiente pendiente.`
+        : 'No aprobado: faltan fuentes oficiales verificadas y enlaces de series.';
 
     // 2. Data Check
     const dataCheckPassed = results !== null && results !== undefined;
-    const dataCheckNotes = dataCheckPassed 
-      ? 'Conjunto de datos estructurado y verificado.' 
+    const dataCheckNotes = dataCheckPassed
+      ? 'Hay un resultado estructurado; esto no demuestra que los datos de entrada sean reales o estén verificados.'
       : 'Datos incompletos o vacíos.';
 
     // 3. Model Check
-    let modelCheckPassed = true;
-    let modelCheckNotes = 'Modelo matemático ejecutado dentro de dominios admisibles.';
+    let modelCheckPassed = !isDemo && results !== null && results !== undefined;
+    let modelCheckNotes = isDemo
+      ? 'No aprobado: el modelo no está calibrado ni validado con datos empíricos verificados.'
+      : 'Ejecución estructural detectada; la validación independiente del modelo sigue pendiente.';
     if (results && typeof results.rSquared === 'number' && (results.rSquared < 0 || results.rSquared > 1)) {
       modelCheckPassed = false;
       modelCheckNotes = 'Violación de rango en R² [0, 1].';
     }
 
     // 4. Statistical Check
-    let statisticalCheckPassed = true;
-    let statisticalCheckNotes = 'Pruebas estadísticas consistentes.';
+    let statisticalCheckPassed = !isDemo;
+    let statisticalCheckNotes = isDemo
+      ? 'No aprobado: faltan datos observacionales, supuestos comprobados y pruebas inferenciales válidas.'
+      : 'La validación estadística independiente sigue pendiente.';
     let confidenceDegraded = false;
     let degradationReason: string | undefined = undefined;
 
     if (results && typeof results.parallelTrendsVerified === 'boolean' && !results.parallelTrendsVerified) {
       confidenceDegraded = true;
-      degradationReason = 'Fallo en la prueba de tendencias paralelas pre-tratamiento (p < 0.05).';
-      statisticalCheckNotes = 'Inferencia causal debilitada por violación de tendencias paralelas.';
+      degradationReason = 'Las tendencias paralelas no han sido verificadas con datos longitudinales adecuados.';
+      statisticalCheckNotes = 'No se certifica inferencia causal: tendencias paralelas no verificadas.';
     }
 
     // 5. Epistemic Check (Rule of Gold Enforcement)
     // Rule: FORECAST != OBSERVED; CORRELATION != CAUSAL; MODEL != FACT
-    const ruleOfGoldCompliance = true;
+    const ruleOfGoldCompliance = !isDemo && sourceCheckPassed && dataCheckPassed && modelCheckPassed && statisticalCheckPassed;
     let epistemicCategoryAssigned = assignedEpistemicType;
 
-    const baseConfidence = provenance.reduce((acc, p) => acc + (p.confidenceScore || 90), 0) / (provenance.length || 1);
-    const finalConfidence = confidenceDegraded ? Math.round(baseConfidence * 0.7) : Math.round(baseConfidence);
+    const baseConfidence = provenance.length > 0 ? provenance.reduce((acc, p) => acc + p.confidenceScore, 0) / provenance.length : 0;
+    const finalConfidence = isDemo ? 0 : confidenceDegraded ? Math.round(baseConfidence * 0.7) : Math.round(baseConfidence);
 
     return {
       sourceCheckPassed,
@@ -361,7 +387,7 @@ export class EconomicIntelligenceOrchestrator {
       statisticalCheckNotes,
       epistemicCheckPassed: true,
       epistemicCategoryAssigned,
-      confidenceScore: isDemo ? Math.min(finalConfidence, 75) : finalConfidence,
+      confidenceScore: finalConfidence,
       confidenceDegraded,
       degradationReason,
       ruleOfGoldCompliance
