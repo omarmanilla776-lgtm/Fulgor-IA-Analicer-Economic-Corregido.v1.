@@ -89,14 +89,9 @@ export class EconometricEngine {
     const seSlope = denominator > 0 && df > 0 ? Math.sqrt((ssRes / df) / denominator) : 0.001;
     const tStat = seSlope > 0 ? slope / seSlope : 0;
 
-    // Approximate p-value based on t-stat
-    const absT = Math.abs(tStat);
-    let pValue = 0.5;
-    if (absT > 3.29) pValue = 0.001;
-    else if (absT > 2.58) pValue = 0.01;
-    else if (absT > 1.96) pValue = 0.05;
-    else if (absT > 1.64) pValue = 0.10;
-    else pValue = 0.25;
+    // This implementation does not calculate the exact Student-t tail probability.
+    // Do not fabricate a p-value or claim statistical significance from coarse thresholds.
+    const pValue = 1;
 
     // Rank correlation (Spearman rho approximation)
     const spearmanRho = Number(pearsonR.toFixed(3));
@@ -132,12 +127,13 @@ export class EconometricEngine {
     const treatmentEffect = diffTreat - diffControl;
 
     const tStat = treatmentEffect / se;
-    const pValue = Math.abs(tStat) > 3.29 ? 0.001 : (Math.abs(tStat) > 2.58 ? 0.01 : (Math.abs(tStat) > 1.96 ? 0.05 : 0.15));
+    // No raw panel data or validated variance estimator is available here; inferential p-value is not established.
+    const pValue = 1;
     const ciLower = Number((treatmentEffect - 1.96 * se).toFixed(2));
     const ciUpper = Number((treatmentEffect + 1.96 * se).toFixed(2));
 
-    // Parallel trends F-test simulation
-    const parallelTrendsPValue = 0.42; // > 0.05 fails to reject null of parallel pre-trends -> PASS
+    // Parallel trends cannot be tested from four group means alone.
+    const parallelTrendsPValue = 1;
 
     return {
       treatmentEffect: Number(treatmentEffect.toFixed(2)),
@@ -147,7 +143,7 @@ export class EconometricEngine {
       ciLower95: ciLower,
       ciUpper95: ciUpper,
       parallelTrendsFTestPValue: parallelTrendsPValue,
-      parallelTrendsVerified: parallelTrendsPValue > 0.05,
+      parallelTrendsVerified: false,
       rSquared: 0.74,
       sampleSizeN: sampleSize
     };
