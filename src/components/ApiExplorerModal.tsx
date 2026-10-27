@@ -83,7 +83,7 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({ isOpen, onCl
               <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
                 FULGOR REST API Explorer <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">v1.0.0-PRO</span>
               </h3>
-              <p className="text-[11px] text-slate-400">Prueba y consume programáticamente indicadores, simulaciones y modelos de inferencia causal.</p>
+              <p className="text-[11px] text-amber-300">Demo técnica: la API protegida no está habilitada para consumo público. Las respuestas de ejemplo no son datos reales.</p>
             </div>
           </div>
 
