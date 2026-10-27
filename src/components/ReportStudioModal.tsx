@@ -301,7 +301,7 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
                     onChange={(e) => setIncludeMethodology(e.target.checked)}
                     className="accent-amber-400 rounded"
                   />
-                  <span>Ficha técnica de proveniencia de fuentes oficiales (INEGI, FRED, Eurostat, OCDE)</span>
+                  <span>Ficha de fuentes declaradas; conexión y actualización no verificadas (INEGI, FRED, Eurostat, OCDE)</span>
                 </label>
 
                 <label className="flex items-center gap-2.5 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-lg border border-slate-800">
