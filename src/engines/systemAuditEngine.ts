@@ -27,7 +27,7 @@ export interface TestResultItem {
 }
 
 export class SystemAuditEngine {
-  public static readonly AUDIT_VERSION = '1.0.0-PRO';
+  public static readonly AUDIT_VERSION = '1.0.0-DEMO';
 
   /**
    * Executes the entire automated verification test suite
