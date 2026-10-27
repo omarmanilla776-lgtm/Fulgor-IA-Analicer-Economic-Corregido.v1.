@@ -400,7 +400,7 @@ app.use('/api/v1', (req, res, next) => {
 app.get('/api/v1/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: 'v1.0.0-PRO',
+    version: 'v1.0.0-DEMO',
     service: 'FULGOR IA ANALICER ECONOMIC REST API',
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString()
@@ -589,7 +589,7 @@ app.get('/api/v1/faii', (req, res) => {
 app.get('/api/v1/system-audit', (req, res) => {
   res.json({
     status: 'ok',
-    version: 'v1.0.0-PRO',
+    version: 'v1.0.0-DEMO',
     auditResult: 'NOT READY FOR RELEASE',
     gatesPassed: 'No verificado — auditoría automatizada y evidencia externa pendientes',
     timestamp: new Date().toISOString(),
