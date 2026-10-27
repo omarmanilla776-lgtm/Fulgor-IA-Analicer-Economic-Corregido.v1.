@@ -19,15 +19,17 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({ isOpen, onCl
   if (!isOpen) return null;
 
   const apiKey = ApiEngine.getApiKey();
+  const isApiLive = Boolean(apiKey);
 
   const handleCopyKey = () => {
+    if (!isApiLive) return;
     navigator.clipboard.writeText(apiKey);
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2000);
   };
 
-  const curlCommand = `curl -X ${selectedEndpoint.method} "https://ais-dev-j2dny7ymeduidtrn5kdo6u-480113977584.us-west2.run.app${selectedEndpoint.path}" \\
-  -H "Authorization: Bearer ${apiKey}" \\
+  const curlCommand = `curl -X ${selectedEndpoint.method} "${window.location.origin}${selectedEndpoint.path}" \\
+  -H "Authorization: Bearer $FULGOR_API_KEY" \\
   -H "Content-Type: application/json"${selectedEndpoint.sampleRequestBody ? ` \\\n  -d '${JSON.stringify(selectedEndpoint.sampleRequestBody)}'` : ''}`;
 
   const handleCopyCurl = () => {
@@ -37,6 +39,11 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({ isOpen, onCl
   };
 
   const handleExecute = async () => {
+    if (selectedEndpoint.authRequired && !isApiLive) {
+      setExecutionResult({ status: 'DEMO_API_DISABLED', message: 'Este endpoint requiere autenticación de servidor. No se puede ejecutar desde el navegador de demostración y no se debe exponer FULGOR_API_KEY al cliente.' });
+      setActiveTab('response');
+      return;
+    }
     setIsLoading(true);
     try {
       if (selectedEndpoint.path === '/api/v1/health' || selectedEndpoint.path === '/api/v1/indicators' || selectedEndpoint.path === '/api/v1/countries' || selectedEndpoint.path === '/api/v1/observability') {
@@ -74,19 +81,21 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({ isOpen, onCl
             </div>
             <div>
               <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
-                FULGOR REST API Explorer <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">v1.0.0-PRO</span>
+                FULGOR REST API Explorer <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">v1.0.0-DEMO</span>
               </h3>
-              <p className="text-[11px] text-slate-400">Prueba y consume programáticamente indicadores, simulaciones y modelos de inferencia causal.</p>
+              <p className="text-[11px] text-amber-300">Demo técnica: la API protegida no está habilitada para consumo público. Las respuestas de ejemplo no son datos reales.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={handleCopyKey}
+              disabled={!isApiLive}
+              title={!isApiLive ? 'La clave se configura solo en el servidor; no está disponible en la demo.' : 'Copiar clave de API'}
               className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono rounded-lg flex items-center gap-1.5 transition-colors"
             >
               {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-              <span>{copiedKey ? 'API Key Copiada' : 'Copiar Bearer Key'}</span>
+              <span>{copiedKey ? 'API Key Copiada' : isApiLive ? 'Copiar Bearer Key' : 'API no disponible en demo'}</span>
             </button>
             <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-100 rounded-md hover:bg-slate-800 transition-colors">
               <X className="w-5 h-5" />

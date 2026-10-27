@@ -1,17 +1,6 @@
 import React, { useState } from 'react';
-import { FulgorProductImpact } from '../types/economic';
 import { FULGOR_ECOSYSTEM_PRODUCTS } from '../data/economicData';
 import { EpistemicBadge } from './EpistemicBadge';
-import { 
-  ResponsiveContainer, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend 
-} from 'recharts';
 import { 
   Sparkles, 
   Clock, 
@@ -21,7 +10,8 @@ import {
   ShieldCheck, 
   Cpu, 
   CheckCircle2, 
-  ExternalLink 
+  ExternalLink,
+  Database 
 } from 'lucide-react';
 
 interface EcosystemViewProps {
@@ -33,13 +23,6 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
 
   const selectedProduct = FULGOR_ECOSYSTEM_PRODUCTS.find(p => p.id === selectedProductId) || FULGOR_ECOSYSTEM_PRODUCTS[0];
 
-  const chartData = FULGOR_ECOSYSTEM_PRODUCTS.map((prod) => ({
-    name: prod.name.replace('Fulgor ', ''),
-    hoursSaved: prod.avgHoursSavedUserMonth,
-    productivity: prod.productivityLiftPercent,
-    roi: prod.estimatedRoiMultiple,
-  }));
-
   return (
     <div className="space-y-6">
       
@@ -48,23 +31,23 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-400" /> ECOSISTEMA FULGOR IA • MICRO-TELEMETRÍA AGREGADA
+              <Sparkles className="w-4 h-4 text-amber-400" /> ECOSISTEMA FULGOR IA • IMPACTO PENDIENTE DE MEDICIÓN
             </span>
-            <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+            <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Medición del Retorno y Ganancia Operativa de las Soluciones Fulgor IA
+            Hipótesis de valor del ecosistema Fulgor IA (sin métricas verificadas)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Telemetría agregada y anonimizada de empresas usuarias de las plataformas Fulgor (Creador, Traductor, Ingeniero, Trading, Logística).
+            No hay telemetría de empresas suscritas ni interacciones de producción conectadas. Las cifras de ahorro, productividad y ROI no se mostrarán hasta contar con mediciones verificables.
           </p>
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Calcula el ROI estimado de implementar la suite completa de Fulgor IA (Creador, Ingeniero y Logística) para una empresa de 150 empleados en el sector manufacturero y de exportación.`)}
+          onClick={() => onOpenCopilotWithPrompt(`Diseña una metodología para medir el ROI de Fulgor IA sin inventar cifras; enumera datos, línea base, periodo y evidencia necesarios.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
-          <Sparkles className="w-4 h-4" /> Calcular ROI para mi Empresa
+          <Sparkles className="w-4 h-4" /> Preparar medición de ROI
         </button>
       </div>
 
@@ -85,7 +68,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono text-amber-400 font-bold">{prod.category}</span>
                 <span className="text-[10px] bg-slate-950 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800 font-mono">
-                  {prod.activeUsersEstimate}
+                  Sin telemetría
                 </span>
               </div>
 
@@ -96,15 +79,15 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
               <div className="space-y-1 pt-2 border-t border-slate-800 text-xs">
                 <div className="flex justify-between text-[11px]">
                   <span className="text-slate-400">Ahorro mensual:</span>
-                  <span className="font-mono font-bold text-emerald-400">{prod.avgHoursSavedUserMonth}h</span>
+                  <span className="font-mono font-bold text-emerald-400">No medido</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
                   <span className="text-slate-400">Productividad:</span>
-                  <span className="font-mono font-bold text-sky-400">+{prod.productivityLiftPercent}%</span>
+                  <span className="font-mono font-bold text-sky-400">No medido</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
                   <span className="text-slate-400">Múltiplo ROI:</span>
-                  <span className="font-mono font-bold text-amber-400">{prod.estimatedRoiMultiple}x</span>
+                  <span className="font-mono font-bold text-amber-400">No medido</span>
                 </div>
               </div>
             </div>
@@ -120,25 +103,17 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-amber-400" />
-              Comparativa de Ahorro de Horas & Ganancia de Productividad
+              Métricas de impacto no disponibles
             </h3>
-            <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+            <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
 
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#64748b" fontSize={11} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                <Bar dataKey="hoursSaved" name="Horas Ahorradas / Mes" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="productivity" name="Ganancia Productividad (%)" fill="#38bdf8" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-80 w-full flex items-center justify-center rounded-lg border border-dashed border-slate-700 bg-slate-950/70 p-6 text-center">
+            <div className="max-w-md space-y-2">
+              <Database className="w-8 h-8 text-amber-400 mx-auto" />
+              <p className="font-semibold text-slate-200">Sin datos de producción</p>
+              <p className="text-xs text-slate-400">El gráfico se habilitará cuando existan métricas reales, fuente de captura, periodo de observación y método de cálculo verificables.</p>
+            </div>
           </div>
         </div>
 
@@ -148,7 +123,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs text-amber-400 font-mono font-semibold">{selectedProduct.category}</span>
               <span className="text-xs text-slate-500">•</span>
-              <span className="text-xs text-slate-400">ROI: {selectedProduct.estimatedRoiMultiple}x</span>
+              <span className="text-xs text-slate-400">ROI medido: no disponible</span>
             </div>
             <h3 className="font-bold text-slate-100 text-lg">{selectedProduct.name}</h3>
             <p className="text-xs text-slate-400 mt-1">{selectedProduct.description}</p>
@@ -173,7 +148,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onOpenCopilotWithP
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Privacidad & Muestreo Telemetría:
             </span>
             <p>
-              Muestra basada en más de 250,000 interacciones agregadas y anonimizadas de empresas suscritas a planes Pro y Enterprise. Las tasas de tiempo ahorrado se calculan en base al tiempo promedio histórico requerido para la misma tarea manual.
+              No hay muestra de producción conectada ni datos de clientes verificados. Los indicadores de impacto se mantienen ocultos hasta contar con registros auditables y metodología de medición.
             </p>
           </div>
         </div>

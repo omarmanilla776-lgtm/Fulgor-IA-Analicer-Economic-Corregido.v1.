@@ -1,0 +1,74 @@
+# Base44 sandbox environment for Fulgor IA Analicer Economic.
+#
+# The app is a single Node process (`tsx server.ts`): Express serves the /api/*
+# endpoints and mounts the Vite dev server in middleware mode for the frontend,
+# so both the UI and the API live on port 3000 and no prebuilt/static bundle is
+# involved. The repo is bind-mounted and dependencies are installed at startup
+# from the checkout, so edits are picked up without rebuilding an image.
+#
+# Secrets: external credentials (GEMINI_API_KEY, FULGOR_API_KEY) are delivered by
+# the platform to /run/base44/app.env, which must stay the LAST env_file entry so
+# the user's dashboard values always win. The app boots without them: the Copilot
+# and the protected /api/v1/* routes fail closed instead of inventing figures.
+
+services:
+  app:
+    image: node:22
+    init: true
+    working_dir: /app
+    # Install from the mounted checkout, then run the project's own dev command.
+    # `tsx server.ts` is the app's dev entry point (Vite middleware mode).
+    command: ["sh", "-ec", "npm install --no-audit --no-fund && exec npm run dev"]
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+    environment:
+      # Vite dev server host allowlist: the preview proxy reaches the dev server
+      # as <port>-<sandbox id>.$BASE44_SANDBOX_HOST_DOMAIN, which the sandbox id
+      # in this value covers. Vite >= 6.1 appends it to server.allowedHosts.
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      # Sandbox marker; "1" only inside the Base44 preview, unset elsewhere.
+      - BASE44_PREVIEW_MODE
+    env_file:
+      - /run/base44/app.env
+    labels:
+      base44.project: "Fulgor IA Analicer Economic"
+      base44.kind: "web"
+      base44.port: "3000"
+    healthcheck:
+      # Probes real responsiveness of both components of this container: the
+      # Express API (/api/health) and the Vite-served frontend (/).
+      test:
+        - CMD
+        - node
+        - -e
+        - |
+          const probes = [
+            ['api', 'http://127.0.0.1:3000/api/health', '"status":"ok"'],
+            ['ui', 'http://127.0.0.1:3000/', 'id="root"'],
+          ];
+          (async () => {
+            const failed = [];
+            for (const probe of probes) {
+              try {
+                const res = await fetch(probe[1], { signal: AbortSignal.timeout(4000) });
+                const body = await res.text();
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                if (!body.includes(probe[2])) throw new Error('unexpected response body');
+              } catch (error) {
+                failed.push(probe[0] + ': ' + error.message);
+              }
+            }
+            if (failed.length > 0) {
+              console.error('healthcheck failed -> ' + failed.join('; '));
+              process.exit(1);
+            }
+            process.exit(0);
+          })();
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      # Covers the first dependency install on a cold checkout.
+      start_period: 300s

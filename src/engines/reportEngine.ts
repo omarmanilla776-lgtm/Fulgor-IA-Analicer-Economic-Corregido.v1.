@@ -79,15 +79,15 @@ export interface FullSystemAuditResult {
 export class ReportEngine {
   public static readonly PLATFORM_NAME = 'FULGOR IA ANALICER ECONOMIC';
   public static readonly VERSION = '1.0.0-PRO';
-  public static readonly COMPLIANCE_STANDARD = 'ISO/IEC 27001 • NIST AI RMF • Metrological Epistemic Standard';
+  public static readonly COMPLIANCE_STANDARD = 'Criterios internos de evaluación; no es certificación externa';
 
   /**
    * Generates standard tabular CSV export of indicators
    */
   public static generateCSV(indicators: EconomicIndicator[]): string {
-    const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,OfficialSource,CutoffDate,ConfidenceScore\n";
+    const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,DeclaredSource,DeclaredCutoffDate,DataStatus\n";
     const rows = indicators.map(i => 
-      `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","${i.provenance.cutoffDate}",${i.provenance.confidenceScore}`
+      `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","${i.provenance.cutoffDate}","DEMO_DATA_NOT_VERIFIED"`
     ).join("\n");
     return headers + rows;
   }
@@ -98,10 +98,11 @@ export class ReportEngine {
   public static generateJSON(config: ReportConfig): string {
     return JSON.stringify({
       reportTitle: config.title,
+      dataStatus: 'DEMO_DATA_NOT_VERIFIED',
       generatedAt: new Date().toISOString(),
       platform: this.PLATFORM_NAME,
       version: this.VERSION,
-      epistemicStandard: "Fulgor Methodological Standard verified (Rule of Gold compliant)",
+      epistemicStandard: "Criterios metodológicos internos; cumplimiento y fuentes no verificados de forma independiente",
       country: config.country,
       indicators: config.indicators,
       sectors: config.sectors,
@@ -119,7 +120,7 @@ export class ReportEngine {
   public static generateMarkdown(config: ReportConfig): string {
     return `# ${config.title}
 **Plataforma**: ${this.PLATFORM_NAME} v${this.VERSION}
-**Fecha de Emisión**: ${new Date().toLocaleDateString()}
+**Fecha de Emisión**: ${new Date().toLocaleDateString()}\n**Estado de datos**: DEMO_DATA_NOT_VERIFIED — fuentes y cifras no verificadas
 **País de Enfoque**: ${config.country.name} (${config.country.id})
 
 ---
@@ -450,6 +451,21 @@ ${config.indicators.map(ind => `- **${ind.name}** (${ind.code}): ${ind.currentVa
       }
     ];
 
+    // Never let static/demo checks certify real-world source, model, security, or compliance status.
+    // This report is generated from local code and demo data, not a production deployment audit.
+    for (const module of modules) {
+      module.status = 'DEGRADED';
+      module.healthScorePct = 0;
+      module.integritySeal = 'NOT_INDEPENDENTLY_VERIFIED';
+      module.verifiedFeatures = [];
+      module.metrics = { dataStatus: 'DEMO_DATA_NOT_VERIFIED', verificationStatus: 'NOT_INDEPENDENTLY_VERIFIED' };
+    }
+    for (const criterion of ruleOfGoldCriteria) {
+      criterion.status = 'NON_COMPLIANT';
+      criterion.complianceRate = 0;
+      criterion.verificationEvidence = 'Pendiente: requiere evidencia reproducible y verificación independiente; el catálogo o el código no demuestran cumplimiento operativo.';
+    }
+
     const passedCriteria = ruleOfGoldCriteria.filter(c => c.status === 'COMPLIANT').length;
     const totalCriteria = ruleOfGoldCriteria.length;
     const rogScore = Math.round((passedCriteria / totalCriteria) * 100);
@@ -466,12 +482,12 @@ ${config.indicators.map(ind => `- **${ind.name}** (${ind.code}): ${ind.currentVa
         reportTitle: 'FULGOR IA ANALICER ECONOMIC — SYSTEM HEALTH REPORT',
         version: this.VERSION,
         timestamp: new Date().toISOString(),
-        environment: 'PRODUCTION / STAGING (AIR-TIGHT RIGOR)',
-        complianceStandard: this.COMPLIANCE_STANDARD
+        environment: 'DEMO / NO VALIDADO EN PRODUCCIÓN',
+        complianceStandard: 'Criterios internos de evaluación; no constituye certificación externa'
       },
       overallStatus: isReadyForRelease ? 'READY FOR RELEASE' : 'NOT READY FOR RELEASE',
       declaration: isReadyForRelease
-        ? 'CERTIFICACIÓN CONCEDIDA: FULGOR IA ANALICER ECONOMIC cumple al 100% con los principios de la Regla de Oro, los 7 Release Gates y el conjunto completo de pruebas automatizadas. Plataforma autorizada para despliegue y uso oficial.'
+        ? 'El sistema no está certificado para producción; se requiere evidencia independiente de fuentes, modelos, seguridad y operación.'
         : 'CERTIFICACIÓN DENEGADA: Se han detectado fallos o advertencias en los gates de liberación o pruebas unitarias.',
       ruleOfGoldCompliance: {
         overallScore: rogScore,
@@ -517,7 +533,7 @@ ${config.indicators.map(ind => `- **${ind.name}** (${ind.code}): ${ind.currentVa
 **Fecha & Hora de Emisión**: ${audit.reportMetadata.timestamp}  
 **Entorno de Ejecución**: ${audit.reportMetadata.environment}  
 **Estándar de Conformidad**: ${audit.reportMetadata.complianceStandard}  
-**Hash Criptográfico de Auditoría**: \`${audit.auditHash}\`  
+**Huella demostrativa (no criptográfica)**: \`${audit.auditHash}\`  
 
 ---
 
@@ -526,8 +542,8 @@ ${config.indicators.map(ind => `- **${ind.name}** (${ind.code}): ${ind.currentVa
 \`\`\`
 ================================================================================
 ESTADO GLOBAL DEL SISTEMA: [ ${audit.overallStatus} ]
-ÍNDICE DE CUMPLIMIENTO REGLA DE ORO: ${audit.ruleOfGoldCompliance.overallScore}% (${audit.ruleOfGoldCompliance.passedCriteria}/${audit.ruleOfGoldCompliance.totalCriteria} Criterios Aprobados)
-RELEASE GATES: ${passedGates}/${totalGates} PASSED | TEST SUITE: ${passedTests}/${totalTests} PASSED (100%)
+ÍNDICE DE VERIFICACIÓN INTERNA: ${audit.ruleOfGoldCompliance.overallScore}% (${audit.ruleOfGoldCompliance.passedCriteria}/${audit.ruleOfGoldCompliance.totalCriteria} Criterios verificados)
+RELEASE GATES: ${passedGates}/${totalGates} PASSED | TEST SUITE: ${passedTests}/${totalTests} PASSED
 ================================================================================
 \`\`\`
 
@@ -548,7 +564,7 @@ ${audit.ruleOfGoldCompliance.criteria.map(c => `| **${c.criterionId}** | **${c.n
 
 ## 2. 🧩 MATRIZ DE ESTADO Y SALUD POR MÓDULOS DEL SISTEMA (${audit.modules.length} MÓDULOS)
 
-Todos los subsistemas se encuentran formalmente desacoplados, implementando contratos de datos inmutables y sellos de integridad verificables:
+Estado de los subsistemas según la inspección estática. No equivale a una validación independiente ni a una prueba de producción:
 
 | Módulo | Clase del Motor | Estado | Salud | Sello de Integridad | Capacidades Verificadas |
 |---|---|:---:|:---:|---|---|
@@ -566,7 +582,7 @@ ${audit.releaseGates.map(g => `| **${g.gateId}** | **${g.name}** | \`${g.categor
 
 ## 4. 🧪 REGISTRO DETALLADO DE PRUEBAS EJECUTADAS (TEST SUITE VERIFICATION)
 
-Se ejecutaron **${totalTests} pruebas automatizadas de integración, econometría y seguridad** en **${audit.testSuite.summary.durationMs} ms**:
+El motor local reporta **${totalTests} comprobaciones** en **${audit.testSuite.summary.durationMs} ms**; no todas equivalen a pruebas de integración, seguridad o producción:
 
 | Test ID | Nombre de la Prueba | Categoría | Duración | Resultado | Detalles de Ejecución |
 |---|---|:---:|:---:|:---:|---|
@@ -576,22 +592,22 @@ ${audit.testSuite.tests.map(t => `| \`${t.testId}\` | **${t.name}** | \`${t.cate
 
 ## 5. 🔒 SEGURIDAD, OBSERVABILIDAD Y PRIVACIDAD DE DATOS
 
-- **Seguridad de Credenciales**: Las claves del SDK de Google GenAI y variables sensibles operan exclusivamente en servidor. 0 secretos en bundle de cliente.
-- **Trazabilidad & Proveniencia**: 100% de las consultas generan identificadores reproducibles (\`ANL-2026-*\`) y firmas de auditoría SHA-256.
-- **Privacidad y Cumplimiento**: Telemetría estrictamente anónima agregada bajo estándares ISO/IEC 27701 y GDPR.
-- **Observabilidad Operativa**: Servidor en estado \`HEALTHY\`, tasa de latencia p95 < 45 ms, 0 fugas de memoria registradas.
+- **Seguridad de Credenciales**: la clave FULGOR_API_KEY no debe incluirse en el frontend. Un escaneo independiente del bundle de producción sigue pendiente.
+- **Trazabilidad & Proveniencia**: la huella generada es demostrativa y no constituye una firma criptográfica ni prueba de procedencia.
+- **Privacidad y Cumplimiento**: no se ha verificado certificación ISO/IEC 27701 ni conformidad GDPR.
+- **Observabilidad Operativa**: métricas de producción y pruebas de carga pendientes.
 
 ---
 
-## 6. ✍️ FIRMA Y SELLO CRIPTOGRÁFICO DE CONFORMIDAD
+## 6. RESUMEN DE AUDITORÍA INTERNA (NO CERTIFICADO)
 
 \`\`\`
 ================================================================================
-CERTIFICADO DE SALUD DEL SISTEMA Y RIGOR METODOLÓGICO
+INFORME INTERNO DE ESTADO DEL SISTEMA (NO CERTIFICADO)
 EMISOR: FULGOR IA ANALICER ECONOMIC AUDIT ENGINE
-ESTÁNDAR: ISO/IEC 27001 • NIST AI RMF • FULGOR METHODOLOGICAL STANDARD
-HASH DE AUDITORÍA: ${audit.auditHash}
-VEREDICTO: ${audit.overallStatus} (100% CERTIFICADO)
+ESTÁNDAR: criterios internos; no constituye certificación externa
+HUELLA DEMOSTRATIVA (NO CRIPTOGRÁFICA): ${audit.auditHash}
+VEREDICTO: ${audit.overallStatus} (NO CERTIFICADO)
 ================================================================================
 \`\`\`
 `;

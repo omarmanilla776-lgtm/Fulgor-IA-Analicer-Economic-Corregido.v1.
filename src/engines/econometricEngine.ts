@@ -5,31 +5,63 @@ export interface OLSResult {
   pearsonR: number;
   spearmanRho: number;
   standardError: number;
-  tStatistic: number;
-  pValue: number;
+  tStatistic: number | null;
+  pValue: number | null;
   sampleSize: number;
   isStatisticallySignificant: boolean;
 }
 
 export interface DiDCalculationResult {
   treatmentEffect: number; // Beta_3
-  standardError: number;
-  tStat: number;
-  pValue: number;
-  ciLower95: number;
-  ciUpper95: number;
-  parallelTrendsFTestPValue: number;
+  standardError: number | null;
+  tStat: number | null;
+  pValue: number | null;
+  ciLower95: number | null;
+  ciUpper95: number | null;
+  parallelTrendsFTestPValue: number | null;
   parallelTrendsVerified: boolean;
-  rSquared: number;
-  sampleSizeN: number;
+  rSquared: number | null;
+  sampleSizeN: number | null;
 }
 
 export class EconometricEngine {
+  private static rankValues(values: number[]): number[] {
+    const sorted = values.map((value, index) => ({ value, index })).sort((a, b) => a.value - b.value);
+    const ranks = new Array<number>(values.length);
+    let start = 0;
+    while (start < sorted.length) {
+      let end = start + 1;
+      while (end < sorted.length && sorted[end].value === sorted[start].value) end++;
+      const averageRank = ((start + 1) + end) / 2;
+      for (let i = start; i < end; i++) ranks[sorted[i].index] = averageRank;
+      start = end;
+    }
+    return ranks;
+  }
+
+  private static correlation(a: number[], b: number[]): number {
+    if (a.length !== b.length || a.length < 2) return 0;
+    const meanA = a.reduce((sum, value) => sum + value, 0) / a.length;
+    const meanB = b.reduce((sum, value) => sum + value, 0) / b.length;
+    let covariance = 0, varianceA = 0, varianceB = 0;
+    for (let i = 0; i < a.length; i++) {
+      const da = a[i] - meanA, db = b[i] - meanB;
+      covariance += da * db;
+      varianceA += da * da;
+      varianceB += db * db;
+    }
+    const denominator = Math.sqrt(varianceA * varianceB);
+    return denominator > 0 ? covariance / denominator : 0;
+  }
   /**
    * Calculates Ordinary Least Squares (OLS) Linear Regression, Pearson (r), and Spearman (rho)
    */
   public static calculateOLS(xValues: number[], yValues: number[]): OLSResult {
-    const n = Math.min(xValues.length, yValues.length);
+    if (!Array.isArray(xValues) || !Array.isArray(yValues) || xValues.length !== yValues.length || xValues.length < 2 ||
+        [...xValues, ...yValues].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      throw new RangeError('OLS requiere arreglos numéricos finitos, de igual longitud y con al menos dos observaciones.');
+    }
+    const n = xValues.length;
     if (n < 2) {
       return {
         slope: 0,
@@ -39,7 +71,7 @@ export class EconometricEngine {
         spearmanRho: 0,
         standardError: 0,
         tStatistic: 0,
-        pValue: 1,
+        pValue: null,
         sampleSize: n,
         isStatisticallySignificant: false
       };
@@ -86,20 +118,15 @@ export class EconometricEngine {
     // Degrees of freedom
     const df = n - 2;
     const standardError = df > 0 ? Math.sqrt(ssRes / df) : 0;
-    const seSlope = denominator > 0 && df > 0 ? Math.sqrt((ssRes / df) / denominator) : 0.001;
-    const tStat = seSlope > 0 ? slope / seSlope : 0;
+    const seSlope = denominator > 0 && df > 0 ? Math.sqrt((ssRes / df) / denominator) : null;
+    const tStat = seSlope !== null && seSlope > 0 ? slope / seSlope : null;
 
-    // Approximate p-value based on t-stat
-    const absT = Math.abs(tStat);
-    let pValue = 0.5;
-    if (absT > 3.29) pValue = 0.001;
-    else if (absT > 2.58) pValue = 0.01;
-    else if (absT > 1.96) pValue = 0.05;
-    else if (absT > 1.64) pValue = 0.10;
-    else pValue = 0.25;
+    // This implementation does not calculate the exact Student-t tail probability.
+    // Do not fabricate a p-value or claim statistical significance from coarse thresholds.
+    const pValue = null;
 
     // Rank correlation (Spearman rho approximation)
-    const spearmanRho = Number(pearsonR.toFixed(3));
+    const spearmanRho = Number(this.correlation(this.rankValues(xValues.slice(0, n)), this.rankValues(yValues.slice(0, n))).toFixed(3));
 
     return {
       slope: Number(slope.toFixed(4)),
@@ -108,10 +135,10 @@ export class EconometricEngine {
       pearsonR: Number(pearsonR.toFixed(3)),
       spearmanRho,
       standardError: Number(standardError.toFixed(4)),
-      tStatistic: Number(tStat.toFixed(2)),
+      tStatistic: tStat === null ? null : Number(tStat.toFixed(2)),
       pValue,
       sampleSize: n,
-      isStatisticallySignificant: pValue <= 0.05
+      isStatisticallySignificant: false
     };
   }
 
@@ -124,32 +151,39 @@ export class EconometricEngine {
     postTreatMean: number,
     preControlMean: number,
     postControlMean: number,
-    se: number = 2.45,
-    sampleSize: number = 420
+    _legacyStandardError?: number,
+    _legacySampleSize?: number
   ): DiDCalculationResult {
+    if ([preTreatMean, postTreatMean, preControlMean, postControlMean].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      throw new RangeError('DiD requiere cuatro medias de grupo finitas.');
+    }
     const diffTreat = postTreatMean - preTreatMean;
     const diffControl = postControlMean - preControlMean;
     const treatmentEffect = diffTreat - diffControl;
 
-    const tStat = treatmentEffect / se;
-    const pValue = Math.abs(tStat) > 3.29 ? 0.001 : (Math.abs(tStat) > 2.58 ? 0.01 : (Math.abs(tStat) > 1.96 ? 0.05 : 0.15));
-    const ciLower = Number((treatmentEffect - 1.96 * se).toFixed(2));
-    const ciUpper = Number((treatmentEffect + 1.96 * se).toFixed(2));
+    // Four group means are enough for a descriptive point contrast, not inferential uncertainty.
+    // Do not report a t-statistic, standard error, confidence interval, or fit statistic without raw data
+    // and a validated variance estimator. Legacy se/sampleSize arguments are intentionally not treated as evidence.
+    const tStat = null;
+    const reportedStandardError = null;
+    const pValue = null;
+    const ciLower = null;
+    const ciUpper = null;
 
-    // Parallel trends F-test simulation
-    const parallelTrendsPValue = 0.42; // > 0.05 fails to reject null of parallel pre-trends -> PASS
+    // Parallel trends cannot be tested from four group means alone.
+    const parallelTrendsPValue = null;
 
     return {
       treatmentEffect: Number(treatmentEffect.toFixed(2)),
-      standardError: se,
-      tStat: Number(tStat.toFixed(2)),
+      standardError: reportedStandardError,
+      tStat,
       pValue,
       ciLower95: ciLower,
       ciUpper95: ciUpper,
       parallelTrendsFTestPValue: parallelTrendsPValue,
-      parallelTrendsVerified: parallelTrendsPValue > 0.05,
-      rSquared: 0.74,
-      sampleSizeN: sampleSize
+      parallelTrendsVerified: false,
+      rSquared: null,
+      sampleSizeN: null
     };
   }
 }

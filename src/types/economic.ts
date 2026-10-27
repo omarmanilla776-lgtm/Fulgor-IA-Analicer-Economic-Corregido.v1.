@@ -1,5 +1,6 @@
 export type EpistemicType = 
-  | 'OBSERVED_DATA'    // Dato factual observado y verificado
+  | 'OBSERVED_DATA'    // Tipo declarado como observado; requiere verificación de fuente
+  | 'DEMO_DATA'        // Valor estático de demostración, no observado ni verificado
   | 'CORRELATION'      // Correlación estadística (r, p-value)
   | 'MODEL_ESTIMATE'   // Estimación econométrica (Beta, R2)
   | 'CAUSAL_INFERENCE' // Posible inferencia causal (DiD, Control Sintético, IV)
@@ -97,14 +98,15 @@ export interface DiDExperiment {
   treatmentGroupName: string;
   controlGroupName: string;
   parallelTrendsVerified: boolean;
-  parallelTrendsPValue: number;
-  estimatedTreatmentEffect: number; // beta
-  confidenceInterval95: [number, number];
-  tStatistic: number;
-  rSquared: number;
-  sampleSize: number;
+  parallelTrendsPValue: number | null;
+  estimatedTreatmentEffect: number | null; // unavailable until validated
+  confidenceInterval95: [number, number] | null;
+  tStatistic: number | null;
+  rSquared: number | null;
+  sampleSize: number | null;
   assumptions: string[];
   caveats: string[];
+  dataStatus: 'DEMO_INFERENCE_NOT_VALIDATED';
   seriesData: {
     year: number;
     treatmentActual: number;

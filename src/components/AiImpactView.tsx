@@ -82,18 +82,18 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
             <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Medición de Productividad, Ahorro de Tiempo y Recomposición Laboral
+            Escenarios ilustrativos de impacto de IA (sin mediciones verificadas)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Evaluación empírica y econométrica de las curvas pre/durante/post adopción de tecnologías de inteligencia artificial por sector e industria.
+            Escenarios sintéticos para explorar variables de impacto. No existen datos de empresas, encuestas ni telemetría de producción conectados; los resultados no son estimaciones empíricas.
           </p>
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`¿Cuáles son los sectores con mayor retorno de inversión y ganancia de productividad laboral tras adoptar herramientas de IA en 2026?`)}
+          onClick={() => onOpenCopilotWithPrompt(`Diseña un método para medir el retorno y la productividad de la adopción de IA por sector; enumera datos, línea base, muestra y supuestos necesarios sin inventar resultados.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
-          <Sparkles className="w-4 h-4" /> Diagnóstico Sectorial IA
+          <Sparkles className="w-4 h-4" /> Diseñar medición sectorial
         </button>
       </div>
 
@@ -104,9 +104,9 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
             <Clock className="w-3.5 h-3.5 text-amber-400" /> Ahorro Promedio Mensual
           </span>
           <div className="font-mono font-bold text-2xl text-slate-100">
-            28.4 <span className="text-xs font-normal text-slate-400">hrs/trabajador</span>
+            No medido
           </div>
-          <p className="text-[10px] text-slate-500">Equivalente a 3.5 días laborales mensuales recuperados para tareas de alto valor.</p>
+          <p className="text-[10px] text-slate-500">Ahorro real pendiente de medir con línea base y registros de uso.</p>
         </div>
 
         <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
@@ -114,9 +114,9 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
             <TrendingUp className="w-3.5 h-3.5 text-emerald-400" /> Ganancia de Productividad VAB
           </span>
           <div className="font-mono font-bold text-2xl text-emerald-400">
-            +18.6% <span className="text-xs font-normal text-slate-400">anual</span>
+            No medido
           </div>
-          <p className="text-[10px] text-slate-500">Incremento en Valor Agregado Bruto por empleado en firmas maduras.</p>
+          <p className="text-[10px] text-slate-500">Productividad real pendiente de medir con metodología y grupo de comparación.</p>
         </div>
 
         <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
@@ -124,9 +124,9 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
             <DollarSign className="w-3.5 h-3.5 text-sky-400" /> Reducción de Costes Operativos
           </span>
           <div className="font-mono font-bold text-2xl text-sky-400">
-            -16.2% <span className="text-xs font-normal text-slate-400">TCO</span>
+            No medido
           </div>
-          <p className="text-[10px] text-slate-500">Optimización de procesos repetitivos, atención a clientes y código.</p>
+          <p className="text-[10px] text-slate-500">Reducción real de costes pendiente de medir.</p>
         </div>
 
         <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
@@ -134,9 +134,9 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
             <Users className="w-3.5 h-3.5 text-purple-400" /> Recomposición de Empleo
           </span>
           <div className="font-mono font-bold text-2xl text-purple-400">
-            +1.4% <span className="text-xs font-normal text-slate-400">neto</span>
+            No medido
           </div>
-          <p className="text-[10px] text-slate-500">Aumento neto positivo impulsado por nuevos roles y expansión de capacidad.</p>
+          <p className="text-[10px] text-slate-500">Cambio neto de empleo no medido; no se dispone de datos de cohorte.</p>
         </div>
       </div>
 
@@ -256,7 +256,7 @@ export const AiImpactView: React.FC<AiImpactViewProps> = ({ sectors, onOpenCopil
             <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-400 flex items-start gap-2">
               <HelpCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>
-                <strong>Metodología de Calibración:</strong> Mediciones agregadas calibradas a partir de encuestas empresariales de la OCDE y micro-datos de despliegue de plataformas del ecosistema Fulgor IA. Los resultados reflejan promedios de cohorte y pueden variar según el nivel de digitalización previa de cada firma.
+                <strong>Estado metodológico:</strong> escenarios sintéticos sin calibración empírica ni datos de usuarios de Fulgor conectados.
               </span>
             </div>
 

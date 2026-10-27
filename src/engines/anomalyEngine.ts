@@ -7,7 +7,7 @@ export interface AnomalyDetectionResult {
   observedDelta: number;
   thresholdZ: number;
   severity: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'INFO';
-  epistemicType: 'OBSERVED_DATA' | 'CORRELATION' | 'MODEL_ESTIMATE' | 'CAUSAL_INFERENCE' | 'PROJECTION';
+  epistemicType: 'MODEL_ESTIMATE';
   suggestedAction: string;
 }
 
@@ -32,8 +32,8 @@ export class AnomalyEngine {
         observedDelta: 0,
         thresholdZ,
         severity: 'INFO',
-        epistemicType: 'OBSERVED_DATA',
-        suggestedAction: 'Monitoreo estándar de serie de tiempo.'
+        epistemicType: 'MODEL_ESTIMATE',
+        suggestedAction: 'No se puede calcular Z-Score porque la desviación estándar es cero; el resultado no es evaluable.'
       };
     }
 
@@ -52,7 +52,7 @@ export class AnomalyEngine {
       observedDelta: Number((currentValue - historicalMean).toFixed(2)),
       thresholdZ,
       severity,
-      epistemicType: 'OBSERVED_DATA',
+      epistemicType: 'MODEL_ESTIMATE',
       suggestedAction: isAnomaly 
         ? 'Activar protocolo de revisión analítica y validar consistencia con fuentes cruzadas.'
         : 'Parámetros dentro del intervalo de variación normal.'

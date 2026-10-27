@@ -20,7 +20,8 @@ export interface OfficialCatalogSource {
   countryOrRegion: string;
   coverage: string[];
   officialPortalUrl: string;
-  trustScore: number;
+  trustScore: number | null;
+  trustScoreStatus: 'NOT_ASSESSED';
   apiProtocol: 'REST / JSON' | 'SDMX / XML' | 'Bulk CSV' | 'OpenData';
 }
 
@@ -32,7 +33,8 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'México',
     coverage: ['PIB Trimestral', 'INPC Inflación', 'ENOE Empleo', 'BIE Indicadores'],
     officialPortalUrl: 'https://www.inegi.org.mx',
-    trustScore: 99.4,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'REST / JSON'
   },
   {
@@ -42,7 +44,8 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'México',
     coverage: ['Tasa Objetivo TIIE', 'Tipo de Cambio FIX', 'Reservas Internacionales', 'Balanza de Pagos'],
     officialPortalUrl: 'https://www.banxico.org.mx/SieAPIRest',
-    trustScore: 99.8,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'REST / JSON'
   },
   {
@@ -52,7 +55,8 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'Estados Unidos & Global',
     coverage: ['US GDP', 'Core CPI', 'Non-Farm Payrolls', 'Fed Funds Rate', 'M2 Money Supply'],
     officialPortalUrl: 'https://fred.stlouisfed.org',
-    trustScore: 99.9,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'REST / JSON'
   },
   {
@@ -62,7 +66,8 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'Unión Europea',
     coverage: ['Eurozone HICP Inflation', 'Euro Area GDP Growth', 'Labour Market Statistics'],
     officialPortalUrl: 'https://ec.europa.eu/eurostat',
-    trustScore: 99.6,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'SDMX / XML'
   },
   {
@@ -72,7 +77,8 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'Países Miembros OECD',
     coverage: ['OECD.AI Policy Observatory', 'Productivity Database', 'Science & Tech Indicators'],
     officialPortalUrl: 'https://oecd.ai',
-    trustScore: 99.2,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'REST / JSON'
   },
   {
@@ -82,7 +88,8 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'Global Multilateral',
     coverage: ['World Economic Outlook (WEO)', 'International Financial Statistics (IFS)'],
     officialPortalUrl: 'https://www.imf.org/en/Data',
-    trustScore: 99.5,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'REST / JSON'
   },
   {
@@ -92,16 +99,18 @@ export const OFFICIAL_SOURCES_CATALOG: OfficialCatalogSource[] = [
     countryOrRegion: 'Global Multilateral',
     coverage: ['World Development Indicators (WDI)', 'GNI per capita', 'Digital Adoption Index'],
     officialPortalUrl: 'https://data.worldbank.org',
-    trustScore: 99.1,
+    trustScore: null,
+    trustScoreStatus: 'NOT_ASSESSED',
     apiProtocol: 'REST / JSON'
   }
 ];
 
 export class DataEngine {
-  private static isDemoMode: boolean = false;
+  private static isDemoMode: boolean = true;
 
-  public static setDemoMode(active: boolean): void {
-    this.isDemoMode = active;
+  public static setDemoMode(_active: boolean): void {
+    // Live source adapters and independent validation are not implemented; demo mode cannot be disabled yet.
+    this.isDemoMode = true;
   }
 
   public static getIsDemoMode(): boolean {

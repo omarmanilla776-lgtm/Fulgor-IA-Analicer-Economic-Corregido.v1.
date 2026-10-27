@@ -40,14 +40,14 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
       if (res.ok) {
         const data = await res.json();
         setMetrics({
-          serverStatus: data.status || 'HEALTHY',
-          uptimeSeconds: data.uptimeSeconds || 7420,
-          apiLatencyMs: data.apiLatencyMs || 38,
-          memoryUsageMb: data.memoryUsageMb || 86,
-          errorRatePercentage: 0.02,
-          activeSessions: data.activeConnections || 148,
-          geminiModelReady: data.geminiAiReady ?? true,
-          provenanceVerificationRate: 100.0,
+          serverStatus: 'DEGRADED',
+          uptimeSeconds: Number.isFinite(data.uptimeSeconds) ? data.uptimeSeconds : 0,
+          apiLatencyMs: Number.isFinite(data.apiLatencyMs) ? data.apiLatencyMs : 0,
+          memoryUsageMb: Number.isFinite(data.memoryUsageMb) ? data.memoryUsageMb : 0,
+          errorRatePercentage: Number.isFinite(data.errorRatePercentage) ? data.errorRatePercentage : 0,
+          activeSessions: Number.isFinite(data.activeConnections) ? data.activeConnections : 0,
+          geminiModelReady: data.geminiAiReady === true,
+          provenanceVerificationRate: Number.isFinite(data.provenanceVerificationRate) ? data.provenanceVerificationRate : 0,
           lastHealthCheck: new Date().toISOString(),
         });
       }
@@ -84,11 +84,11 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
             <div>
               <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
                 Panel de Observabilidad, QA &amp; Auditoría de Publicación
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
-                  {auditResult?.report.overallStatus || 'READY FOR RELEASE'}
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono bg-amber-500/10 text-amber-200 px-2 py-0.5 rounded border border-amber-500/30">
+                  {auditResult?.report.overallStatus || 'AUDITORÍA PENDIENTE'}
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-400">Verificación de los 12 engines, validación de compuertas G1-G7 y telemetría de producción.</p>
+              <p className="text-[11px] text-slate-400">Inspección local de módulos; no equivale a pruebas de despliegue ni telemetría de producción.</p>
             </div>
           </div>
 
@@ -156,76 +156,76 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
                 <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
                     <span className="flex items-center gap-1.5"><Server className="w-3.5 h-3.5 text-sky-400" /> Estado Servidor</span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                   </div>
-                  <div className="font-mono text-base font-bold text-emerald-400">En Línea (99.98%)</div>
-                  <p className="text-[10px] text-slate-400">Uptime: {Math.floor(metrics.uptimeSeconds / 3600)}h {Math.floor((metrics.uptimeSeconds % 3600) / 60)}m</p>
+                  <div className="font-mono text-base font-bold text-amber-300">{metrics.serverStatus === 'HEALTHY' ? 'Estado reportado por API' : 'No verificado / demo'}</div>
+                  <p className="text-[10px] text-slate-400">Uptime de servidor: no verificado</p>
                 </div>
 
                 <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
                     <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-400" /> Latencia API p95</span>
                   </div>
-                  <div className="font-mono text-base font-bold text-slate-100">{metrics.apiLatencyMs} ms</div>
-                  <p className="text-[10px] text-emerald-400">Óptimo (&lt; 100ms)</p>
+                  <div className="font-mono text-base font-bold text-slate-100">{metrics.apiLatencyMs > 0 ? `${metrics.apiLatencyMs} ms` : 'No medido'}</div>
+                  <p className="text-[10px] text-slate-400">Medición de producción pendiente</p>
                 </div>
 
                 <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
                     <span className="flex items-center gap-1.5"><Cpu className="w-3.5 h-3.5 text-purple-400" /> Memoria Heap</span>
                   </div>
-                  <div className="font-mono text-base font-bold text-slate-100">{metrics.memoryUsageMb} MB</div>
-                  <p className="text-[10px] text-slate-400">Node.js V8 Engine</p>
+                  <div className="font-mono text-base font-bold text-slate-100">{metrics.memoryUsageMb > 0 ? `${metrics.memoryUsageMb} MB` : 'No medido'}</div>
+                  <p className="text-[10px] text-slate-400">Métrica de servidor no conectada</p>
                 </div>
 
                 <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
-                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Trazabilidad ISO</span>
+                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Verificación de procedencia</span>
                   </div>
-                  <div className="font-mono text-base font-bold text-emerald-400">100.0%</div>
-                  <p className="text-[10px] text-slate-400">Auditoría de proveniencia</p>
+                  <div className="font-mono text-base font-bold text-amber-300">No verificada</div>
+                  <p className="text-[10px] text-slate-400">Validación de fuentes pendiente</p>
                 </div>
               </div>
 
               {/* Engine Status Grid */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-200">Estado Operativo de los 12 Engines Desacoplados:</span>
+                <span className="text-xs font-bold text-slate-200">Estado declarado de motores (sin verificación en producción):</span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">DataEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 100% OPERATIVO</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">ProvenanceEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 ISO 27001 AUDIT</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">EconometricEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 OLS / DiD OK</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">DigitalTwinEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 COBB-DOUGLAS</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">ForecastEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 FAN CHARTS</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">FaiiEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 MULTICRITERIA</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">AnomalyEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 Z-SCORE AUDIT</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">CopilotEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 GEMINI 3.7 SYNC</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                   <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
                     <span className="text-slate-300">OrchestratorEngine</span>
-                    <span className="text-[10px] font-bold text-emerald-400">🟢 E2E PIPELINE</span>
+                    <span className="text-[10px] font-bold text-amber-300">⚠ DEMO / NO VERIFICADO</span>
                   </div>
                 </div>
               </div>
@@ -263,17 +263,17 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
           {/* TAB 2: AUDIT GATES (G1 to G7) */}
           {activeSubTab === 'audit-gates' && auditResult && (
             <div className="space-y-4">
-              <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between">
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between">
                 <div>
-                  <h4 className="text-emerald-300 font-bold text-sm flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    CERTIFICADO DE RIGOR METODOLÓGICO — {auditResult.report.overallStatus}
+                  <h4 className="text-amber-300 font-bold text-sm flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-400" />
+                    DICTAMEN DE AUDITORÍA INTERNA — {auditResult.report.overallStatus}
                   </h4>
                   <p className="text-xs text-slate-300 mt-1">{auditResult.report.executiveSummary}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-xl font-black text-emerald-400 font-mono">7 / 7</span>
-                  <p className="text-[10px] text-slate-400">Compuertas Superadas</p>
+                  <span className="text-xl font-black text-amber-300 font-mono">{auditResult.gates.filter((gate) => gate.status === 'PASSED').length} / {auditResult.gates.length}</span>
+                  <p className="text-[10px] text-slate-400">Compuertas superadas (sin certificación externa)</p>
                 </div>
               </div>
 
@@ -285,7 +285,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
                         <span className="font-mono text-xs font-bold text-amber-400">{gate.gateId}</span>
                         <span className="text-xs font-bold text-slate-100">{gate.name}</span>
                       </div>
-                      <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded">
+                      <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-500/10 text-amber-200 border border-amber-500/30 rounded">
                         {gate.status}
                       </span>
                     </div>
@@ -305,7 +305,7 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
               <div className="flex items-center justify-between p-3.5 bg-slate-950 border border-slate-800 rounded-xl">
                 <div>
                   <h4 className="text-sm font-bold text-slate-100">Batería de Pruebas Unitarias, Econométricas &amp; de Integración</h4>
-                  <p className="text-xs text-slate-400">Ejecución en tiempo real sobre los 12 motores del sistema.</p>
+                  <p className="text-xs text-slate-400">Ejecución local de pruebas de lógica; no verifica despliegue, datos en vivo ni telemetría de producción.</p>
                 </div>
                 <div className="flex items-center gap-4 text-right">
                   <div>
@@ -347,9 +347,9 @@ export const ObservabilityModal: React.FC<ObservabilityModalProps> = ({ isOpen, 
         {/* Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs text-slate-400">
           <div className="flex items-center gap-2 font-mono text-[11px]">
-            <span>Estándar: ISO/IEC 27001 • NIST AI RMF</span>
+            <span>Criterios internos; no es certificación externa</span>
             <span>•</span>
-            <span className="text-emerald-400">Regla de Oro Epistémica 100% Activa</span>
+            <span className="text-emerald-400">Validación independiente pendiente</span>
           </div>
           <button
             onClick={onClose}

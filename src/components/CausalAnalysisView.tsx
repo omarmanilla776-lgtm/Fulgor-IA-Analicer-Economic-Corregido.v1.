@@ -37,7 +37,7 @@ interface CausalAnalysisViewProps {
 }
 
 export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCopilotWithPrompt }) => {
-  const [selectedExpId, setSelectedExpId] = useState<string>(DID_EXPERIMENTS[0].id);
+  const [selectedExpId, setSelectedExpId] = useState<string>(DID_EXPERIMENTS[0]?.id ?? '');
   const [activeTab, setActiveTab] = useState<'did' | 'interactive-orchestrator'>('did');
 
   // Interactive Orchestrator State
@@ -47,8 +47,6 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
   const [postTreat, setPostTreat] = useState<number>(21.6);
   const [preControl, setPreControl] = useState<number>(0.1);
   const [postControl, setPostControl] = useState<number>(0.2);
-  const [standardError, setStandardError] = useState<number>(2.45);
-  const [sampleSizeN, setSampleSizeN] = useState<number>(420);
   
   const [isExecutingOrchestrator, setIsExecutingOrchestrator] = useState<boolean>(false);
   const [orchestratedResult, setOrchestratedResult] = useState<OrchestrationPipelineResult | null>(null);
@@ -64,16 +62,14 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           countryCode,
           sector: 'Manufactura & Servicios Avanzados',
           indicatorCode: 'PROD_LIFT_DID',
-          indicatorName: 'Productividad Marginal del Trabajo',
-          period: '2026-Q1/Q2'
+          indicatorName: 'Contraste descriptivo de ejemplo',
+          period: 'DEMO — periodo no verificado'
         },
         parameters: {
           preTreat,
           postTreat,
           preControl,
           postControl,
-          se: standardError,
-          sampleSize: sampleSizeN,
           xValues: [10, 20, 30, 40, 50, 60, 70, 80],
           yValues: [12, 22, 35, 41, 56, 68, 74, 89]
         },
@@ -100,10 +96,10 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             <EpistemicBadge type="CAUSAL_INFERENCE" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Diferenciación Estricta: Correlación Estadística vs. Causalidad Inequívoca
+            Correlación vs. inferencia causal: los supuestos deben verificarse
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Implementación de métodos cuasi-experimentales (Difference-in-Differences, controles sintéticos y variables instrumentales) con validación obligatoria de supuestos de tendencias paralelas.
+            Interfaz de demostración para explorar conceptos de inferencia causal. Los valores iniciales y las series OLS son sintéticos. El DiD calcula solo un contraste descriptivo; no certifica tendencias paralelas ni efectos causales.
           </p>
         </div>
 
@@ -113,10 +109,10 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             className="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
           >
             <Play className="w-3.5 h-3.5" />
-            {activeTab === 'did' ? 'Modo Orquestador Interactivo' : 'Ver Estudios Calibrados'}
+            {activeTab === 'did' ? 'Modo Orquestador Interactivo' : 'Ver ejemplos de demostración'}
           </button>
           <button
-            onClick={() => onOpenCopilotWithPrompt(`Explica detalladamente la metodología Difference-in-Differences (DiD), cómo se verifica el supuesto de tendencias paralelas y por qué un p-value de ${activeExperiment.parallelTrendsPValue} valida la inferencia causal en este caso.`)}
+            onClick={() => onOpenCopilotWithPrompt(`Explica la metodología Difference-in-Differences (DiD), qué datos hacen falta para evaluar tendencias paralelas y por qué este ejemplo de demostración no permite certificar inferencia causal.`)}
             className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Copilot
@@ -131,7 +127,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           La Escala Epistémica de Fulgor IA Analicer Economic
         </h3>
         <p className="text-xs text-slate-400">
-          Toda afirmación económica debe clasificarse dentro de uno de los siguientes 5 niveles de certeza:
+          Toda afirmación debe clasificarse por su tipo de evidencia; la etiqueta no sustituye la verificación de fuentes:
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
@@ -139,7 +135,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10px] font-bold text-emerald-400">NIVEL 1</span>
-              <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1 rounded">100% Certeza</span>
+              <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1 rounded">Requiere fuente y fecha verificadas</span>
             </div>
             <h4 className="font-bold text-slate-100 text-xs">Dato Observado</h4>
             <p className="text-[11px] text-slate-300">Medición empírica histórica directa por agencias oficiales (INEGI, FRED, Eurostat).</p>
@@ -151,7 +147,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               <span className="text-[10px] bg-amber-950 text-amber-300 px-1 rounded">Asociación (r)</span>
             </div>
             <h4 className="font-bold text-slate-100 text-xs">Correlación</h4>
-            <p className="text-[11px] text-slate-300">Dos variables se mueven juntas. <strong className="text-amber-300">Nunca</strong> prueba que una sea la causa de la otra.</p>
+            <p className="text-[11px] text-slate-300">Dos variables pueden moverse juntas; la correlación por sí sola no demuestra causalidad.</p>
           </div>
 
           <div className="p-3 rounded-lg bg-sky-950/20 border border-sky-500/30 space-y-1.5">
@@ -169,7 +165,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               <span className="text-[10px] bg-purple-950 text-purple-300 px-1 rounded">Cuasi-Experimento</span>
             </div>
             <h4 className="font-bold text-slate-100 text-xs">Inferencia Causal</h4>
-            <p className="text-[11px] text-slate-300">Efecto tratamiento medido contra un grupo de control sintético contrafactual verificado.</p>
+            <p className="text-[11px] text-slate-300">Ejemplo ilustrativo: no hay un contrafactual verificado ni datos empíricos conectados.</p>
           </div>
 
           <div className="p-3 rounded-lg bg-rose-950/20 border border-rose-500/30 space-y-1.5">
@@ -191,7 +187,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           {/* Left: Experiment Selection */}
           <div className="lg:col-span-4 space-y-3">
             <div className="text-xs font-semibold text-slate-400">
-              Estudios Cuasi-Experimentales Calibrados ({DID_EXPERIMENTS.length})
+              Escenarios ilustrativos — no estudios empíricos ({DID_EXPERIMENTS.length})
             </div>
 
             <div className="space-y-3">
@@ -219,9 +215,9 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                     </h4>
 
                     <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800 flex items-center justify-between">
-                      <span>Efecto Tratamiento Estimado:</span>
+                      <span>Efecto causal validado:</span>
                       <span className="font-mono font-bold text-emerald-400">
-                        +{exp.estimatedTreatmentEffect}% (95% CI)
+                        No disponible
                       </span>
                     </div>
                   </div>
@@ -232,31 +228,31 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             {/* Econometric Parameters Box */}
             <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 text-xs">
               <h4 className="font-bold text-slate-200 flex items-center gap-1.5">
-                <Calculator className="w-3.5 h-3.5 text-purple-400" /> Parámetros Econométricos del Modelo
+                <Calculator className="w-3.5 h-3.5 text-purple-400" /> Estadísticas de ejemplo (no validadas)
               </h4>
               <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Efecto (Beta)</span>
-                  <span className="text-emerald-400 font-bold">+{activeExperiment.estimatedTreatmentEffect}%</span>
+                  <span className="text-amber-300 font-bold">{activeExperiment.estimatedTreatmentEffect === null ? "No validado" : `${activeExperiment.estimatedTreatmentEffect}% (no verificado)`}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Estadístico t</span>
-                  <span className="text-slate-200 font-bold">{activeExperiment.tStatistic}</span>
+                  <span className="text-slate-200 font-bold">{activeExperiment.tStatistic ?? "No calculado"}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">R² Ajustado</span>
-                  <span className="text-slate-200 font-bold">{activeExperiment.rSquared}</span>
+                  <span className="text-slate-200 font-bold">{activeExperiment.rSquared ?? "No calculado"}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Muestra Total (N)</span>
-                  <span className="text-slate-200 font-bold">{activeExperiment.sampleSize}</span>
+                  <span className="text-slate-200 font-bold">{activeExperiment.sampleSize ?? "No disponible"}</span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded bg-emerald-950/30 border border-emerald-500/30 flex items-center gap-2 text-[11px] text-emerald-300">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="p-2.5 rounded bg-amber-950/30 border border-amber-500/30 flex items-center gap-2 text-[11px] text-amber-200">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>
-                  Tendencias Paralelas Verificadas (F-test p = {activeExperiment.parallelTrendsPValue} &gt; 0.05).
+                  Tendencias paralelas NO verificadas; no se informa p-value inferencial.
                 </span>
               </div>
             </div>
@@ -273,10 +269,10 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                     Modelo: Difference-in-Differences (DiD)
                   </span>
                   <span className="text-xs text-slate-500">•</span>
-                  <span className="text-xs text-slate-400">{activeExperiment.targetSector}</span>
+                  <span className="text-xs text-slate-400">{activeExperiment.targetSector} — escenario simulado</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-100">
-                  Trayectoria Observada vs. Contrafactual Sintético (Sin Adopción)
+                  Trayectorias simuladas de tratamiento y control (no datos observados)
                 </h3>
               </div>
 
@@ -310,7 +306,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                       <Line 
                         type="monotone" 
                         dataKey="treatmentActual" 
-                        name="Tratamiento Real (Firmas con IA)" 
+                        name="Tratamiento simulado (con IA)" 
                         stroke="#34d399" 
                         strokeWidth={3} 
                         dot={{ r: 4 }} 
@@ -318,7 +314,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                       <Line 
                         type="monotone" 
                         dataKey="treatmentCounterfactual" 
-                        name="Contrafactual Estimado (Sin IA)" 
+                        name="Contrafactual simulado (sin IA)" 
                         stroke="#f59e0b" 
                         strokeWidth={2} 
                         strokeDasharray="5 5" 
@@ -327,7 +323,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                       <Line 
                         type="monotone" 
                         dataKey="controlGroup" 
-                        name="Grupo de Control Observado" 
+                        name="Grupo de control simulado" 
                         stroke="#64748b" 
                         strokeWidth={2} 
                         dot={{ r: 3 }} 
@@ -339,7 +335,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 <div className="p-3 bg-purple-950/20 border border-purple-500/30 rounded-lg text-xs text-purple-200 leading-relaxed flex items-start gap-2">
                   <FileCheck2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>Efecto Causal Neto:</strong> El diferencial entre la trayectoria real tratada ({activeExperiment.seriesData[activeExperiment.seriesData.length - 1].treatmentActual}) y el contrafactual ({activeExperiment.seriesData[activeExperiment.seriesData.length - 1].treatmentCounterfactual}) representa una ganancia neta estimada de <strong>+{activeExperiment.estimatedTreatmentEffect}%</strong> atribuible con 95% de confianza al despliegue de IA.
+                    <strong>Advertencia:</strong> Las curvas mostradas son ilustrativas y simuladas; no representan datos observados, no verifican un contrafactual y no permiten atribuir un efecto causal.
                   </span>
                 </div>
               </div>
@@ -349,7 +345,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 
                 <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5 text-xs">
                   <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Supuestos Clave Validados
+                    <AlertTriangle className="w-3.5 h-3.5" /> Supuestos no verificados
                   </span>
                   <ul className="list-disc list-inside text-slate-400 text-[11px] space-y-1 leading-relaxed">
                     {activeExperiment.assumptions.map((assump, idx) => (
@@ -439,25 +435,20 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               {targetEngineType === 'causal' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-slate-300 font-medium">Post-Tratamiento (% Delta)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={postTreat}
-                      onChange={(e) => setPostTreat(Number(e.target.value))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none"
-                    />
+                    <label className="text-slate-300 font-medium">Tratamiento — antes</label>
+                    <input type="number" step="any" value={preTreat} onChange={(e) => setPreTreat(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
                   </div>
-
                   <div className="space-y-1.5">
-                    <label className="text-slate-300 font-medium">Error Estándar (SE)</label>
-                    <input
-                      type="number"
-                      step="0.05"
-                      value={standardError}
-                      onChange={(e) => setStandardError(Number(e.target.value))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none"
-                    />
+                    <label className="text-slate-300 font-medium">Tratamiento — después</label>
+                    <input type="number" step="any" value={postTreat} onChange={(e) => setPostTreat(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-slate-300 font-medium">Control — antes</label>
+                    <input type="number" step="any" value={preControl} onChange={(e) => setPreControl(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-slate-300 font-medium">Control — después</label>
+                    <input type="number" step="any" value={postControl} onChange={(e) => setPostControl(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
                   </div>
                 </>
               )}
@@ -477,7 +468,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                   </div>
                   <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Audit Hash: {orchestratedResult.auditHash.substring(0, 18)}...</span>
+                    <span>Huella demostrativa (no criptográfica): {orchestratedResult.auditHash.substring(0, 18)}...</span>
                   </div>
                 </div>
 
@@ -485,19 +476,23 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">SOURCE CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className={orchestratedResult.qualityAudit.sourceCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.sourceCheckPassed ? "PASS" : "NOT VERIFIED"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">DATA CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className="text-amber-300 font-bold">{orchestratedResult.qualityAudit.dataCheckPassed ? "STRUCTURE PRESENT — NOT VERIFIED" : "MISSING"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">MODEL CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className={orchestratedResult.qualityAudit.modelCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.modelCheckPassed ? "VALIDATED" : "NOT VALIDATED"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">STATISTICAL CHECK</span>
-                    <span className="text-emerald-400 font-bold">100% OK</span>
+                    <span className={orchestratedResult.qualityAudit.statisticalCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.statisticalCheckPassed ? "VALIDATED" : "NOT VALIDATED"}</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-900 border border-slate-800">
+                    <span className="text-[10px] text-slate-500 block">EPISTEMIC CHECK</span>
+                    <span className={orchestratedResult.qualityAudit.epistemicCheckPassed ? "text-emerald-400 font-bold" : "text-amber-300 font-bold"}>{orchestratedResult.qualityAudit.epistemicCheckPassed ? "PASS" : "NOT VERIFIED"}</span>
                   </div>
                   <div className="p-2 rounded bg-slate-900 border border-slate-800">
                     <span className="text-[10px] text-slate-500 block">CONFIDENCE SCORE</span>
@@ -509,20 +504,20 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 {targetEngineType === 'causal' && (
                   <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Efecto Tratamiento DiD</span>
-                      <span className="text-emerald-400 text-sm font-bold">+{orchestratedResult.analyticalResult.treatmentEffect}%</span>
+                      <span className="text-slate-400 block text-[10px]">Contraste descriptivo DiD</span>
+                      <span className="text-amber-300 text-sm font-bold">{orchestratedResult.analyticalResult.treatmentEffect} (unidades de entrada)</span>
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[10px]">Estadístico t</span>
-                      <span className="text-slate-200 text-sm font-bold">{orchestratedResult.analyticalResult.tStat}</span>
+                      <span className="text-slate-200 text-sm font-bold">{orchestratedResult.analyticalResult.tStat ?? "No calculado"}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Intervalo de Confianza (95%)</span>
-                      <span className="text-slate-200 text-sm font-bold">[{orchestratedResult.analyticalResult.ciLower95}%, {orchestratedResult.analyticalResult.ciUpper95}%]</span>
+                      <span className="text-slate-400 block text-[10px]">IC 95% (no disponible)</span>
+                      <span className="text-slate-200 text-sm font-bold">{orchestratedResult.analyticalResult.ciLower95 === null || orchestratedResult.analyticalResult.ciUpper95 === null ? "No calculado" : `[${orchestratedResult.analyticalResult.ciLower95}, ${orchestratedResult.analyticalResult.ciUpper95}]`}</span>
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[10px]">Tendencias Paralelas</span>
-                      <span className="text-emerald-400 text-sm font-bold">{orchestratedResult.analyticalResult.parallelTrendsVerified ? 'VERIFICADAS' : 'FALLIDAS'}</span>
+                      <span className="text-amber-300 text-sm font-bold">{orchestratedResult.analyticalResult.parallelTrendsVerified ? 'VERIFICADAS' : 'NO VERIFICADAS'}</span>
                     </div>
                   </div>
                 )}

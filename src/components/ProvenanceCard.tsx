@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataSourceProvenance } from '../types/economic';
-import { Database, CheckCircle, ExternalLink, Calendar, Layers, Activity } from 'lucide-react';
+import { Database, ExternalLink, Calendar, Layers, Activity, AlertTriangle } from 'lucide-react';
 
 interface ProvenanceCardProps {
   provenance: DataSourceProvenance;
@@ -9,50 +9,46 @@ interface ProvenanceCardProps {
 
 export const ProvenanceCard: React.FC<ProvenanceCardProps> = ({ provenance, compact = false }) => {
   return (
-    <div 
+    <div
       id={`provenance-${provenance.agency.replace(/\s+/g, '-').toLowerCase()}`}
-      className="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-300 text-xs space-y-2"
+      className="p-3.5 rounded-lg bg-slate-900/80 border border-amber-800/70 text-slate-300 text-xs space-y-2"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Database className="w-3.5 h-3.5 text-amber-400" />
           <span className="font-semibold text-slate-100">{provenance.sourceName}</span>
-          {provenance.isOfficial && (
-            <span className="flex items-center gap-1 text-[10px] bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded">
-              <CheckCircle className="w-2.5 h-2.5" /> Oficial
-            </span>
-          )}
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400">Confiabilidad:</span>
-          <span className={`font-mono font-bold text-xs ${provenance.confidenceScore >= 95 ? 'text-emerald-400' : 'text-amber-400'}`}>
-            {provenance.confidenceScore}%
-          </span>
-        </div>
+        <span className="flex items-center gap-1 text-[10px] bg-amber-950/60 text-amber-200 border border-amber-500/30 px-1.5 py-0.5 rounded">
+          <AlertTriangle className="w-2.5 h-2.5" /> Fuente no conectada
+        </span>
       </div>
 
+      <p className="text-[11px] text-amber-200 leading-relaxed">
+        Referencia de fuente declarada en los datos de demostración. La conexión, descarga, fecha, cifras y metodología no han sido verificadas automáticamente por la aplicación.
+      </p>
+
       <p className="text-[11px] text-slate-400 leading-relaxed">
-        <strong className="text-slate-300">Dataset:</strong> {provenance.datasetName}
+        <strong className="text-slate-300">Dataset declarado:</strong> {provenance.datasetName}
       </p>
 
       {!compact && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 border-t border-slate-800/80 text-[11px] text-slate-400">
           <div>
-            <span className="text-slate-500 block text-[10px]">Corte de Datos</span>
+            <span className="text-slate-500 block text-[10px]">Fecha declarada (sin verificar)</span>
             <span className="font-mono text-slate-300 flex items-center gap-1 mt-0.5">
               <Calendar className="w-3 h-3 text-slate-500" /> {provenance.cutoffDate}
             </span>
           </div>
           <div>
-            <span className="text-slate-500 block text-[10px]">Frecuencia</span>
+            <span className="text-slate-500 block text-[10px]">Frecuencia declarada</span>
             <span className="font-mono text-slate-300 flex items-center gap-1 mt-0.5">
               <Layers className="w-3 h-3 text-slate-500" /> {provenance.frequency}
             </span>
           </div>
           <div>
-            <span className="text-slate-500 block text-[10px]">Error Estándar (SE)</span>
+            <span className="text-slate-500 block text-[10px]">Error estándar</span>
             <span className="font-mono text-slate-300 flex items-center gap-1 mt-0.5">
-              <Activity className="w-3 h-3 text-slate-500" /> {provenance.standardError ? `±${provenance.standardError}` : 'N/A'}
+              <Activity className="w-3 h-3 text-slate-500" /> No verificado
             </span>
           </div>
         </div>
@@ -60,7 +56,7 @@ export const ProvenanceCard: React.FC<ProvenanceCardProps> = ({ provenance, comp
 
       {!compact && provenance.methodology && (
         <div className="text-[10px] text-slate-400 bg-slate-950/60 p-2 rounded border border-slate-800/60">
-          <span className="font-semibold text-slate-300">Metodología: </span>
+          <span className="font-semibold text-slate-300">Metodología declarada, no auditada: </span>
           {provenance.methodology}
         </div>
       )}
@@ -73,7 +69,7 @@ export const ProvenanceCard: React.FC<ProvenanceCardProps> = ({ provenance, comp
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-[11px] text-amber-400 hover:text-amber-300 transition-colors"
           >
-            Verificar en fuente oficial <ExternalLink className="w-3 h-3" />
+            Abrir sitio de referencia <ExternalLink className="w-3 h-3" />
           </a>
         </div>
       )}

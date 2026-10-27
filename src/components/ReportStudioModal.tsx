@@ -48,12 +48,25 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
           document.body.appendChild(downloadAnchor);
           downloadAnchor.click();
           downloadAnchor.remove();
-        } else if (reportFormat === 'markdown' || reportFormat === 'csv') {
+        } else if (reportFormat === 'markdown') {
           const mdContent = ReportEngine.generateSystemHealthReport('markdown');
           const dataStr = "data:text/markdown;charset=utf-8," + encodeURIComponent(mdContent);
           const downloadAnchor = document.createElement('a');
           downloadAnchor.setAttribute("href", dataStr);
           downloadAnchor.setAttribute("download", `fulgor-system-health-report-${Date.now()}.md`);
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          downloadAnchor.remove();
+        } else if (reportFormat === 'csv') {
+          const escapeCsv = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+          const header = ['RecordType', 'ID', 'Name', 'Status', 'Details', 'DataStatus'];
+          const gateRows = auditPreview.releaseGates.map(gate => ['release_gate', gate.gateId, gate.name, gate.status, gate.details, 'DEMO_DATA_NOT_VERIFIED']);
+          const testRows = auditPreview.testSuite.tests.map(test => ['test', test.testId, test.name, test.passed ? 'PASS' : 'FAIL', test.details, 'DEMO_DATA_NOT_VERIFIED']);
+          const csvContent = [header, ...gateRows, ...testRows].map(row => row.map(escapeCsv).join(',')).join('\n');
+          const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.setAttribute("href", dataStr);
+          downloadAnchor.setAttribute("download", `fulgor-system-health-report-${Date.now()}.csv`);
           document.body.appendChild(downloadAnchor);
           downloadAnchor.click();
           downloadAnchor.remove();
@@ -68,7 +81,8 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
             country: currentCountry,
             indicators: primaryIndicators,
             sectors: sectors,
-            epistemicCompliance: "ISO-like Fulgor Methodological Standard verified (Rule of Gold)"
+            dataStatus: "DEMO_DATA_NOT_VERIFIED",
+            epistemicCompliance: "No verificado; no constituye certificación ni validación de fuentes"
           }, null, 2));
           const downloadAnchor = document.createElement('a');
           downloadAnchor.setAttribute("href", dataStr);
@@ -77,9 +91,9 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
           downloadAnchor.click();
           downloadAnchor.remove();
         } else if (reportFormat === 'csv') {
-          const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,OfficialSource\n";
+          const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,DeclaredSource,DataStatus\n";
           const rows = primaryIndicators.map(i => 
-            `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}"`
+            `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","DEMO_DATA_NOT_VERIFIED"`
           ).join("\n");
           const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);
           const downloadAnchor = document.createElement('a');
@@ -134,8 +148,8 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
               <FileText className="w-4 h-4 text-amber-400" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-100 text-sm">Estudio de Reportes Oficiales & Auditoría</h3>
-              <p className="text-[10px] text-slate-400">Genera informes ejecutivos certificados y el System Health Report de la plataforma.</p>
+              <h3 className="font-bold text-slate-100 text-sm">Estudio de Reportes de Demostración & Auditoría Interna</h3>
+              <p className="text-[10px] text-slate-400">Exporta informes de demostración. Los datos y la auditoría no están certificados ni verificados de forma independiente.</p>
             </div>
           </div>
 
@@ -300,7 +314,7 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
                     onChange={(e) => setIncludeMethodology(e.target.checked)}
                     className="accent-amber-400 rounded"
                   />
-                  <span>Ficha técnica de proveniencia de fuentes oficiales (INEGI, FRED, Eurostat, OCDE)</span>
+                  <span>Ficha de fuentes declaradas; conexión y actualización no verificadas (INEGI, FRED, Eurostat, OCDE)</span>
                 </label>
 
                 <label className="flex items-center gap-2.5 text-slate-300 cursor-pointer bg-slate-950 p-2.5 rounded-lg border border-slate-800">

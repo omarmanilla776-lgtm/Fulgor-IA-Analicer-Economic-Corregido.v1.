@@ -7,6 +7,7 @@ import {
 } from '../types/economic';
 import { EpistemicBadge } from './EpistemicBadge';
 import { ProvenanceCard } from './ProvenanceCard';
+import { LiveEconomicData } from './LiveEconomicData';
 import { PROVENANCE_REGISTRY } from '../data/economicData';
 import { 
   ResponsiveContainer, 
@@ -83,6 +84,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
   return (
     <div className="space-y-6">
+      <LiveEconomicData />
       
       {/* Top Banner: Epistemic & Methodological Principle */}
       <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -91,13 +93,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <span className="font-mono text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-400" /> PRINCIPIO DE RIGOR CIENTÍFICO
             </span>
-            <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+            <EpistemicBadge type="DEMO_DATA" size="sm" />
           </div>
           <h2 className="text-base sm:text-lg font-bold text-slate-100">
-            Inteligencia Macroeconómica Verificada & Medición Causal del Impacto Tecnológico
+            Panel macroeconómico de demostración
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            La confiabilidad está por encima del espectáculo. Cada métrica separa estrictamente 
+            La clasificación epistémica indica el tipo de resultado, no su verificación. El panel de World Bank consulta una fuente pública; los gráficos y rankings estáticos de los demás módulos siguen siendo ilustrativos y no están conectados a esa fuente. Las vistas distinguen 
             <strong className="text-emerald-300"> dato observado</strong>, 
             <strong className="text-amber-300"> correlación estadística</strong>, 
             <strong className="text-sky-300"> estimación modelada</strong>, 
@@ -117,6 +119,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       </div>
 
       {/* Global Macro KPI Grid */}
+      <p className="text-[11px] text-amber-300">Tarjetas y cifras de esta cuadrícula: demostración estática, no se actualizan con el panel World Bank.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {filteredCountries.slice(0, 4).map((country) => (
           <div 
@@ -132,7 +135,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   <span className="text-[10px] text-slate-400 font-mono">{country.currency}</span>
                 </div>
               </div>
-              <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+              <EpistemicBadge type="DEMO_DATA" size="sm" />
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 text-xs">
@@ -171,7 +174,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               Dinámica Macroeconómica & Cruce de Variables
             </h3>
             <p className="text-xs text-slate-400">
-              Series históricas armonizadas y análisis de dispersión entre penetración tecnológica y valor agregado.
+              Gráficos de demostración sin series conectadas; los puntos de dispersión son sintéticos y no acreditan una relación empírica.
             </p>
           </div>
 
@@ -182,7 +185,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 activeTabSub === 'macro' ? 'bg-slate-800 text-amber-400' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Crecimiento Histórico
+              Escenario PIB (demo)
             </button>
             <button
               onClick={() => setActiveTabSub('ai-correlation')}
@@ -208,9 +211,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400">
-                Variación porcentual anual del PIB Real (2021 - 2025)
+                Valores ilustrativos de variación anual del PIB real (2021–2025; no verificados)
               </span>
-              <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+              <EpistemicBadge type="DEMO_DATA" size="sm" />
             </div>
 
             <div className="h-72 w-full">
@@ -224,10 +227,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                  <Line type="monotone" dataKey="US" name="Estados Unidos (BEA)" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="MX" name="México (INEGI)" stroke="#34d399" strokeWidth={2.5} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="ES" name="España (INE)" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="DE" name="Alemania (Destatis)" stroke="#c084fc" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="US" name="Estados Unidos (ejemplo)" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="MX" name="México (ejemplo)" stroke="#34d399" strokeWidth={2.5} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="ES" name="España (ejemplo)" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="DE" name="Alemania (ejemplo)" stroke="#c084fc" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -235,7 +238,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <div className="p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-xs text-slate-400 flex items-start gap-2">
               <HelpCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>
-                <strong>Lectura metodológica:</strong> Datos extraídos de Cuentas Nacionales oficiales. La recuperación post-2021 muestra dinámicas dispares en Europa central por costos energéticos versus la resiliencia impulsada por inversión productiva en Norteamérica.
+                <strong>Lectura metodológica:</strong> Las curvas son valores estáticos de demostración, no datos extraídos de cuentas nacionales ni una comparación empírica verificada.
               </span>
             </div>
           </div>
@@ -247,10 +250,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <span className="text-xs font-semibold text-slate-200">
-                  Tasa de Adopción Empresarial de IA (%) vs Crecimiento PIB (%)
+                  Puntos sintéticos de adopción IA vs. crecimiento del PIB
                 </span>
                 <span className="text-[11px] text-amber-400 block font-mono">
-                  Coeficiente de Correlación de Pearson: r = +0.64 (p-value = 0.012)
+                  Coeficiente y p-value: no disponibles; no calculados con una muestra verificada
                 </span>
               </div>
               <EpistemicBadge type="CORRELATION" size="sm" showDetail />
@@ -268,13 +271,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
                     formatter={(val: any, name: string) => [`${val}`, name]}
                   />
-                  <Scatter name="Economías Analizadas" data={scatterData} fill="#f59e0b" shape="circle" />
+                  <Scatter name="Puntos de demostración" data={scatterData} fill="#f59e0b" shape="circle" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
 
             <div className="p-3 bg-amber-950/20 border border-amber-500/30 rounded-lg text-xs text-amber-200/90 leading-relaxed">
-              <strong>Advertencia Epistemológica Fulgor IA:</strong> Aunque se observa una asociación positiva (r = 0.64), esto <em>NO</em> implica que la adopción de IA sea la causa directa exclusiva del crecimiento macroeconómico general. Las economías con mayores rentas per cápita cuentan con mayor capital disponible para invertir en I+D. Para una inferencia causal rigurosa con grupos de control, consulta el <strong>Módulo de Inferencia Causal (DiD)</strong>.
+              <strong>Advertencia Epistemológica Fulgor IA:</strong> Los puntos de esta gráfica son demostrativos, no observaciones económicas verificadas. No se reporta correlación ni significancia estadística. Para estimar una asociación real se requieren series compatibles, fuente, periodo y método reproducible; una correlación tampoco demuestra causalidad.
             </div>
           </div>
         )}
@@ -333,7 +336,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
         </div>
 
-        {/* Real-time Economic Alerts */}
+        {/* Demo economic alerts */}
         <div className="p-5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">

@@ -2,14 +2,53 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
+import { timingSafeEqual } from 'node:crypto';
 import { GoogleGenAI } from '@google/genai';
 
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+// Enable only when the deployment platform's reverse proxy is trusted and configured.
+if (process.env.TRUST_PROXY === '1') app.set('trust proxy', 1);
+const configuredPort = process.env.PORT === undefined ? 3000 : Number(process.env.PORT);
+if (!Number.isInteger(configuredPort) || configuredPort < 1 || configuredPort > 65535) {
+  throw new Error('PORT debe ser un entero entre 1 y 65535.');
+}
+const PORT = configuredPort;
 
-app.use(express.json({ limit: '10mb' }));
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+app.use(express.json({ limit: '256kb' }));
+
+// Protected API routes fail closed unless a server-side bearer secret is configured.
+// Never send FULGOR_API_KEY to browser code.
+function requireConfiguredBearer(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const configuredKey = process.env.FULGOR_API_KEY;
+  if (!configuredKey || configuredKey.length < 32) {
+    return res.status(503).json({ error: 'Servicio API no disponible: falta configurar un secreto de servidor válido.' });
+  }
+  const authorization = req.headers.authorization || '';
+  const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  const supplied = Buffer.from(suppliedKey);
+  const expected = Buffer.from(configuredKey);
+  if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
+    return res.status(401).json({ error: 'Autenticación requerida.' });
+  }
+  next();
+}
+
+// Protect legacy endpoints too: they can trigger model costs or return computed outputs.
+// The public demo UI must not embed the secret; use a trusted server-side session/proxy for live access.
+app.use('/api/copilot', requireConfiguredBearer);
+app.use('/api/digital-twin', requireConfiguredBearer);
+app.use('/api/causal', requireConfiguredBearer);
 
 // Lazy Google GenAI Client
 let aiClient: GoogleGenAI | null = null;
@@ -28,23 +67,122 @@ function getGenAI(): GoogleGenAI | null {
 }
 
 // 1. Health check
+type WorldBankObservation = {
+  countryiso3code?: string;
+  country?: { value?: string };
+  date?: string;
+  value?: number | null;
+  indicator?: { id?: string; value?: string };
+};
+
+const worldBankCache: { expiresAt: number; payload: Record<string, unknown> } = {
+  expiresAt: 0,
+  payload: {},
+};
+const publicFeedRate = new Map<string, { count: number; resetAt: number }>();
+const WORLD_BANK_COUNTRIES: Record<string, string> = {
+  MEX: 'México',
+  USA: 'Estados Unidos',
+  ESP: 'España',
+  DEU: 'Alemania',
+};
+const WORLD_BANK_INDICATORS = [
+  { id: 'NY.GDP.MKTP.KD.ZG', label: 'Crecimiento anual del PIB real', unit: '%' },
+  { id: 'FP.CPI.TOTL.ZG', label: 'Inflación anual del IPC', unit: '%' },
+  { id: 'SL.UEM.TOTL.ZS', label: 'Desempleo (% de fuerza laboral; estimación modelada OIT)', unit: '%' },
+] as const;
+
+app.get('/api/public/world-bank', async (req, res) => {
+  const now = Date.now();
+  const clientKey = req.ip || req.socket.remoteAddress || 'unknown';
+  const current = publicFeedRate.get(clientKey);
+  if (!current || current.resetAt <= now) {
+    publicFeedRate.set(clientKey, { count: 1, resetAt: now + 60_000 });
+  } else if (current.count >= 30) {
+    return res.status(429).json({ error: 'Límite temporal de consultas alcanzado. Inténtalo de nuevo en un minuto.' });
+  } else {
+    current.count += 1;
+  }
+  if (publicFeedRate.size > 5000) {
+    for (const [key, value] of publicFeedRate) {
+      if (value.resetAt <= now) publicFeedRate.delete(key);
+    }
+  }
+
+  if (worldBankCache.expiresAt > now && Object.keys(worldBankCache.payload).length > 0) {
+    return res.json(worldBankCache.payload);
+  }
+
+  try {
+    const countryCodes = Object.keys(WORLD_BANK_COUNTRIES).join(';');
+    const responses = await Promise.all(WORLD_BANK_INDICATORS.map(async (indicator) => {
+      const url = `https://api.worldbank.org/v2/country/${countryCodes}/indicator/${indicator.id}?format=json&per_page=1000`;
+      const response = await fetch(url, { signal: AbortSignal.timeout(12_000), headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error(`World Bank returned HTTP ${response.status}`);
+      const body = await response.json() as [unknown, WorldBankObservation[] | null];
+      const rows = Array.isArray(body?.[1]) ? body[1] : [];
+      if (rows.length === 0) console.warn('World Bank Open Data returned no rows for indicator:', indicator.id, JSON.stringify(body?.[0] ?? {}).slice(0, 300));
+      const latestByCountry = new Map<string, WorldBankObservation>();
+      for (const row of rows) {
+        const code = row.countryiso3code || '';
+        if (!WORLD_BANK_COUNTRIES[code] || row.value === null || row.value === undefined ||
+            !Number.isFinite(Number(row.value)) || !/^\d{4}$/.test(row.date || '')) continue;
+        const prior = latestByCountry.get(code);
+        if (!prior || Number(row.date) > Number(prior.date)) latestByCountry.set(code, row);
+      }
+      return [...latestByCountry.entries()].map(([countryCode, row]) => ({
+        countryCode,
+        countryName: WORLD_BANK_COUNTRIES[countryCode],
+        indicatorCode: indicator.id,
+        indicatorName: indicator.label,
+        value: Number(row.value),
+        unit: indicator.unit,
+        year: row.date,
+        sourceStatus: 'OFFICIAL_SOURCE_VALUE_NOT_INDEPENDENTLY_AUDITED',
+      }));
+    }));
+
+    const observations = responses.flat();
+    if (observations.length === 0) {
+      return res.status(502).json({ error: 'La fuente respondió sin observaciones utilizables; no se sustituyeron con cifras de demostración.' });
+    }
+    const payload = {
+      status: 'WORLD_BANK_DATA_RETRIEVED',
+      source: 'World Bank Open Data',
+      sourceUrl: 'https://api.worldbank.org/',
+      retrievedAt: new Date().toISOString(),
+      note: 'Último dato no nulo disponible por país e indicador. La fecha corresponde al año de la observación, no a tiempo real. Las series no han sido auditadas independientemente por Fulgor.',
+      observations,
+    };
+    worldBankCache.payload = payload;
+    worldBankCache.expiresAt = now + 30 * 60_000;
+    return res.json(payload);
+  } catch (error) {
+    console.warn('World Bank Open Data request failed:', error instanceof Error ? error.message : 'unknown error');
+    return res.status(502).json({ error: 'No se pudo consultar World Bank Open Data. No se muestran cifras alternativas inventadas.' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'FULGOR IA ANALICER ECONOMIC API',
     timestamp: new Date().toISOString(),
-    version: '1.0.0-PRO',
-    hasGeminiKey: !!process.env.GEMINI_API_KEY,
+    version: '1.0.0-DEMO',
   });
 });
 
 // 2. AI Economic Copilot Endpoint
 app.post('/api/copilot/chat', async (req, res) => {
   try {
-    const { prompt, contextCountry, activeSector, history } = req.body;
+    const { prompt, contextCountry, activeSector } = req.body;
 
-    if (!prompt || typeof prompt !== 'string') {
-      return res.status(400).json({ error: 'Prompt es requerido y debe ser texto.' });
+    if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 8000) {
+      return res.status(400).json({ error: 'Prompt requerido; debe contener entre 1 y 8000 caracteres.' });
+    }
+    if ((contextCountry !== undefined && (typeof contextCountry !== 'string' || contextCountry.length > 120)) ||
+        (activeSector !== undefined && (typeof activeSector !== 'string' || activeSector.length > 120))) {
+      return res.status(400).json({ error: 'Los campos de contexto deben ser texto de hasta 120 caracteres.' });
     }
 
     const ai = getGenAI();
@@ -67,12 +205,12 @@ DIRECTIVAS CRÍTICAS DE RIGOR CIENTÍFICO:
 4. Explica con claridad matemática pero en un tono profesional, objetivo, sobrio y analítico.`;
 
     let assistantResponseText = '';
-    let sourcesCited: string[] = ['INEGI BIE', 'Federal Reserve Bank of St. Louis (FRED)', 'OECD.AI Observatory', 'Eurostat / BCE'];
-    let epistemicLevel = 'Alta precisión con separación empírica';
+    let sourcesCited: string[] = [];
+    let epistemicLevel = 'La clasificación epistémica no verifica automáticamente las fuentes';
 
     if (ai) {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
+        model: 'gemini-3.8-flash',
         contents: `Contexto País: ${contextCountry || 'General / Global'}
 Sector activo: ${activeSector || 'Multisectorial'}
 
@@ -85,23 +223,10 @@ ${prompt}`,
       });
       assistantResponseText = response.text || 'Sin respuesta del modelo.';
     } else {
-      // Fallback analytical response when offline or key unavailable
-      assistantResponseText = `### [ANÁLISIS MACROECONÓMICO FULGOR IA]
-**Contexto seleccionado**: ${contextCountry || 'Global'} | **Sector**: ${activeSector || 'Multisectorial'}
-
-1. **[DATO OBSERVADO]**:
-   - En economías avanzadas (EE.UU., Alemania), la adopción empresarial de soluciones de IA generativa alcanzó entre el 41% y el 54% hacia 2025-2026 (Fuente: OCDE.AI Observatory, Banco de la Reserva Federal de St. Louis).
-   - En América Latina (México, Brasil, Chile), la penetración se concentra en servicios financieros, centros de contacto y manufactura avanzada (23% - 28% de firmas medianas/grandes, Fuente: INEGI / CEPAL).
-
-2. **[CORRELACIÓN ESTADÍSTICA (r = 0.68, p < 0.01)]**:
-   - Existe una correlación positiva moderada-alta entre inversión en capital tecnológico digital y el crecimiento del Valor Agregado Bruto (VAB) por hora trabajada. *Nota metodológica: Esta correlación no demuestra que la tecnología sea la única causa motriz, dado que firmas más productivas tienen mayor capacidad financiera de adopción previa.*
-
-3. **[INFERENCIA CAUSAL (Difference-in-Differences / Cuasi-experimental)]**:
-   - Estudios controlados con grupo de comparación sintético muestran un incremento causal neto de entre +17.8% y +24.5% en la velocidad de ejecución de tareas cognitivas repetitivas (código, atención al cliente, documentación).
-
-4. **[PRONÓSTICO PROBABILÍSTICO (Horizonte 2026-2028)]**:
-   - **Escenario Base**: Aumento anual del 0.4% al 0.7% en la Productividad Total de los Factores (PTF) en sectores de alta intensidad digital.
-   - **Riesgos**: Fricciones temporales de recualificación laboral y cuellos de botella energéticos en infraestructura de centros de datos.`;
+      // Fail closed epistemically: no fabricated statistics when the AI provider is unavailable.
+      assistantResponseText = '### MODO SIN DATOS VERIFICADOS\n\nEl servicio de análisis no está configurado. No se generaron cifras, correlaciones, efectos causales ni pronósticos. Configura GEMINI_API_KEY o proporciona datos verificables para continuar.';
+      sourcesCited = [];
+      epistemicLevel = 'No verificado — proveedor no disponible';
     }
 
     res.json({
@@ -114,7 +239,7 @@ ${prompt}`,
     console.error('Error in /api/copilot/chat:', error);
     res.status(500).json({
       error: 'Error al procesar el análisis económico en el Copilot.',
-      details: error.message || String(error),
+      details: 'Revisa los registros del servidor; no se exponen detalles internos al cliente.',
     });
   }
 });
@@ -123,22 +248,35 @@ ${prompt}`,
 app.post('/api/digital-twin/simulate', (req, res) => {
   try {
     const {
-      countryCode = 'MX',
-      aiAdoptionDelta = 25, // +25%
+      aiAdoptionDelta = 25,
       rdIncentivePercentage = 15,
       automationCapitalElasticity = 0.35,
       laborUpskillingSpeed = 3,
       tradeTechOpenness = 75,
       regulatoryFriction = 30,
-      baseGDP = 1845.2, // Billions USD for Mexico, or dynamic
-    } = req.body;
+      baseGDP = 1845.2,
+    } = req.body ?? {};
 
-    const delta = Number(aiAdoptionDelta) || 25;
-    const rd = Number(rdIncentivePercentage) || 15;
-    const elast = Number(automationCapitalElasticity) || 0.35;
-    const upskilling = Number(laborUpskillingSpeed) || 3;
-    const openness = Number(tradeTechOpenness) || 75;
-    const friction = Number(regulatoryFriction) || 30;
+    const numericInputs = { aiAdoptionDelta, rdIncentivePercentage, automationCapitalElasticity, laborUpskillingSpeed, tradeTechOpenness, regulatoryFriction, baseGDP };
+    if (Object.values(numericInputs).some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      return res.status(400).json({ error: 'Todos los parámetros deben ser números finitos.' });
+    }
+    if (aiAdoptionDelta < 0 || aiAdoptionDelta > 100 ||
+        rdIncentivePercentage < 0 || rdIncentivePercentage > 100 ||
+        automationCapitalElasticity < 0 || automationCapitalElasticity > 2 ||
+        laborUpskillingSpeed < 0 || laborUpskillingSpeed > 10 ||
+        tradeTechOpenness < 0 || tradeTechOpenness > 100 ||
+        regulatoryFriction < 0 || regulatoryFriction > 100 ||
+        baseGDP <= 0 || baseGDP > 1_000_000) {
+      return res.status(400).json({ error: 'Uno o más parámetros están fuera de los rangos permitidos.' });
+    }
+
+    const delta = aiAdoptionDelta;
+    const rd = rdIncentivePercentage;
+    const elast = automationCapitalElasticity;
+    const upskilling = laborUpskillingSpeed;
+    const openness = tradeTechOpenness;
+    const friction = regulatoryFriction;
 
     // Structural Economic Simulation Model (Cobb-Douglas augmented with Total Factor Productivity dividend)
     // TFP_lift = alpha * ln(1 + delta/100) * (openness/100) * (1 - friction/200) + (rd * 0.02)
@@ -201,37 +339,40 @@ app.post('/api/digital-twin/simulate', (req, res) => {
         'Modelo basado en función de producción Cobb-Douglas expandida con spillovers de productividad digital.',
         'Se asume transmisión salarial con un retardo de 6 a 12 meses respecto a las ganancias de productividad.',
         'Coste de re-entrenamiento (upskilling) absorbido de forma mixta (50% público con incentivos fiscales, 50% privado).',
-        'Elasticidad de sustitución capital-trabajo calibrada con micro-datos de la OCDE.'
+        'Elasticidades ilustrativas; no existe calibración empírica validada en esta simulación.'
       ],
       riskFactors: [
-        { risk: 'Rigidez regulatoria o barreras de interoperabilidad', severity: friction > 40 ? 'ALTA' : 'MEDIA', probability: '35%' },
-        { risk: 'Brecha de competencias de talento especializado', severity: upskilling < 3 ? 'ALTA' : 'BAJA', probability: '42%' },
-        { risk: 'Concentración de mercado en proveedores de infraestructura tecnológica', severity: 'MEDIA', probability: '55%' }
+        { risk: 'Rigidez regulatoria o barreras de interoperabilidad', severity: friction > 40 ? 'ALTA' : 'MEDIA', probability: 'NO ESTIMADA' },
+        { risk: 'Brecha de competencias de talento especializado', severity: upskilling < 3 ? 'ALTA' : 'BAJA', probability: 'NO ESTIMADA' },
+        { risk: 'Concentración de mercado en proveedores de infraestructura tecnológica', severity: 'MEDIA', probability: 'NO ESTIMADA' }
       ]
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'No fue posible ejecutar la simulación.' });
   }
 });
 
 // 4. Causal Difference-in-Differences Calculation API
 app.post('/api/causal/did-analysis', (req, res) => {
-  const { preTreatmentDiff = 0.2, postTreatmentDiff = 21.6, standardError = 2.76 } = req.body;
+  const { preTreatmentDiff = 0.2, postTreatmentDiff = 21.6, standardError = 2.76 } = req.body ?? {};
+  if ([preTreatmentDiff, postTreatmentDiff, standardError].some((value) => typeof value !== 'number' || !Number.isFinite(value)) ||
+      standardError <= 0) {
+    return res.status(400).json({ error: 'Las diferencias deben ser números finitos y el error estándar debe ser positivo.' });
+  }
   const treatmentEffect = postTreatmentDiff - preTreatmentDiff;
-  const tStat = treatmentEffect / standardError;
-  const pValue = tStat > 3.29 ? 0.001 : (tStat > 2.58 ? 0.01 : (tStat > 1.96 ? 0.05 : 0.12));
-  const ciLower = Number((treatmentEffect - 1.96 * standardError).toFixed(2));
-  const ciUpper = Number((treatmentEffect + 1.96 * standardError).toFixed(2));
+  const pValue = null;
+  const ciLower = null;
+  const ciUpper = null;
 
   res.json({
     method: 'Difference-in-Differences (DiD)',
     treatmentEffect: Number(treatmentEffect.toFixed(2)),
-    confidenceInterval95: [ciLower, ciUpper],
-    standardError,
-    tStatistic: Number(tStat.toFixed(2)),
+    confidenceInterval95: null,
+    standardError: null,
+    tStatistic: null,
     pValue,
-    isStatisticallySignificant: pValue <= 0.05,
-    epistemicStatus: pValue <= 0.05 ? 'EVIDENCIA CAUSAL ROBUSTA (95% CI)' : 'EVIDENCIA INSUFICIENTE / NO SIGNIFICATIVA',
+    isStatisticallySignificant: false,
+    epistemicStatus: 'EXPLORATORIO — no se calculó un p-valor inferencial válido',
     notes: 'Requiere verificación estricta de tendencias paralelas pre-tratamiento.'
   });
 });
@@ -240,10 +381,26 @@ app.post('/api/causal/did-analysis', (req, res) => {
 // VERSIONED API (v1 / v2) - Enterprise REST
 // ==========================================
 
+app.use('/api/v1', (req, res, next) => {
+  if (req.path === '/health') return next();
+  const configuredKey = process.env.FULGOR_API_KEY;
+  if (!configuredKey || configuredKey.length < 32) {
+    return res.status(503).json({ error: 'API protegida no disponible: configura un FULGOR_API_KEY de al menos 32 caracteres en el servidor.' });
+  }
+  const authorization = req.headers.authorization || '';
+  const suppliedKey = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  const supplied = Buffer.from(suppliedKey);
+  const expected = Buffer.from(configuredKey);
+  if (!suppliedKey || supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
+    return res.status(401).json({ error: 'Autenticación requerida.' });
+  }
+  next();
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: 'v1.0.0-PRO',
+    version: 'v1.0.0-DEMO',
     service: 'FULGOR IA ANALICER ECONOMIC REST API',
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString()
@@ -251,23 +408,19 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 app.get('/api/v1/indicators', (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader && req.query.key !== 'demo') {
-    // Allows preview with demo parameter or bearer token
-  }
-  
   res.json({
     version: 'v1',
-    epistemicStandard: 'Rule of Gold - ISO Provenance Verified',
+    epistemicStandard: 'Rule of Gold — provenance not yet independently verified',
+    dataStatus: 'DEMO_DATA_NOT_VERIFIED',
     count: 12,
     timestamp: new Date().toISOString(),
     indicators: [
-      { code: 'MX_GDP_Q', name: 'PIB Trimestral México', country: 'México', value: 2.1, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'INEGI' },
-      { code: 'MX_CPI_YOY', name: 'Inflación General Anual INPC', country: 'México', value: 4.42, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'INEGI / Banxico' },
-      { code: 'US_GDP_Q', name: 'US Real GDP Growth Rate', country: 'Estados Unidos', value: 2.8, unit: '% Annualized', epistemicType: 'OBSERVED_DATA', source: 'BEA / FRED' },
-      { code: 'US_CPI_CORE', name: 'US Core CPI', country: 'Estados Unidos', value: 3.1, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'BLS / FRED' },
-      { code: 'DE_GDP_Q', name: 'PIB Alemania Real Growth', country: 'Alemania', value: 0.4, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'Destatis / Eurostat' },
-      { code: 'BR_GDP_Q', name: 'PIB Brasil Crescimento', country: 'Brasil', value: 2.9, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'IBGE / BCB' }
+      { code: 'MX_GDP_Q', name: 'PIB Trimestral México', country: 'México', value: 2.1, unit: '% YoY', epistemicType: 'MODEL_ESTIMATE', source: 'INEGI' },
+      { code: 'MX_CPI_YOY', name: 'Inflación General Anual INPC', country: 'México', value: 4.42, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'INEGI / Banxico (fuente por verificar)' },
+      { code: 'US_GDP_Q', name: 'US Real GDP Growth Rate', country: 'Estados Unidos', value: 2.8, unit: '% Annualized', epistemicType: 'DEMO_NOT_VERIFIED', source: 'BEA / FRED (fuente por verificar)' },
+      { code: 'US_CPI_CORE', name: 'US Core CPI', country: 'Estados Unidos', value: 3.1, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'BLS / FRED (fuente por verificar)' },
+      { code: 'DE_GDP_Q', name: 'PIB Alemania Real Growth', country: 'Alemania', value: 0.4, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'Destatis / Eurostat (fuente por verificar)' },
+      { code: 'BR_GDP_Q', name: 'PIB Brasil Crescimento', country: 'Brasil', value: 2.9, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'IBGE / BCB (fuente por verificar)' }
     ]
   });
 });
@@ -275,6 +428,8 @@ app.get('/api/v1/indicators', (req, res) => {
 app.get('/api/v1/countries', (req, res) => {
   res.json({
     version: 'v1',
+    dataStatus: 'DEMO_DATA_NOT_VERIFIED',
+    epistemicWarning: 'Las cifras y puntuaciones de esta respuesta son datos ilustrativos no verificados; no usar para decisiones económicas.',
     count: 7,
     countries: [
       { id: 'MX', name: 'México', region: 'LATAM', gdpNominalBillionUSD: 1845.2, faiiIndexScore: 68.4, aiAdoptionRate: 24.8 },
@@ -289,23 +444,34 @@ app.get('/api/v1/countries', (req, res) => {
 });
 
 app.post('/api/v1/simulate', (req, res) => {
-  const { aiAdoptionDelta = 25, rdIncentivePercentage = 15 } = req.body;
+  const { aiAdoptionDelta = 25, rdIncentivePercentage = 15 } = req.body ?? {};
+  if ([aiAdoptionDelta, rdIncentivePercentage].some((value) => typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 100)) {
+    return res.status(400).json({ error: 'aiAdoptionDelta y rdIncentivePercentage deben ser números finitos entre 0 y 100.' });
+  }
   res.json({
     version: 'v1',
-    status: 'simulated_successfully',
+    status: 'illustrative_simulation_only',
+    dataStatus: 'DEMO_MODEL_NOT_CALIBRATED',
+    epistemicWarning: 'Resultados generados por fórmulas ilustrativas no calibradas con datos reales; no son pronósticos ni estimaciones económicas validadas.',
     scenario: `Digital Twin (+${aiAdoptionDelta}% AI, +${rdIncentivePercentage}% R&D)`,
     gdpBonusPct: Number((aiAdoptionDelta * 0.074).toFixed(2)),
     productivityLiftAnnual: Number((aiAdoptionDelta * 0.052).toFixed(2)),
-    epistemicType: 'PROJECTION',
-    uncertaintyBand: '±0.45% (90% Confidence)'
+    epistemicType: 'ILLUSTRATIVE_DEMO_ONLY',
+    uncertaintyBand: 'No calibrado — no interpretar como intervalo de confianza'
   });
 });
 
 app.post('/api/v1/correlation', (req, res) => {
   try {
-    const { x = [1, 2, 3, 4, 5], y = [2.1, 3.9, 6.2, 8.1, 9.8] } = req.body;
-    const n = Math.min(x.length, y.length);
-    if (n < 2) return res.status(400).json({ error: 'Se requieren al menos 2 pares de observaciones.' });
+    const { x = [1, 2, 3, 4, 5], y = [2.1, 3.9, 6.2, 8.1, 9.8] } = req.body ?? {};
+    if (!Array.isArray(x) || !Array.isArray(y) || x.length !== y.length || x.length < 2 || x.length > 10000 ||
+        [...x, ...y].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      return res.status(400).json({ error: 'x e y deben ser arreglos numéricos finitos del mismo tamaño (2 a 10000 pares).' });
+    }
+    const n = x.length;
+    if (new Set(x).size < 2 || new Set(y).size < 2) {
+      return res.status(400).json({ error: 'La correlación no está definida cuando alguna variable no presenta variación.' });
+    }
     
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
     for (let i = 0; i < n; i++) {
@@ -334,61 +500,70 @@ app.post('/api/v1/correlation', (req, res) => {
       rSquared: Number(rSquared.toFixed(4)),
       pearsonR: Number(pearsonR.toFixed(3)),
       sampleSize: n,
-      pValue: 0.001,
-      isStatisticallySignificant: true,
+      pValue: null,
+      isStatisticallySignificant: false,
+      inferenceStatus: 'DESCRIPTIVE_ONLY — p-value not calculated',
       ruleOfGoldCaveat: 'Correlación no implica causalidad.'
     });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'No fue posible procesar el cálculo solicitado.' });
   }
 });
 
 app.post('/api/v1/did', (req, res) => {
   try {
-    const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2, se = 2.45 } = req.body;
+    const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2 } = req.body ?? {};
+    if ([preTreat, postTreat, preControl, postControl].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      return res.status(400).json({ error: 'Los cuatro valores DiD deben ser números finitos.' });
+    }
     const effect = (postTreat - preTreat) - (postControl - preControl);
-    const tStat = effect / se;
-    const pValue = Math.abs(tStat) > 2.58 ? 0.01 : (Math.abs(tStat) > 1.96 ? 0.05 : 0.12);
+    const pValue = null;
     
     res.json({
       version: 'v1',
       epistemicType: 'CAUSAL_INFERENCE',
       methodology: 'Difference-in-Differences (DiD) 2x2',
       treatmentEffect: Number(effect.toFixed(2)),
-      confidenceInterval95: [Number((effect - 1.96 * se).toFixed(2)), Number((effect + 1.96 * se).toFixed(2))],
-      tStatistic: Number(tStat.toFixed(2)),
+      confidenceInterval95: null,
+      tStatistic: null,
+      standardError: null,
       pValue,
-      parallelTrendsVerified: true,
-      parallelTrendsPValue: 0.42,
-      isStatisticallySignificant: pValue <= 0.05
+      parallelTrendsVerified: false,
+      parallelTrendsPValue: null,
+      inferenceStatus: 'EXPLORATORY_ONLY — parallel trends not tested',
+      isStatisticallySignificant: false
     });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'No fue posible procesar el cálculo solicitado.' });
   }
 });
 
 app.get('/api/v1/forecasts', (req, res) => {
-  const baseValue = Number(req.query.baseValue) || 2.4;
+  const parsedBaseValue = req.query.baseValue === undefined ? 2.4 : Number(req.query.baseValue);
+  if (!Number.isFinite(parsedBaseValue)) {
+    return res.status(400).json({ error: 'baseValue debe ser un número finito.' });
+  }
+  const baseValue = parsedBaseValue;
   res.json({
     version: 'v1',
-    epistemicType: 'PROJECTION',
+    epistemicType: 'ILLUSTRATIVE_DEMO_ONLY',
+    dataStatus: 'DEMO_MODEL_NOT_CALIBRATED',
+    epistemicWarning: 'Valores ilustrativos; no proceden de una serie económica verificada ni de un modelo probabilístico calibrado. No son pronósticos reales.',
     horizon: '8 Trimestres (2026-2028)',
     model: 'Fan Chart Probabilístico Estocástico',
     centralP50: baseValue,
     p10LowerTail: Number((baseValue - 1.25).toFixed(2)),
     p90UpperTail: Number((baseValue + 1.45).toFixed(2)),
-    volatilitySigma: 0.015,
-    epistemicWarning: 'Los pronósticos no son garantías; cono de incertidumbre expansivo.'
+    volatilitySigma: null,
+    uncertaintyStatus: 'No calibrada; no es un intervalo de confianza.'
   });
 });
 
 app.get('/api/v1/anomalies', (req, res) => {
   res.json({
     version: 'v1',
-    activeAlerts: [
-      { id: 'ALT-01', indicator: 'MX_CPI_YOY', observedValue: 4.42, zScore: 2.71, severity: 'HIGH', impactArea: 'Inflación' },
-      { id: 'ALT-02', indicator: 'US_TECH_INVESTMENT', observedValue: 14.2, zScore: 3.12, severity: 'CRITICAL', impactArea: 'Productividad' }
-    ]
+    activeAlerts: [],
+    dataStatus: 'NO_LIVE_ALERTS_CONNECTED'
   });
 });
 
@@ -396,7 +571,9 @@ app.get('/api/v1/faii', (req, res) => {
   res.json({
     version: 'v1',
     indexName: 'Fulgor AI Impact Index (FAII)',
-    epistemicType: 'MODEL_ESTIMATE',
+    epistemicType: 'ILLUSTRATIVE_DEMO_ONLY',
+    dataStatus: 'DEMO_INDEX_NOT_VALIDATED',
+    epistemicWarning: 'Este ranking es una maqueta ilustrativa, no un índice calculado con metodología validada ni fuentes verificadas.',
     rankings: [
       { rank: 1, country: 'Estados Unidos', score: 92.6, tier: 'LÍDER GLOBAL' },
       { rank: 2, country: 'Alemania', score: 84.1, tier: 'ALTA CAPACIDAD' },
@@ -412,24 +589,24 @@ app.get('/api/v1/faii', (req, res) => {
 app.get('/api/v1/system-audit', (req, res) => {
   res.json({
     status: 'ok',
-    version: 'v1.0.0-PRO',
-    auditResult: 'READY FOR RELEASE',
-    gatesPassed: '7/7 (G1 a G7 Superados)',
+    version: 'v1.0.0-DEMO',
+    auditResult: 'NOT READY FOR RELEASE',
+    gatesPassed: 'No verificado — auditoría automatizada y evidencia externa pendientes',
     timestamp: new Date().toISOString(),
     ruleOfGoldActive: true,
-    epistemicChecks: '100% Enforced'
+    epistemicChecks: 'No verificado en ejecución; requiere pruebas independientes'
   });
 });
 
 
 app.get('/api/v1/observability', (req, res) => {
   res.json({
-    status: 'HEALTHY',
-    uptimeSeconds: Math.floor(process.uptime()) + 7420,
-    apiLatencyMs: 38,
+    status: 'DEGRADED',
+    uptimeSeconds: Math.floor(process.uptime()),
+    apiLatencyMs: null,
     memoryUsageMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-    activeConnections: 148,
-    errorRate: '0.02%',
+    activeConnections: null,
+    errorRate: null,
     geminiAiReady: !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString()
   });
@@ -446,7 +623,11 @@ app.get('/api/v2/preview', (req, res) => {
 
 // Serve frontend with Vite middleware in dev or static files in production
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Endpoint API no encontrado.' });
+});
+
+if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

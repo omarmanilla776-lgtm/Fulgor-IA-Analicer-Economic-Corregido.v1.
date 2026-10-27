@@ -27,7 +27,7 @@ export interface TestResultItem {
 }
 
 export class SystemAuditEngine {
-  public static readonly AUDIT_VERSION = '1.0.0-PRO';
+  public static readonly AUDIT_VERSION = '1.0.0-DEMO';
 
   /**
    * Executes the entire automated verification test suite
@@ -44,14 +44,14 @@ export class SystemAuditEngine {
       const countries = DataEngine.getCountries();
       const indicators = DataEngine.getIndicators();
       const sources = DataEngine.getSourcesCatalog();
-      const passed = countries.length >= 5 && indicators.length >= 6 && sources.length >= 5;
+      const passed = countries.length >= 5 && indicators.length >= 5 && sources.length >= 5 && sources.every(source => source.trustScore === null && source.trustScoreStatus === 'NOT_ASSESSED');
       tests.push({
         testId: 'TEST-DATA-01',
-        name: 'DataEngine: Catálogo de Fuentes Oficiales y Normalización',
+        name: 'DataEngine: catálogo estático de fuentes declaradas (no conectadas)',
         category: 'UNIT',
         passed,
         durationMs: 1.2,
-        details: `Cargados ${countries.length} países, ${indicators.length} indicadores y ${sources.length} fuentes oficiales.`
+        details: `Cargados ${countries.length} perfiles, ${indicators.length} indicadores y ${sources.length} referencias de fuente; no demuestra conexiones oficiales en vivo.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-DATA-01', name: 'DataEngine', category: 'UNIT', passed: false, durationMs: 1.0, details: e.message });
@@ -61,14 +61,14 @@ export class SystemAuditEngine {
     try {
       const hash = ProvenanceEngine.generateAuditHash('SERIES-TEST', '2026-08-15');
       const seal = ProvenanceEngine.getSeal('OBSERVED_DATA');
-      const passed = hash.startsWith('FLG-AUDIT-') && seal.label.includes('OBSERVADO');
+      const passed = hash.startsWith('FLG-DEMO-FINGERPRINT-') && seal.label.includes('OBSERVADO');
       tests.push({
         testId: 'TEST-PROV-02',
-        name: 'ProvenanceEngine: Generación de Audit Hashes y Sellos Epistémicos',
+        name: 'ProvenanceEngine: huella demostrativa y etiqueta epistemológica',
         category: 'UNIT',
         passed,
         durationMs: 0.8,
-        details: `Hash generado: ${hash} con sello [${seal.label}].`
+        details: `Fingerprint demostrativo: ${hash}; no es un hash criptográfico. Sello [${seal.label}].`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-PROV-02', name: 'ProvenanceEngine', category: 'UNIT', passed: false, durationMs: 0.8, details: e.message });
@@ -79,14 +79,15 @@ export class SystemAuditEngine {
       const x = [1, 2, 3, 4, 5];
       const y = [2, 4, 6, 8, 10]; // Perfect linear relationship
       const ols = EconometricEngine.calculateOLS(x, y);
-      const passed = Math.abs(ols.slope - 2) < 0.001 && Math.abs(ols.rSquared - 1.0) < 0.001 && ols.isStatisticallySignificant;
+      const ranked = EconometricEngine.calculateOLS([1, 2, 3, 4, 5], [1, 4, 9, 16, 25]);
+      const passed = Math.abs(ols.slope - 2) < 0.001 && Math.abs(ols.rSquared - 1.0) < 0.001 && ols.pValue === null && !ols.isStatisticallySignificant && ranked.spearmanRho === 1 && ranked.pearsonR < 1;
       tests.push({
         testId: 'TEST-ECON-03',
-        name: 'EconometricEngine: Regresión Lineal OLS y Pearson (R² = 1.0)',
+        name: 'EconometricEngine: OLS, Pearson, Spearman por rangos y p-valor no inferido',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.5,
-        details: `Pendiente: ${ols.slope}, R²: ${ols.rSquared}, p-value: ${ols.pValue}.`
+        details: `Pendiente: ${ols.slope}, R²: ${ols.rSquared}; Spearman monotónico: ${ranked.spearmanRho}, Pearson no lineal: ${ranked.pearsonR}; p-value: ${ols.pValue ?? 'no calculado'}; significancia no declarada sin inferencia válida.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-ECON-03', name: 'EconometricEngine OLS', category: 'STATISTICAL', passed: false, durationMs: 1.2, details: e.message });
@@ -96,14 +97,14 @@ export class SystemAuditEngine {
     try {
       const did = EconometricEngine.calculateDiD(10, 30, 10, 15, 2.0, 500);
       // diffTreat = 20, diffControl = 5 -> effect = 15
-      const passed = Math.abs(did.treatmentEffect - 15) < 0.01 && did.tStat > 3 && did.parallelTrendsVerified;
+      const passed = Math.abs(did.treatmentEffect - 15) < 0.01 && did.tStat === null && did.standardError === null && did.pValue === null && did.ciLower95 === null && did.ciUpper95 === null && did.parallelTrendsVerified === false && did.parallelTrendsFTestPValue === null && did.rSquared === null && did.sampleSizeN === null;
       tests.push({
         testId: 'TEST-DID-04',
         name: 'EconometricEngine: Difference-in-Differences 2x2 & Test de Tendencias Paralelas',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.1,
-        details: `Efecto estimado: ${did.treatmentEffect}, t-stat: ${did.tStat}, tendencias paralelas: ${did.parallelTrendsVerified ? 'VÁLIDAS' : 'FALLIDAS'}.`
+        details: `Contraste descriptivo DiD: ${did.treatmentEffect}; t-stat, error estándar, intervalo, R² y tamaño muestral no reportados sin evidencia suficiente; tendencias paralelas no verificadas.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-DID-04', name: 'EconometricEngine DiD', category: 'STATISTICAL', passed: false, durationMs: 1.0, details: e.message });
@@ -125,11 +126,11 @@ export class SystemAuditEngine {
       const passed = sim.yearlyTrajectory.length === 5 && sim.summary.gdpExtraGrowthCumulative > 0 && sim.uncertaintyScore >= 0 && sim.uncertaintyScore <= 100;
       tests.push({
         testId: 'TEST-TWIN-05',
-        name: 'DigitalTwinEngine: Simulación Cobb-Douglas y Crecimiento Estructural del PIB',
+        name: 'DigitalTwinEngine: ejecución aritmética de escenario ilustrativo no calibrado',
         category: 'UNIT',
         passed,
         durationMs: 2.1,
-        details: `PIB extra proyectado: +${sim.summary.gdpExtraGrowthCumulative}%, Score incertidumbre: ${sim.uncertaintyScore}/100.`
+        details: `Resultado ilustrativo: +${sim.summary.gdpExtraGrowthCumulative}%; no es una proyección validada ni un score empírico de incertidumbre.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-TWIN-05', name: 'DigitalTwinEngine', category: 'UNIT', passed: false, durationMs: 1.5, details: e.message });
@@ -143,11 +144,11 @@ export class SystemAuditEngine {
       const passed = fan.length === 13 && allMonotonic && risks.length >= 4;
       tests.push({
         testId: 'TEST-FCST-06',
-        name: 'ForecastEngine: Conos Probabilísticos Fan Chart (P10 ≤ P50 ≤ P90)',
+        name: 'ForecastEngine: orden de bandas de escenario ilustrativo',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.8,
-        details: `Generados ${fan.length} periodos con orden estocástico estricto y ${risks.length} factores de riesgo.`
+        details: `Generados ${fan.length} periodos ilustrativos con bandas ordenadas y ${risks.length} factores de riesgo no calibrados.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-FCST-06', name: 'ForecastEngine', category: 'STATISTICAL', passed: false, durationMs: 1.2, details: e.message });
@@ -160,7 +161,7 @@ export class SystemAuditEngine {
       const passed = !normal.isAnomaly && critical.isAnomaly && critical.severity === 'CRITICAL';
       tests.push({
         testId: 'TEST-ANOM-07',
-        name: 'AnomalyEngine: Detección Z-Score y Gradación de Severidad',
+        name: 'AnomalyEngine: cálculo Z-Score con entradas de prueba sintéticas',
         category: 'UNIT',
         passed,
         durationMs: 0.9,
@@ -183,7 +184,7 @@ export class SystemAuditEngine {
       const passed = rankings.length >= 5 && customScore > 0;
       tests.push({
         testId: 'TEST-FAII-08',
-        name: 'FaiiEngine: Fulgor AI Impact Index & Ponderación Multicriterio',
+        name: 'FaiiEngine: cálculo sobre rankings estáticos de demostración',
         category: 'UNIT',
         passed,
         durationMs: 1.3,
@@ -197,14 +198,14 @@ export class SystemAuditEngine {
     try {
       const health = ObservabilityEngine.getSystemHealth();
       const telemetry = TelemetryEngine.getAggregatedImpact();
-      const passed = health.serverStatus === 'HEALTHY' && health.provenanceVerificationRate === 100 && telemetry.totalHoursSavedHours > 0;
+      const passed = health.serverStatus === 'DEGRADED' && health.provenanceVerificationRate === 0 && telemetry.dataStatus === 'DEMO_ESTIMATES_NOT_VERIFIED' && telemetry.totalHoursSavedHours === null;
       tests.push({
         testId: 'TEST-OBS-09',
         name: 'Observability & Telemetry: Métricas de Producción y Privacidad',
         category: 'SECURITY',
         passed,
         durationMs: 1.4,
-        details: `Servidor: ${health.serverStatus}, Trazabilidad: ${health.provenanceVerificationRate}%, Privacidad: 100% anonimizada.`
+        details: `Estado: ${health.serverStatus}; trazabilidad no verificada; impacto no medido en producción.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-OBS-09', name: 'Observability/Telemetry', category: 'SECURITY', passed: false, durationMs: 1.0, details: e.message });
@@ -217,11 +218,11 @@ export class SystemAuditEngine {
       const passed = analysisId.startsWith('ANL-2026-MX-');
       tests.push({
         testId: 'TEST-ORCH-10',
-        name: 'OrchestratorEngine: Flujo Completo y Pipeline de Trazabilidad ISO',
+        name: 'OrchestratorEngine: formato de ID de análisis (sin prueba end-to-end)',
         category: 'INTEGRATION',
         passed,
         durationMs: 2.2,
-        details: `Analysis ID: ${analysisId}, Flujo verificado: USER -> ORCHESTRATOR -> ENGINES -> AUDIT -> REPORT.`
+        details: `ID generado: ${analysisId}. Esta comprobación valida solo el formato del identificador, no el pipeline completo.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-ORCH-10', name: 'Orchestrator Pipeline', category: 'INTEGRATION', passed: false, durationMs: 1.5, details: e.message });
@@ -234,11 +235,11 @@ export class SystemAuditEngine {
       const passed = csv.includes('Code,Name,Country') && csv.split('\n').length >= 4;
       tests.push({
         testId: 'TEST-REP-11',
-        name: 'ReportEngine: Exportación Certificada CSV, JSON y Health Report',
+        name: 'ReportEngine: exportación CSV de datos de demostración',
         category: 'INTEGRATION',
         passed,
         durationMs: 1.1,
-        details: `ReportEngine validado con generación tabular e integración de metadatos de auditoría.`
+        details: `CSV generado con estado de datos no verificados; no es un informe certificado.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-REP-11', name: 'ReportEngine Export', category: 'INTEGRATION', passed: false, durationMs: 1.0, details: e.message });
@@ -364,9 +365,17 @@ export class SystemAuditEngine {
       }
     ];
 
+    // These gates currently rely on demo data and contain checks that are not independently verified.
+    // Keep release blocked until real source, security, statistical and build checks are supplied.
+    for (const gate of gates) {
+      gate.status = 'WARNING';
+      gate.details = 'Pendiente: requiere evidencia reproducible y validación independiente; los valores de demostración no certifican este gate.';
+      gate.metrics = { dataStatus: 'DEMO_DATA_NOT_VERIFIED', verificationStatus: 'NOT_INDEPENDENTLY_VERIFIED' };
+    }
+
     const passedGates = gates.filter(g => g.status === 'PASSED').length;
     const failedGates = gates.filter(g => g.status === 'FAILED').length;
-    const allPassed = failedGates === 0 && testSuiteResult.summary.failed === 0;
+    const allPassed = gates.every(g => g.status === 'PASSED') && failedGates === 0 && testSuiteResult.summary.failed === 0;
 
     const report: SystemHealthAuditReport = {
       generatedAt: new Date().toISOString(),
@@ -378,27 +387,16 @@ export class SystemAuditEngine {
       totalTestsRun: testSuiteResult.summary.total,
       testsPassed: testSuiteResult.summary.passed,
       testsFailed: testSuiteResult.summary.failed,
-      enginesOperational: [
-        'DataEngine', 'ProvenanceEngine', 'EconometricEngine', 'DigitalTwinEngine',
-        'ForecastEngine', 'FaiiEngine', 'AnomalyEngine', 'CopilotEngine',
-        'ReportEngine', 'ApiEngine', 'TelemetryEngine', 'ObservabilityEngine',
-        'EconomicIntelligenceOrchestrator'
-      ],
-      sourcesConfigured: [
-        'INEGI (BIE / ENOE)', 'Banxico (SIE API)', 'FRED (St. Louis Fed)',
-        'Eurostat (HICP / GDP)', 'OECD (AI Observatory)', 'FMI (WEO)', 'Banco Mundial (WDI)'
-      ],
-      apisOperational: [
-        '/api/v1/health', '/api/v1/indicators', '/api/v1/countries', '/api/v1/analysis',
-        '/api/v1/simulate', '/api/v1/causal', '/api/v1/alerts', '/api/v1/observability', '/api/copilot/chat'
-      ],
-      securityStatus: 'SEGURO — Cero secretos en cliente, API proxy server-side con Google GenAI SDK v2.4, validación de esquemas y sanitización de inputs.',
-      observabilityStatus: 'ÓPTIMO — Monitor de uptime, latencia <45ms, tracking de memoria heap y registro criptográfico de auditoría ISO.',
+      enginesOperational: [], // Runtime health has not been independently verified.
+      sourcesConfigured: [], // Catalog entries are not proof of live source connections.
+      apisOperational: [], // Endpoint operation must be verified in a running deployment.
+      securityStatus: 'PENDIENTE — requiere revisión independiente de autenticación, secretos, validación de entradas y permisos.',
+      observabilityStatus: 'PARCIAL — uptime y memoria del proceso pueden medirse; latencia, sesiones, tasa de error y auditoría criptográfica no están verificadas.',
       i18nStatus: 'COMPLETO — 8 idiomas (ES, EN, PT, FR, DE, IT, ZH, JA) y 5 monedas (USD, MXN, EUR, BRL, GBP) con formateo local desacoplado.',
-      documentationStatus: 'PUBLICADO — Metodología matemática interactiva, fórmulas formales, supuestos de identificación y catálogo de fuentes verificable.',
-      releaseBlockers: allPassed ? [] : ['Corregir pruebas estadísticas o dependencias pendientes'],
+      documentationStatus: 'DOCUMENTACIÓN EN LA APLICACIÓN; revisión metodológica y verificación de fuentes pendientes.',
+      releaseBlockers: allPassed ? [] : ['Validar fuentes y fechas de datos', 'Validar inferencia estadística y causal reproducible', 'Completar revisión de seguridad de autenticación y permisos', 'Configurar autenticación de API y secretos en servidor', 'Conectar observabilidad real antes de publicar', 'Ejecutar pruebas de aceptación en el alojamiento objetivo'],
       executiveSummary: allPassed 
-        ? 'FULGOR IA ANALICER ECONOMIC v1.0 ha superado satisfactoriamente los 7 Gates de Integridad Científica y Producción (G1 a G7). Todos los engines se encuentran desacoplados, los modelos econométricos y causales están matemáticamente verificados y la Regla de Oro Epistémica se encuentra activa transversalmente. La plataforma está 100% LISTA PARA PUBLICACIÓN.'
+        ? 'La plataforma no está certificada para publicación; las pruebas pendientes deben completarse y documentarse.'
         : 'Se han detectado inconsistencias en uno o más Gates de validación. Revise los detalles técnicos antes de proceder.'
     };
 

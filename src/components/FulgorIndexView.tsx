@@ -94,15 +94,15 @@ export const FulgorIndexView: React.FC<FulgorIndexViewProps> = ({ onOpenCopilotW
             <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Índice de Impacto Económico Agregado de la Adopción de IA & Tecnología
+            FAII: índice experimental de demostración (no validado)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Metodología 100% transparente y configurable. Mide la absorción tecnológica, dividendos de productividad, intensidad de capital y fricciones de transición.
+            Fórmula configurable aplicada a puntuaciones sintéticas. No hay series de entrada verificadas ni validación externa; los rankings no son oficiales ni deben usarse para comparar economías reales.
           </p>
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Explica detalladamente la fórmula del índice FAII (Fulgor AI Impact Index), por qué penaliza las fricciones de transición laboral y cuál es el desglose para ${selectedItem.countryName}.`)}
+          onClick={() => onOpenCopilotWithPrompt(`Explica los supuestos y datos que se necesitarían para validar el índice FAII para ${selectedItem.countryName}; no trates la puntuación demostrativa como una medición real.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
           <Sparkles className="w-4 h-4" /> Auditar Metodología con Copilot
@@ -224,7 +224,7 @@ export const FulgorIndexView: React.FC<FulgorIndexViewProps> = ({ onOpenCopilotW
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-100 text-sm flex items-center gap-2">
               <Trophy className="w-4 h-4 text-amber-400" />
-              Ranking de Economías por Índice FAII Recalibrado
+              Ranking ilustrativo FAII (no validado con datos empíricos)
             </h3>
             <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>

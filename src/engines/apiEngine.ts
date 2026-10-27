@@ -10,14 +10,13 @@ export interface ApiEndpointDoc {
 }
 
 export class ApiEngine {
-  private static apiKey: string = 'flg_live_99a84b3e02f1889c09d_prod';
-
+  // API credentials must be configured and validated server-side; never embed them in the client.
   public static getApiKey(): string {
-    return this.apiKey;
+    return '';
   }
 
-  public static setApiKey(key: string): void {
-    this.apiKey = key;
+  public static setApiKey(_key: string): void {
+    // Intentionally no-op: client-side API key storage is not supported.
   }
 
   public static getEndpointsCatalog(): ApiEndpointDoc[] {
@@ -40,10 +39,11 @@ export class ApiEngine {
         method: 'GET',
         path: '/api/v1/indicators',
         version: 'v1',
-        description: 'Obtiene el listado completo de indicadores macroeconómicos con ficha de trazabilidad ISO.',
+        description: 'Obtiene un catálogo demostrativo de indicadores; no hay fuentes en vivo verificadas.',
         authRequired: true,
         requiredTier: 'FREE',
         sampleResponse: {
+          dataStatus: 'DEMO_RESPONSE_NOT_REAL',
           count: 12,
           indicators: [
             { code: 'MX_GDP_Q', name: 'PIB Trimestral México', currentValue: 2.1, unit: '% YoY', epistemicType: 'OBSERVED_DATA' }
@@ -54,10 +54,11 @@ export class ApiEngine {
         method: 'GET',
         path: '/api/v1/countries',
         version: 'v1',
-        description: 'Perfiles macroeconómicos de países y puntuaciones del índice FAII.',
+        description: 'Perfiles y puntuaciones ilustrativos; no validados con fuentes reales.',
         authRequired: true,
         requiredTier: 'FREE',
         sampleResponse: {
+          dataStatus: 'DEMO_RESPONSE_NOT_REAL',
           countries: [{ id: 'MX', name: 'México', faiiIndexScore: 68.4 }]
         }
       },
@@ -65,7 +66,7 @@ export class ApiEngine {
         method: 'POST',
         path: '/api/v1/simulate',
         version: 'v1',
-        description: 'Ejecuta el Gemelo Digital Económico con parámetros multivariables personalizados.',
+        description: 'Ejecuta una simulación ilustrativa no calibrada; no es un pronóstico económico validado.',
         authRequired: true,
         requiredTier: 'PRO',
         sampleRequestBody: {
@@ -76,7 +77,8 @@ export class ApiEngine {
           laborUpskillingSpeed: 3
         },
         sampleResponse: {
-          scenarioName: 'Simulación Digital Twin (+25% Adopción IA)',
+          dataStatus: 'DEMO_MODEL_NOT_CALIBRATED',
+          scenarioName: 'Simulación ilustrativa Digital Twin (+25% Adopción IA)',
           gdpExtraGrowthCumulative: 1.85,
           uncertaintyScore: 38
         }
@@ -85,7 +87,7 @@ export class ApiEngine {
         method: 'POST',
         path: '/api/v1/causal',
         version: 'v1',
-        description: 'Calcula estimaciones econométricas Difference-in-Differences y pruebas de robustez.',
+        description: 'Contrato de demostración; inferencia causal y pruebas de robustez no disponibles sin datos adecuados.',
         authRequired: true,
         requiredTier: 'PRO',
         sampleRequestBody: {
@@ -94,20 +96,22 @@ export class ApiEngine {
           standardError: 2.76
         },
         sampleResponse: {
+          dataStatus: 'DEMO_INFERENCE_NOT_VALIDATED',
           treatmentEffect: 21.4,
           tStatistic: 7.75,
-          pValue: 0.001,
-          isStatisticallySignificant: true
+          pValue: null,
+          isStatisticallySignificant: false
         }
       },
       {
         method: 'GET',
         path: '/api/v1/alerts',
         version: 'v1',
-        description: 'Sistema de alertas tempranas y anomalías estadísticas detectadas (Z-score > 2.0).',
+        description: 'Ejemplos ilustrativos de alertas; no hay monitor de datos en vivo.',
         authRequired: true,
         requiredTier: 'PRO_MAX',
         sampleResponse: {
+          dataStatus: 'DEMO_ALERTS_NOT_LIVE',
           activeAlertsCount: 4,
           alerts: [{ id: 'ALT-01', severity: 'HIGH', impactArea: 'Inflación' }]
         }

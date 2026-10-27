@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, ShieldAlert, Sparkles, X } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface DemoModeBannerProps {
   isDemoMode: boolean;
@@ -20,15 +20,15 @@ export const DemoModeBanner: React.FC<DemoModeBannerProps> = ({ isDemoMode, onDi
             <AlertTriangle className="w-4 h-4" />
           </div>
           <span className="tracking-wide">
-            [MODO DEMO ACTIVADO] — Los datos presentados son sintéticos para fines de simulación y demostración. No constituyen registros empíricos oficiales.
+            [MODO DEMO ACTIVADO] — El panel World Bank consulta datos públicos con su año de observación. Los demás gráficos, rankings y simulaciones siguen siendo ilustrativos; no usar para decisiones económicas reales.
           </span>
         </div>
 
         <button
-          onClick={onDisableDemoMode}
+          disabled
           className="px-2.5 py-0.5 rounded bg-slate-950 text-amber-300 hover:bg-slate-900 text-[11px] font-bold transition-colors whitespace-nowrap"
         >
-          Volver a Datos Reales
+          World Bank conectado · otras fuentes pendientes
         </button>
       </div>
     </div>

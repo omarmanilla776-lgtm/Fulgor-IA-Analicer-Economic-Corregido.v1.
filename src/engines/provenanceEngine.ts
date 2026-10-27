@@ -12,14 +12,24 @@ export interface EpistemicVerificationSeal {
 }
 
 export const EPISTEMIC_SEALS: Record<EpistemicType, EpistemicVerificationSeal> = {
+  DEMO_DATA: {
+    sealId: 'SEAL_DEMO_00',
+    category: 'DEMO_DATA',
+    label: 'DATO ILUSTRATIVO — DEMOSTRACIÓN',
+    badgeColorHex: '#fbbf24',
+    badgeBorderHex: 'rgba(251, 191, 36, 0.4)',
+    bgHex: 'rgba(120, 53, 15, 0.2)',
+    ruleExplanation: 'Valor estático de demostración; no representa una observación económica verificada.',
+    evidenceRequirement: 'Sustituir por una observación descargada de fuente identificable y registrar serie, fecha, unidad y validación.'
+  },
   OBSERVED_DATA: {
     sealId: 'SEAL_OBS_01',
     category: 'OBSERVED_DATA',
-    label: '🟢 DATO OBSERVADO',
-    badgeColorHex: '#10b981',
-    badgeBorderHex: 'rgba(16, 185, 129, 0.4)',
-    bgHex: 'rgba(16, 185, 129, 0.1)',
-    ruleExplanation: 'Registro empírico publicado por organismo oficial con metodología abierta y fecha de corte auditada.',
+    label: 'DATO DECLARADO OBSERVADO — NO VERIFICADO',
+    badgeColorHex: '#f59e0b',
+    badgeBorderHex: 'rgba(245, 158, 11, 0.4)',
+    bgHex: 'rgba(245, 158, 11, 0.1)',
+    ruleExplanation: 'La etiqueta no acredita conexión, descarga ni validación independiente de una fuente oficial.',
     evidenceRequirement: 'Identificador oficial de serie, URL institucional y ficha técnica.'
   },
   CORRELATION: {
@@ -66,21 +76,26 @@ export const EPISTEMIC_SEALS: Record<EpistemicType, EpistemicVerificationSeal> =
 
 export class ProvenanceEngine {
   public static getSeal(type: EpistemicType): EpistemicVerificationSeal {
-    return EPISTEMIC_SEALS[type] || EPISTEMIC_SEALS.OBSERVED_DATA;
+    const seal = EPISTEMIC_SEALS[type];
+    if (!seal) throw new Error('No existe un sello epistemológico para el tipo solicitado.');
+    return seal;
   }
 
   public static generateCitationString(provenance: DataSourceProvenance): string {
-    return `${provenance.sourceName} (${provenance.agency}). "${provenance.datasetName}". Corte: ${provenance.cutoffDate}. Frecuencia: ${provenance.frequency}. Unidad: ${provenance.unit}. Confianza: ${provenance.confidenceScore}%.`;
+    return `${provenance.sourceName} (${provenance.agency}). "${provenance.datasetName}". Corte: ${provenance.cutoffDate}. Frecuencia: ${provenance.frequency}. Unidad: ${provenance.unit}. Confianza declarada (no verificada): ${provenance.confidenceScore}%.`;
   }
 
+  /**
+   * Returns an explicitly non-cryptographic fingerprint for legacy UI compatibility.
+   * It must not be used as proof of integrity, authenticity, or source verification.
+   * Replace with a SHA-256 digest over a canonical payload before production use.
+   */
   public static generateAuditHash(seriesId: string, timestamp: string): string {
+    const input = `${seriesId}::${timestamp}::FULGOR_NON_CRYPTOGRAPHIC_FINGERPRINT`;
     let hash = 0;
-    const str = `${seriesId}::${timestamp}::FULGOR_AUDIT_STANDARD_ISO`;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash |= 0;
+    for (let i = 0; i < input.length; i++) {
+      hash = (Math.imul(hash, 31) + input.charCodeAt(i)) | 0;
     }
-    return `FLG-AUDIT-${Math.abs(hash).toString(16).toUpperCase().padStart(8, '0')}`;
+    return `FLG-DEMO-FINGERPRINT-${(hash >>> 0).toString(16).toUpperCase().padStart(8, '0')}`;
   }
 }

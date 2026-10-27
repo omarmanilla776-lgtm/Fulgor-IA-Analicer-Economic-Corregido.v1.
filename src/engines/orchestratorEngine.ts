@@ -84,8 +84,8 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Regresión Lineal MCO con errores estándar robustos.',
             frequency: 'Trimestral',
             unit: 'Índice base 100',
-            confidenceScore: 98.4,
-            isOfficial: true,
+            confidenceScore: 0,
+            isOfficial: false,
             sampleSize: `N=${ols.sampleSize}`,
             standardError: ols.standardError
           });
@@ -110,9 +110,9 @@ export class EconomicIntelligenceOrchestrator {
             frequency: 'Anual',
             unit: '% Ganancia de Productividad',
             confidenceScore: did.parallelTrendsVerified ? 96.5 : 65.0,
-            isOfficial: true,
+            isOfficial: false,
             sampleSize: `N=${did.sampleSizeN}`,
-            standardError: did.standardError
+            standardError: did.standardError ?? undefined
           });
 
           if (!did.parallelTrendsVerified) {
@@ -148,7 +148,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Simulación estructural mediante función de producción aumentada con spillovers de PTF.',
             frequency: 'Anual',
             unit: 'Miles de millones USD / Índices',
-            confidenceScore: 92.0,
+            confidenceScore: 0,
             isOfficial: true
           });
 
@@ -173,7 +173,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Modelación probabilística Fan Chart (P10, P50, P90) con calibración de volatilidad histórica.',
             frequency: 'Trimestral',
             unit: '% Variación Anualizada',
-            confidenceScore: 88.5,
+            confidenceScore: 0,
             isOfficial: true
           });
 
@@ -199,7 +199,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Monitoreo estandarizado Z-Score con umbrales de alerta temprana.',
             frequency: 'Mensual',
             unit: 'Puntos Z / Desviación Estándar',
-            confidenceScore: 99.2,
+            confidenceScore: 0,
             isOfficial: true
           });
 
@@ -233,7 +233,7 @@ export class EconomicIntelligenceOrchestrator {
             methodology: 'Ponderación multicriterio normalizada de 5 pilares de transformación digital.',
             frequency: 'Trimestral',
             unit: 'Puntuación 0-100',
-            confidenceScore: 94.0,
+            confidenceScore: 0,
             isOfficial: false
           });
 
@@ -243,6 +243,26 @@ export class EconomicIntelligenceOrchestrator {
 
         default:
           throw new Error(`Engine no reconocido: ${request.targetEngine}`);
+      }
+
+      // Demo fixtures and source labels in code are not evidence of live source access.
+      // Normalize provenance so generated reports cannot present them as official or verified.
+      if (isDemo) {
+        for (const source of dataProvenance) {
+          source.sourceName = 'DEMO — fuente económica no conectada';
+          source.agency = 'No verificado';
+          source.datasetName = 'Valores ilustrativos incluidos en el código';
+          source.lastUpdated = 'No verificado';
+          source.cutoffDate = 'No verificado';
+          source.methodology = 'No hay fuente empírica conectada ni calibración independiente';
+          source.unit = 'Unidades ilustrativas';
+          source.confidenceScore = 0;
+          source.isOfficial = false;
+          delete source.verificationUrl;
+          delete source.sampleSize;
+          delete source.standardError;
+        }
+        limitations.push('MODO DEMO: las fuentes, cifras y parámetros no están conectados ni verificados; no usar como evidencia económica real.');
       }
 
       // 3. Mandatory Epistemic Quality Gate Validation (Rule of Gold)
@@ -310,45 +330,47 @@ export class EconomicIntelligenceOrchestrator {
     isDemo: boolean
   ): EpistemicQualityCheck {
     // 1. Source Check
-    const hasOfficialSources = provenance.some(p => p.isOfficial);
-    const sourceCheckPassed = provenance.length > 0;
-    const sourceCheckNotes = sourceCheckPassed 
-      ? `Fuentes auditadas correctamente (${provenance.map(p => p.agency).join(', ')}).` 
-      : 'Faltan metadatos de procedencia.';
+    const hasOfficialSources = provenance.some(p => p.isOfficial && Boolean(p.verificationUrl));
+    const sourceCheckPassed = !isDemo && provenance.length > 0 && hasOfficialSources;
+    const sourceCheckNotes = isDemo
+      ? 'No aprobado: los datos son demostrativos y no hay fuentes en vivo verificadas.'
+      : sourceCheckPassed
+        ? `Metadatos de fuentes presentes (${provenance.map(p => p.agency).join(', ')}); verificación independiente pendiente.`
+        : 'No aprobado: faltan fuentes oficiales verificadas y enlaces de series.';
 
     // 2. Data Check
     const dataCheckPassed = results !== null && results !== undefined;
-    const dataCheckNotes = dataCheckPassed 
-      ? 'Conjunto de datos estructurado y verificado.' 
+    const dataCheckNotes = dataCheckPassed
+      ? 'Hay un resultado estructurado; esto no demuestra que los datos de entrada sean reales o estén verificados.'
       : 'Datos incompletos o vacíos.';
 
     // 3. Model Check
-    let modelCheckPassed = true;
-    let modelCheckNotes = 'Modelo matemático ejecutado dentro de dominios admisibles.';
+    let modelCheckPassed = false;
+    let modelCheckNotes = 'No aprobado: no hay evidencia de calibración y validación independiente del modelo.';
     if (results && typeof results.rSquared === 'number' && (results.rSquared < 0 || results.rSquared > 1)) {
       modelCheckPassed = false;
       modelCheckNotes = 'Violación de rango en R² [0, 1].';
     }
 
     // 4. Statistical Check
-    let statisticalCheckPassed = true;
-    let statisticalCheckNotes = 'Pruebas estadísticas consistentes.';
+    let statisticalCheckPassed = false;
+    let statisticalCheckNotes = 'No aprobado: faltan datos observacionales verificados, supuestos comprobados y pruebas inferenciales válidas.';
     let confidenceDegraded = false;
     let degradationReason: string | undefined = undefined;
 
     if (results && typeof results.parallelTrendsVerified === 'boolean' && !results.parallelTrendsVerified) {
       confidenceDegraded = true;
-      degradationReason = 'Fallo en la prueba de tendencias paralelas pre-tratamiento (p < 0.05).';
-      statisticalCheckNotes = 'Inferencia causal debilitada por violación de tendencias paralelas.';
+      degradationReason = 'Las tendencias paralelas no han sido verificadas con datos longitudinales adecuados.';
+      statisticalCheckNotes = 'No se certifica inferencia causal: tendencias paralelas no verificadas.';
     }
 
     // 5. Epistemic Check (Rule of Gold Enforcement)
     // Rule: FORECAST != OBSERVED; CORRELATION != CAUSAL; MODEL != FACT
-    const ruleOfGoldCompliance = true;
+    const ruleOfGoldCompliance = !isDemo && sourceCheckPassed && dataCheckPassed && modelCheckPassed && statisticalCheckPassed;
     let epistemicCategoryAssigned = assignedEpistemicType;
 
-    const baseConfidence = provenance.reduce((acc, p) => acc + (p.confidenceScore || 90), 0) / (provenance.length || 1);
-    const finalConfidence = confidenceDegraded ? Math.round(baseConfidence * 0.7) : Math.round(baseConfidence);
+    const baseConfidence = provenance.length > 0 ? provenance.reduce((acc, p) => acc + p.confidenceScore, 0) / provenance.length : 0;
+    const finalConfidence = isDemo ? 0 : confidenceDegraded ? Math.round(baseConfidence * 0.7) : Math.round(baseConfidence);
 
     return {
       sourceCheckPassed,
@@ -359,9 +381,9 @@ export class EconomicIntelligenceOrchestrator {
       modelCheckNotes,
       statisticalCheckPassed,
       statisticalCheckNotes,
-      epistemicCheckPassed: true,
+      epistemicCheckPassed: ruleOfGoldCompliance,
       epistemicCategoryAssigned,
-      confidenceScore: isDemo ? Math.min(finalConfidence, 75) : finalConfidence,
+      confidenceScore: finalConfidence,
       confidenceDegraded,
       degradationReason,
       ruleOfGoldCompliance
@@ -378,13 +400,15 @@ export class EconomicIntelligenceOrchestrator {
     result: any,
     limitations: string[]
   ): string {
-    const epistemicLabel = {
-      OBSERVED_DATA: '🟢 [DATO OBSERVADO Y VERIFICADO]',
-      CORRELATION: '🔵 [CORRELACIÓN ESTADÍSTICA]',
-      MODEL_ESTIMATE: '🟠 [ESTIMACIÓN MODELADA]',
-      CAUSAL_INFERENCE: '🔴 [INFERENCIA CAUSAL CONTROLADA]',
-      PROJECTION: '🟣 [PRONÓSTICO PROBABILÍSTICO]'
-    }[epistemicType];
+    const epistemicLabel = DataEngine.getIsDemoMode()
+      ? `⚠ [DEMO — ${epistemicType} NO VERIFICADO]`
+      : ({
+          OBSERVED_DATA: '[DATO OBSERVADO]',
+          CORRELATION: '[CORRELACIÓN ESTADÍSTICA]',
+          MODEL_ESTIMATE: '[ESTIMACIÓN MODELADA]',
+          CAUSAL_INFERENCE: '[INFERENCIA CAUSAL]',
+          PROJECTION: '[PRONÓSTICO PROBABILÍSTICO]'
+        } as Record<EpistemicType, string>)[epistemicType];
 
     let body = '';
     if (engineName === 'econometric') {
@@ -396,7 +420,7 @@ export class EconomicIntelligenceOrchestrator {
     } else if (engineName === 'forecast') {
       body = `El análisis probabilístico con Fan Chart delimita la trayectoria central (P50) con conos de incertidumbre entre P10 y P90 para los próximos trimestres.`;
     } else if (engineName === 'anomaly') {
-      body = `La evaluación de desviación histórica Z-Score registra un valor de ${result.zScore} (Variación observada: ${result.observedDelta}). Clasificación: ${result.severity}.`;
+      body = `La evaluación de desviación histórica Z-Score registra un valor de ${result.zScore} (Variación de entrada: ${result.observedDelta}). Clasificación: ${result.severity}.`;
     } else if (engineName === 'faii') {
       body = `El índice compuesto FAII consolida 5 pilares estructurales para evaluar la resiliencia y el aprovechamiento de la IA en la economía.`;
     }

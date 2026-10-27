@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'fix/audit-security-epistemic-integrity']
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -31,5 +31,72 @@ jobs:
       - name: TypeScript check
         run: npm run lint
 
+      - name: Run automated audit tests
+        run: npm run test:audit
+
       - name: Build application
         run: npm run build
+
+      - name: Ensure production server source maps are not emitted
+        run: test ! -e dist/server.cjs.map
+
+      - name: Production server smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          FULGOR_API_KEY=ci-smoke-test-012345678901234567890123456789 NODE_ENV=production node dist/server.cjs > /tmp/fulgor-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --silent --show-error --fail http://127.0.0.1:3000/api/v1/health > /tmp/fulgor-health.json; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" -eq 1
+          node -e "const h=require('/tmp/fulgor-health.json'); if(h.status!=='ok') process.exit(1)"
+          curl --silent --show-error --dump-header /tmp/fulgor-health-headers.txt --output /dev/null http://127.0.0.1:3000/api/v1/health
+          grep -qi '^X-Content-Type-Options: nosniff' /tmp/fulgor-health-headers.txt
+          grep -qi '^X-Frame-Options: DENY' /tmp/fulgor-health-headers.txt
+          if grep -qi '^X-Powered-By:' /tmp/fulgor-health-headers.txt; then echo "X-Powered-By must not be exposed"; exit 1; fi
+
+          unknown_api_status=$(curl --silent --output /tmp/fulgor-unknown-api.json --write-out '%{http_code}' http://127.0.0.1:3000/api/unknown-route)
+          test "$unknown_api_status" = "404"
+          node -e "const d=require('/tmp/fulgor-unknown-api.json'); if(typeof d.error!=='string') process.exit(1)"
+
+          unauth_status=$(curl --silent --output /tmp/fulgor-unauth.json --write-out '%{http_code}' http://127.0.0.1:3000/api/v1/indicators)
+          test "$unauth_status" = "401"
+
+          auth_status=$(curl --silent --output /tmp/fulgor-indicators.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test-012345678901234567890123456789' http://127.0.0.1:3000/api/v1/indicators)
+          test "$auth_status" = "200"
+          node -e "const d=require('/tmp/fulgor-indicators.json'); if(d.dataStatus!=='DEMO_DATA_NOT_VERIFIED') process.exit(1)"
+
+          legacy_unauth_status=$(curl --silent --output /tmp/fulgor-legacy-unauth.json --write-out '%{http_code}' -H 'Content-Type: application/json' -d '{"prompt":"test"}' http://127.0.0.1:3000/api/copilot/chat)
+          test "$legacy_unauth_status" = "401"
+
+          legacy_auth_status=$(curl --silent --output /tmp/fulgor-legacy-auth.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test-012345678901234567890123456789' -H 'Content-Type: application/json' -d '{"prompt":""}' http://127.0.0.1:3000/api/copilot/chat)
+          test "$legacy_auth_status" = "400"
+
+          bad_simulation_status=$(curl --silent --output /tmp/fulgor-bad-simulation.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test-012345678901234567890123456789' -H 'Content-Type: application/json' -d '{"aiAdoptionDelta":1000}' http://127.0.0.1:3000/api/digital-twin/simulate)
+          test "$bad_simulation_status" = "400"
+
+          bad_correlation_status=$(curl --silent --output /tmp/fulgor-bad-correlation.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test-012345678901234567890123456789' -H 'Content-Type: application/json' -d '{"x":[1,2,3],"y":[1,"bad",3]}' http://127.0.0.1:3000/api/v1/correlation)
+          test "$bad_correlation_status" = "400"
+
+          legacy_health_key_status=$(curl --silent --output /tmp/fulgor-short-key.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test' -H 'Content-Type: application/json' -d '{"prompt":"test"}' http://127.0.0.1:3000/api/copilot/chat)
+          test "$legacy_health_key_status" = "401"
+
+          # The public source endpoint must either return validated source data or an explicit upstream-unavailable error; never fabricated fallback values.
+          public_feed_status=$(curl --silent --max-time 20 --output /tmp/fulgor-world-bank.json --write-out '%{http_code}' http://127.0.0.1:3000/api/public/world-bank)
+          echo "World Bank public feed HTTP status: $public_feed_status"
+          if [ "$public_feed_status" = "200" ]; then
+            node -e "const d=require('/tmp/fulgor-world-bank.json'); const expected=['NY.GDP.MKTP.KD.ZG','FP.CPI.TOTL.ZG','SL.UEM.TOTL.ZS']; const countries=['MEX','USA','ESP','DEU']; if(d.status!=='WORLD_BANK_DATA_RETRIEVED' || !Array.isArray(d.observations) || d.observations.length!==12) process.exit(1); for(const code of expected) for(const country of countries) if(!d.observations.some(o=>o.indicatorCode===code && o.countryCode===country)) process.exit(1); for(const o of d.observations) if(!Number.isFinite(o.value) || !/^\\d{4}$/.test(o.year) || !o.countryCode || !o.indicatorCode) process.exit(1); console.log('Validated World Bank country/indicator combinations:', d.observations.length)"
+          elif [ "$public_feed_status" = "502" ]; then
+            node -e "const d=require('/tmp/fulgor-world-bank.json'); if(typeof d.error!=='string' || d.observations!==undefined) process.exit(1)"
+          else
+            echo "Unexpected World Bank endpoint status: $public_feed_status"
+            exit 1
+          fi

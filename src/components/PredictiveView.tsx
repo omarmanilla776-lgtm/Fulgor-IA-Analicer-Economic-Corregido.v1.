@@ -42,10 +42,10 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
 
   // Monte Carlo Fan Chart Data (2022 to 2028)
   const gdpFanData = [
-    { year: '2022', observed: 3.9, base: 3.9, conservative: 3.9, optimistic: 3.9, p10: 3.9, p90: 3.9 },
-    { year: '2023', observed: 3.2, base: 3.2, conservative: 3.2, optimistic: 3.2, p10: 3.2, p90: 3.2 },
-    { year: '2024', observed: 2.1, base: 2.1, conservative: 2.1, optimistic: 2.1, p10: 2.1, p90: 2.1 },
-    { year: '2025', observed: 2.3, base: 2.3, conservative: 2.3, optimistic: 2.3, p10: 2.3, p90: 2.3 },
+    { year: '2022', observed: null, base: 3.9, conservative: 3.9, optimistic: 3.9, p10: 3.9, p90: 3.9 },
+    { year: '2023', observed: null, base: 3.2, conservative: 3.2, optimistic: 3.2, p10: 3.2, p90: 3.2 },
+    { year: '2024', observed: null, base: 2.1, conservative: 2.1, optimistic: 2.1, p10: 2.1, p90: 2.1 },
+    { year: '2025', observed: null, base: 2.3, conservative: 2.3, optimistic: 2.3, p10: 2.3, p90: 2.3 },
     // Forecast years
     { year: '2026 (P)', observed: null, base: 2.4, conservative: 1.8, optimistic: 3.1, p10: 1.2, p90: 3.8 },
     { year: '2027 (P)', observed: null, base: 2.6, conservative: 1.6, optimistic: 3.6, p10: 0.9, p90: 4.3 },
@@ -53,10 +53,10 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
   ];
 
   const inflationFanData = [
-    { year: '2022', observed: 7.82, base: 7.82, conservative: 7.82, optimistic: 7.82, p10: 7.82, p90: 7.82 },
-    { year: '2023', observed: 4.66, base: 4.66, conservative: 4.66, optimistic: 4.66, p10: 4.66, p90: 4.66 },
-    { year: '2024', observed: 4.45, base: 4.45, conservative: 4.45, optimistic: 4.45, p10: 4.45, p90: 4.45 },
-    { year: '2025', observed: 4.28, base: 4.28, conservative: 4.28, optimistic: 4.28, p10: 4.28, p90: 4.28 },
+    { year: '2022', observed: null, base: 7.82, conservative: 7.82, optimistic: 7.82, p10: 7.82, p90: 7.82 },
+    { year: '2023', observed: null, base: 4.66, conservative: 4.66, optimistic: 4.66, p10: 4.66, p90: 4.66 },
+    { year: '2024', observed: null, base: 4.45, conservative: 4.45, optimistic: 4.45, p10: 4.45, p90: 4.45 },
+    { year: '2025', observed: null, base: 4.28, conservative: 4.28, optimistic: 4.28, p10: 4.28, p90: 4.28 },
     // Forecast years
     { year: '2026 (P)', observed: null, base: 3.75, conservative: 4.30, optimistic: 3.20, p10: 2.8, p90: 4.9 },
     { year: '2027 (P)', observed: null, base: 3.40, conservative: 4.10, optimistic: 2.90, p10: 2.4, p90: 4.7 },
@@ -64,10 +64,10 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
   ];
 
   const aiAdoptionFanData = [
-    { year: '2022', observed: 12.0, base: 12.0, conservative: 12.0, optimistic: 12.0, p10: 12.0, p90: 12.0 },
-    { year: '2023', observed: 18.5, base: 18.5, conservative: 18.5, optimistic: 18.5, p10: 18.5, p90: 18.5 },
-    { year: '2024', observed: 21.4, base: 21.4, conservative: 21.4, optimistic: 21.4, p10: 21.4, p90: 21.4 },
-    { year: '2025', observed: 24.8, base: 24.8, conservative: 24.8, optimistic: 24.8, p10: 24.8, p90: 24.8 },
+    { year: '2022', observed: null, base: 12.0, conservative: 12.0, optimistic: 12.0, p10: 12.0, p90: 12.0 },
+    { year: '2023', observed: null, base: 18.5, conservative: 18.5, optimistic: 18.5, p10: 18.5, p90: 18.5 },
+    { year: '2024', observed: null, base: 21.4, conservative: 21.4, optimistic: 21.4, p10: 21.4, p90: 21.4 },
+    { year: '2025', observed: null, base: 24.8, conservative: 24.8, optimistic: 24.8, p10: 24.8, p90: 24.8 },
     // Forecast years
     { year: '2026 (P)', observed: null, base: 32.5, conservative: 28.0, optimistic: 38.0, p10: 25.0, p90: 42.0 },
     { year: '2027 (P)', observed: null, base: 42.0, conservative: 34.0, optimistic: 52.0, p10: 30.0, p90: 58.0 },
@@ -95,15 +95,15 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
             <EpistemicBadge type="PROJECTION" size="sm" />
           </div>
           <h2 className="text-lg font-bold text-slate-100">
-            Modelos de Simulación Estocástica y Análisis de Cono de Incertidumbre
+            Fan chart de demostración (no pronóstico calibrado)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Proyecciones multivariables horizonte 2026-2028 mediante simulación Monte Carlo. <strong>Principio de rigor:</strong> Toda predicción es una estimación probabilística y nunca una certidumbre.
+            Las curvas y valores históricos de esta pantalla son ilustrativos. No hay series económicas verificadas ni simulación Monte Carlo calibrada conectadas; los percentiles no son probabilidades validadas.
           </p>
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`Analiza los supuestos detrás de las proyecciones macroeconómicas para ${currentCountry.name} en 2026-2028. ¿Cuáles son los principales riesgos de cola (tail risks)?`)}
+          onClick={() => onOpenCopilotWithPrompt(`Evalúa qué datos y validaciones se necesitan para pronosticar la economía de ${currentCountry.name}; no presentes las curvas de demostración como pronóstico real.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
           <Sparkles className="w-4 h-4" /> Evaluar Supuestos con Copilot
@@ -179,14 +179,14 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 
                 {/* Confidence Bounds */}
-                <Area type="monotone" dataKey="p90" name="Intervalo Superior (P90)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="url(#fanSpread)" />
-                <Area type="monotone" dataKey="p10" name="Intervalo Inferior (P10)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="transparent" />
+                <Area type="monotone" dataKey="p90" name="Banda superior ilustrativa (no percentil validado)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="url(#fanSpread)" />
+                <Area type="monotone" dataKey="p10" name="Banda inferior ilustrativa (no percentil validado)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" fill="transparent" />
 
                 {/* Scenarios */}
                 <Line type="monotone" dataKey="optimistic" name="Escenario Optimista" stroke="#34d399" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="base" name="Escenario Base" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
                 <Line type="monotone" dataKey="conservative" name="Escenario Conservador" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="observed" name="Dato Histórico Observado" stroke="#f8fafc" strokeWidth={3.5} dot={{ r: 5 }} />
+                <Line type="monotone" dataKey="observed" name="Serie de demostración (sin observaciones verificadas)" stroke="#f8fafc" strokeWidth={3.5} dot={{ r: 5 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -231,7 +231,7 @@ export const PredictiveView: React.FC<PredictiveViewProps> = ({
         <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
           <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
           <span>
-            <strong>Aviso de Riesgo y Responsabilidad Económica:</strong> Los pronósticos se calculan combinando modelos autorregresivos (ARIMA), vectores autorregresivos (VAR) y calibración empírica. No constituyen asesoría financiera ni garantía de eventos futuros.
+            <strong>Estado del modelo:</strong> esta vista usa valores fijos de demostración; no se han ajustado modelos ARIMA/VAR ni realizado validación fuera de muestra. No usar como pronóstico económico real.
           </span>
         </div>
 

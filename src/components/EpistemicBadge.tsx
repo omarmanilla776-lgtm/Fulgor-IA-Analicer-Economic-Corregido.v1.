@@ -17,10 +17,19 @@ export const EPISTEMIC_CONFIG: Record<EpistemicType, {
   borderClass: string;
   icon: React.ReactNode;
 }> = {
+  DEMO_DATA: {
+    label: 'DATO ILUSTRATIVO DE DEMOSTRACIÓN',
+    shortLabel: 'DEMO',
+    description: 'Valor estático de demostración; no procede de una observación económica verificada.',
+    colorClass: 'text-amber-300',
+    bgClass: 'bg-amber-950/40',
+    borderClass: 'border-amber-500/40',
+    icon: <Info className="w-3.5 h-3.5 text-amber-300" />
+  },
   OBSERVED_DATA: {
-    label: 'DATO OBSERVADO (FACTUAL)',
-    shortLabel: 'OBSERVADO',
-    description: 'Dato empírico verificado por agencia oficial (INEGI, FRED, Eurostat, Banco Mundial). Sin inferencia.',
+    label: 'DATO DECLARADO OBSERVADO (NO VERIFICADO)',
+    shortLabel: 'NO VERIFICADO',
+    description: 'El tipo de dato está etiquetado en el ejemplo, pero la aplicación no ha verificado una conexión en vivo ni la procedencia.',
     colorClass: 'text-emerald-400',
     bgClass: 'bg-emerald-950/40',
     borderClass: 'border-emerald-500/40',
@@ -36,27 +45,27 @@ export const EPISTEMIC_CONFIG: Record<EpistemicType, {
     icon: <GitCompare className="w-3.5 h-3.5 text-amber-400" />
   },
   MODEL_ESTIMATE: {
-    label: 'ESTIMACIÓN MODELADA',
-    shortLabel: 'ESTIMACIÓN',
-    description: 'Resultado de modelo econométrico/estadístico condicional a especificación paramétrica (R², Beta).',
+    label: 'ESTIMACIÓN MODELADA (DEMO)',
+    shortLabel: 'DEMO',
+    description: 'Resultado ilustrativo; el modelo no está calibrado de forma independiente con datos económicos verificados.',
     colorClass: 'text-sky-400',
     bgClass: 'bg-sky-950/40',
     borderClass: 'border-sky-500/40',
     icon: <Calculator className="w-3.5 h-3.5 text-sky-400" />
   },
   CAUSAL_INFERENCE: {
-    label: 'INFERENCIA CAUSAL (DiD/IV)',
-    shortLabel: 'CAUSALIDAD ESTIMADA',
-    description: 'Estimación cuasi-experimental con grupo de control (Difference-in-Differences, controles sintéticos).',
+    label: 'INFERENCIA CAUSAL (NO VALIDADA)',
+    shortLabel: 'NO VALIDADA',
+    description: 'No se ha validado un diseño causal con datos reales, supuestos comprobados y estimación de incertidumbre.',
     colorClass: 'text-purple-400',
     bgClass: 'bg-purple-950/40',
     borderClass: 'border-purple-500/40',
     icon: <Sparkles className="w-3.5 h-3.5 text-purple-400" />
   },
   PROJECTION: {
-    label: 'PRONÓSTICO PROBABILÍSTICO',
-    shortLabel: 'PRONÓSTICO',
-    description: 'Proyección estocástica basada en escenarios futuros. Sujeto a incertidumbre intrínseca.',
+    label: 'PRONÓSTICO (NO CALIBRADO)',
+    shortLabel: 'NO CALIBRADO',
+    description: 'Escenario ilustrativo; no está calibrado con una serie histórica verificada ni validado fuera de muestra.',
     colorClass: 'text-rose-400',
     bgClass: 'bg-rose-950/40',
     borderClass: 'border-rose-500/40',
@@ -69,7 +78,7 @@ export const EpistemicBadge: React.FC<EpistemicBadgeProps> = ({
   size = 'md',
   showDetail = false 
 }) => {
-  const config = EPISTEMIC_CONFIG[type] || EPISTEMIC_CONFIG.OBSERVED_DATA;
+  const config = EPISTEMIC_CONFIG[type] || EPISTEMIC_CONFIG.DEMO_DATA;
 
   const sizeClasses = {
     sm: 'text-[10px] px-2 py-0.5 gap-1',

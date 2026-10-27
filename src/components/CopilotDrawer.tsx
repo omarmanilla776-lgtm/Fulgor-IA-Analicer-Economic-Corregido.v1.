@@ -30,9 +30,9 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
     {
       id: 'welcome-msg',
       role: 'assistant',
-      content: `Hola. Soy el **AI Economic Copilot** de **FULGOR IA ANALICER ECONOMIC**.\n\nMi objetivo es convertir datos macroeconómicos y métricas de impacto de IA en inteligencia clara y fundamentada para la toma de decisiones.\n\n*Nota de rigor científico:* Cada afirmación separa estrictamente datos empíricos observados, correlaciones estadísticas, estimaciones paramétricas, inferencias causales y proyecciones. ¿En qué análisis económico o simulación puedo ayudarte hoy?`,
+      content: `Hola. Soy el **AI Economic Copilot** de **FULGOR IA ANALICER ECONOMIC**.\n\nPuedo ayudarte a razonar sobre economía y explicar métodos analíticos. En esta demo no hay fuentes económicas en vivo conectadas; no presentaré cifras ilustrativas como hechos verificados.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      epistemicType: 'OBSERVED_DATA'
+      epistemicType: 'DEMO_DATA'
     }
   ]);
   const [input, setInput] = useState('');
@@ -83,12 +83,9 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: query,
-          conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
-          context: {
-            country: selectedCountry,
-            timestamp: new Date().toISOString()
-          }
+          prompt: query,
+          contextCountry: selectedCountry,
+          activeSector: 'Multisectorial'
         })
       });
 
@@ -107,16 +104,16 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err: any) {
-      // Fallback response with epistemic rigor
-      const fallbackMsg: Message = {
+    } catch (err: unknown) {
+      // Never fabricate economic figures when the AI service is unavailable.
+      const errorMsg: Message = {
         id: `err-${Date.now()}`,
         role: 'assistant',
-        content: `**Diagnóstico Económico Fulgor:** Basado en la base de datos oficial y los modelos econométricos calibrados:\n\n1. **Datos Observados:** En México y EE.UU., los sectores de servicios financieros y desarrollo tecnológico muestran las mayores tasas de penetración de IA (48% y 54% respectivamente).\n2. **Inferencia Causal (DiD):** Los estudios cuasi-experimentales confirman una ganancia neta en valor agregado bruto de +14.2% en firmas manufactureras con adopción madura (p-value = 0.004).\n3. **Proyección:** El índice FAII estima una aceleración de la productividad multifactorial de +1.8% anual en escenarios base.`,
+        content: '**Copiloto no disponible en este momento.** La solicitud no pudo completarse porque el servicio de IA o su autenticación no están configurados para el acceso público. No se generó un análisis económico. Puedes seguir explorando los módulos de demostración; sus cifras no están verificadas.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        epistemicType: 'MODEL_ESTIMATE'
+        epistemicType: 'DEMO_DATA'
       };
-      setMessages((prev) => [...prev, fallbackMsg]);
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +132,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
         role: 'assistant',
         content: 'Conversación reiniciada. ¿Qué consulta o hipótesis económica deseas analizar?',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        epistemicType: 'OBSERVED_DATA'
+        epistemicType: 'DEMO_DATA'
       }
     ]);
   };
@@ -162,7 +159,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-slate-100 text-sm">AI Economic Copilot</h3>
                 <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800">
-                  Gemini 2.5 Pro
+                  IA · disponibilidad condicionada
                 </span>
               </div>
               <p className="text-[10px] text-slate-400">

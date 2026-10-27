@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EconomicIndicator, CountryEconomicProfile } from '../types/economic';
 import { EpistemicBadge } from './EpistemicBadge';
 import { ProvenanceCard } from './ProvenanceCard';
+import { LiveEconomicData } from './LiveEconomicData';
 import { 
   ResponsiveContainer, 
   LineChart, 
@@ -74,6 +75,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
 
   return (
     <div className="space-y-6">
+      <LiveEconomicData />
       
       {/* Header with Search and Category Pills */}
       <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-4">
@@ -81,10 +83,10 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
           <div>
             <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
               <Globe className="w-5 h-5 text-amber-400" />
-              Explorador de Indicadores Macroeconómicos
+              Explorador de indicadores macroeconómicos (demo)
             </h2>
             <p className="text-xs text-slate-400">
-              Datos normalizados y auditados provenientes de institutos oficiales (INEGI, FRED, Eurostat, OCDE, FMI).
+              El catálogo inferior contiene valores de demostración y no se actualiza con el panel World Bank mostrado arriba.
             </p>
           </div>
 
@@ -218,7 +220,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
                       showForecastScenario === 'none' ? 'bg-slate-800 text-slate-200' : 'text-slate-400'
                     }`}
                   >
-                    Solo Observados
+                    Solo etiquetados como observados (no verificados)
                   </button>
                   <button
                     onClick={() => setShowForecastScenario('base')}
@@ -226,7 +228,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
                       showForecastScenario === 'base' ? 'bg-amber-950 text-amber-300 border border-amber-800/60' : 'text-slate-400'
                     }`}
                   >
-                    Escenario Base + Intervalo
+                    Escenario ilustrativo + bandas
                   </button>
                 </div>
               </div>
@@ -252,7 +254,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
                     <Area 
                       type="monotone" 
                       dataKey="value" 
-                      name="Valor Histórico / Proyectado" 
+                      name="Valores de demostración" 
                       stroke="#f59e0b" 
                       strokeWidth={2.5} 
                       fillOpacity={1} 
@@ -260,8 +262,8 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
                     />
                     {showForecastScenario === 'base' && (
                       <>
-                        <Line type="monotone" dataKey="lowerBound" name="Límite Inferior (95% CI)" stroke="#94a3b8" strokeDasharray="3 3" dot={false} />
-                        <Line type="monotone" dataKey="upperBound" name="Límite Superior (95% CI)" stroke="#94a3b8" strokeDasharray="3 3" dot={false} />
+                        <Line type="monotone" dataKey="lowerBound" name="Banda inferior ilustrativa (no IC)" stroke="#94a3b8" strokeDasharray="3 3" dot={false} />
+                        <Line type="monotone" dataKey="upperBound" name="Banda superior ilustrativa (no IC)" stroke="#94a3b8" strokeDasharray="3 3" dot={false} />
                       </>
                     )}
                   </AreaChart>
@@ -281,7 +283,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({
               {/* Provenance Card */}
               <div className="space-y-2 pt-2">
                 <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-amber-400" /> Ficha Técnica y Verificación de Fuente
+                  <Database className="w-3.5 h-3.5 text-amber-400" /> Ficha técnica y estado de fuente declarada
                 </span>
                 <ProvenanceCard provenance={activeIndicator.provenance} />
               </div>

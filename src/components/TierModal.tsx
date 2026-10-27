@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, KeyRound, Sparkles, Shield, Zap, Building2, Copy } from 'lucide-react';
+import { X, Check, KeyRound, Sparkles, Shield, Zap, Building2 } from 'lucide-react';
 import { UserPlanTier } from '../types/economic';
 
 interface TierModalProps {
@@ -15,8 +15,7 @@ export const TierModal: React.FC<TierModalProps> = ({
   currentTier,
   onSelectTier,
 }) => {
-  const [copiedApiKey, setCopiedApiKey] = useState(false);
-  const mockApiKey = 'flg_sec_live_99a84b3e02f1889c09d_prod';
+  const mockApiKey = 'No hay una clave API configurada';
 
   if (!isOpen) return null;
 
@@ -26,13 +25,13 @@ export const TierModal: React.FC<TierModalProps> = ({
       name: 'Free Starter',
       price: '$0',
       period: 'por siempre',
-      description: 'Acceso esencial a indicadores macroeconómicos oficiales y series históricas básicas.',
+      description: 'Acceso a la interfaz y datos ilustrativos; las fuentes económicas oficiales aún no están conectadas.',
       features: [
-        'Indicadores macroeconómicos principales',
-        'Series históricas de hasta 3 años',
+        'Indicadores de demostración no verificados',
+        'Series históricas ilustrativas, sin verificación de fuente',
         'Visualización de gráficos estándar',
-        'AI Copilot (5 consultas diarias)',
-        'Epistemic Badges básicos'
+        'Copiloto no disponible hasta habilitar un servicio autenticado',
+        'Etiquetas con estado de verificación explícito'
       ],
       badge: 'Básico',
       isPopular: false,
@@ -48,7 +47,7 @@ export const TierModal: React.FC<TierModalProps> = ({
         'Laboratorio de Inferencia Causal (DiD)',
         'Gemelo Digital (hasta 50 simulaciones/mes)',
         'Pronósticos probabilísticos a 3 años',
-        'AI Copilot ilimitado con Gemini 2.5 Pro',
+        'Copiloto IA sujeto a habilitación segura y límites de uso',
         'Exportación de reportes en PDF y CSV'
       ],
       badge: 'Recomendado',
@@ -90,11 +89,6 @@ export const TierModal: React.FC<TierModalProps> = ({
     },
   ];
 
-  const handleCopyKey = () => {
-    navigator.clipboard.writeText(mockApiKey);
-    setCopiedApiKey(true);
-    setTimeout(() => setCopiedApiKey(false), 2000);
-  };
 
   return (
     <div 
@@ -114,7 +108,7 @@ export const TierModal: React.FC<TierModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-slate-100 text-base">Planes de Suscripción & Acceso a la API</h3>
-              <p className="text-xs text-slate-400">Selecciona el nivel de acceso para desbloquear capacidades analíticas avanzadas.</p>
+              <p className="text-xs text-slate-400">Demo técnica. Los precios son referenciales y las funciones son objetivos de producto; no hay pagos, suscripciones ni prestaciones Pro activas.</p>
             </div>
           </div>
 
@@ -176,11 +170,17 @@ export const TierModal: React.FC<TierModalProps> = ({
                 </div>
 
                 <button
+                  type="button"
+                  disabled={tier.id !== 'FREE'}
                   onClick={() => {
-                    onSelectTier(tier.id);
+                    if (tier.id !== 'FREE') return;
+                    onSelectTier('FREE');
                     onClose();
                   }}
                   className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                    tier.id !== 'FREE'
+                      ? 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed'
+                      :
                     isCurrent
                       ? 'bg-slate-800 text-amber-400 border border-slate-700 cursor-default'
                       : tier.isPopular
@@ -188,7 +188,7 @@ export const TierModal: React.FC<TierModalProps> = ({
                       : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
                   }`}
                 >
-                  {isCurrent ? 'Plan Actual' : `Cambiar a ${tier.name}`}
+                  {tier.id !== 'FREE' ? 'No disponible aún' : (isCurrent ? 'Plan gratuito actual' : 'Usar plan gratuito')}
                 </button>
               </div>
             );
@@ -208,24 +208,18 @@ export const TierModal: React.FC<TierModalProps> = ({
             </div>
 
             <button
-              onClick={handleCopyKey}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+              type="button"
+              disabled
+              aria-label="No hay clave API configurada"
+              className="px-3 py-1.5 rounded-lg bg-slate-900 text-slate-500 border border-slate-800 text-xs font-semibold flex items-center gap-1.5 self-start sm:self-auto cursor-not-allowed"
             >
-              {copiedApiKey ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Copiada
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" /> Copiar API Key
-                </>
-              )}
+              No hay clave configurada
             </button>
           </div>
 
           <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-amber-400 flex items-center justify-between overflow-x-auto">
             <span>{mockApiKey}</span>
-            <span className="text-[10px] text-slate-500 ml-4 shrink-0 font-sans">Permisos: Read Indicators, Run Digital Twin</span>
+            <span className="text-[10px] text-slate-500 ml-4 shrink-0 font-sans">Demostración: no es una credencial</span>
           </div>
         </div>
 
