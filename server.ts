@@ -344,9 +344,12 @@ app.post('/api/v1/simulate', (req, res) => {
 
 app.post('/api/v1/correlation', (req, res) => {
   try {
-    const { x = [1, 2, 3, 4, 5], y = [2.1, 3.9, 6.2, 8.1, 9.8] } = req.body;
-    const n = Math.min(x.length, y.length);
-    if (n < 2) return res.status(400).json({ error: 'Se requieren al menos 2 pares de observaciones.' });
+    const { x = [1, 2, 3, 4, 5], y = [2.1, 3.9, 6.2, 8.1, 9.8] } = req.body ?? {};
+    if (!Array.isArray(x) || !Array.isArray(y) || x.length !== y.length || x.length < 2 || x.length > 10000 ||
+        [...x, ...y].some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+      return res.status(400).json({ error: 'x e y deben ser arreglos numéricos finitos del mismo tamaño (2 a 10000 pares).' });
+    }
+    const n = x.length;
     
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
     for (let i = 0; i < n; i++) {
@@ -387,7 +390,10 @@ app.post('/api/v1/correlation', (req, res) => {
 
 app.post('/api/v1/did', (req, res) => {
   try {
-    const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2, se = 2.45 } = req.body;
+    const { preTreat = 0.2, postTreat = 21.6, preControl = 0.1, postControl = 0.2, se = 2.45 } = req.body ?? {};
+    if ([preTreat, postTreat, preControl, postControl, se].some((value) => typeof value !== 'number' || !Number.isFinite(value)) || se <= 0) {
+      return res.status(400).json({ error: 'Los valores DiD deben ser números finitos y el error estándar debe ser positivo.' });
+    }
     const effect = (postTreat - preTreat) - (postControl - preControl);
     const tStat = effect / se;
     const pValue = null;
@@ -406,7 +412,7 @@ app.post('/api/v1/did', (req, res) => {
       isStatisticallySignificant: false
     });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'No fue posible procesar el cálculo solicitado.' });
   }
 });
 
