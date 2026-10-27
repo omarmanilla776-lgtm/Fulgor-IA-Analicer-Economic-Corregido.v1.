@@ -61,15 +61,15 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
             Ejemplos de alertas económicas (no son alertas actuales verificadas)
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Algoritmos continuos de detección de outliers (Z-Score &gt; 2.0σ) en variables de inversión, costos energéticos, desacoplamiento salarios-productividad y cuellos de botella tecnológicos.
+            Ejemplos estáticos para explicar el concepto de alerta. No hay un feed en vivo ni un monitor que detecte anomalías actuales.
           </p>
         </div>
 
         <button
-          onClick={() => onOpenCopilotWithPrompt(`¿Cuáles son las 3 alertas económicas más urgentes para la región de ${selectedCountry === 'ALL' ? 'Norteamérica y Europa' : selectedCountry} y qué medidas de mitigación se recomiendan?`)}
+          onClick={() => onOpenCopilotWithPrompt(`Explica un marco para evaluar riesgos económicos en ${selectedCountry === 'ALL' ? 'Norteamérica y Europa' : selectedCountry}; no afirmes alertas actuales sin datos en vivo verificados.`)}
           className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-semibold rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
-          <Sparkles className="w-4 h-4" /> Mitigación con Copilot
+          <Sparkles className="w-4 h-4" /> Marco de mitigación
         </button>
       </div>
 
