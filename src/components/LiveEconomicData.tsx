@@ -82,11 +82,13 @@ export const LiveEconomicData: React.FC = () => {
             <span className="text-slate-400">Consultado: {new Date(data.retrievedAt).toLocaleString('es-MX')}</span>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-            {Object.entries(grouped).map(([indicatorCode, items]) => (
+            {Object.entries(grouped).map(([indicatorCode, rawItems]) => {
+              const items = [...(rawItems as Observation[])].sort((a, b) => a.countryName.localeCompare(b.countryName, 'es'));
+              return (
               <div key={indicatorCode} className="rounded-lg border border-slate-800 bg-slate-950/70 p-3">
                 <h3 className="text-sm font-semibold text-slate-100 min-h-10">{items[0]?.indicatorName}</h3>
                 <div className="mt-2 space-y-2">
-                  {items.sort((a, b) => a.countryName.localeCompare(b.countryName, 'es')).map(item => (
+                  {items.map(item => (
                     <div key={`${item.countryCode}-${item.indicatorCode}`} className="flex items-center justify-between gap-3 border-t border-slate-800 pt-2">
                       <div><p className="text-xs text-slate-300">{item.countryName}</p><p className="text-[10px] text-slate-500">{item.year} · {item.countryCode}</p></div>
                       <p className="text-sm font-mono font-semibold text-sky-200 tabular-nums">{numberFormat.format(item.value)}{item.unit}</p>
@@ -94,7 +96,8 @@ export const LiveEconomicData: React.FC = () => {
                   ))}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           <p className="text-[11px] leading-relaxed text-slate-400">{data.note} Fuente: <a className="underline underline-offset-2 text-sky-300" href={data.sourceUrl} target="_blank" rel="noreferrer">World Bank Open Data</a>. Estado de cada valor: fuente oficial consultada, sin auditoría independiente de Fulgor.</p>
         </>
