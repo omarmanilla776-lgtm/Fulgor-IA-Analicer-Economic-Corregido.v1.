@@ -108,7 +108,7 @@ export const TierModal: React.FC<TierModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-slate-100 text-base">Planes de Suscripción & Acceso a la API</h3>
-              <p className="text-xs text-slate-400">Selecciona el nivel de acceso para desbloquear capacidades analíticas avanzadas.</p>
+              <p className="text-xs text-slate-400">Modo de demostración. Los precios son referenciales; suscripciones y pagos aún no están conectados.</p>
             </div>
           </div>
 
@@ -170,11 +170,17 @@ export const TierModal: React.FC<TierModalProps> = ({
                 </div>
 
                 <button
+                  type="button"
+                  disabled={tier.id !== 'FREE'}
                   onClick={() => {
-                    onSelectTier(tier.id);
+                    if (tier.id !== 'FREE') return;
+                    onSelectTier('FREE');
                     onClose();
                   }}
                   className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                    tier.id !== 'FREE'
+                      ? 'bg-slate-900 text-slate-500 border border-slate-800 cursor-not-allowed'
+                      :
                     isCurrent
                       ? 'bg-slate-800 text-amber-400 border border-slate-700 cursor-default'
                       : tier.isPopular
@@ -182,7 +188,7 @@ export const TierModal: React.FC<TierModalProps> = ({
                       : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
                   }`}
                 >
-                  {isCurrent ? 'Plan Actual' : `Cambiar a ${tier.name}`}
+                  {tier.id !== 'FREE' ? 'No disponible aún' : (isCurrent ? 'Plan gratuito actual' : 'Usar plan gratuito')}
                 </button>
               </div>
             );
