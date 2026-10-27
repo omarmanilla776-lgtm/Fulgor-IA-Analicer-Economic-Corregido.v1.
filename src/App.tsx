@@ -33,12 +33,12 @@ import { Bot, Sparkles, ShieldCheck, Database, FileText, Terminal, Activity, Boo
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [selectedCountry, setSelectedCountry] = useState<string>('ALL');
-  const [currentTier, setCurrentTier] = useState<UserPlanTier>('PRO_MAX');
+  const [currentTier, setCurrentTier] = useState<UserPlanTier>('FREE');
   
   // Localization & Currency
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>(LocalizationEngine.getCurrentLanguage());
   const [currentCurrency, setCurrentCurrency] = useState<SupportedCurrency>(LocalizationEngine.getCurrentCurrency());
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(DataEngine.getIsDemoMode());
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(true);
 
   // Modals & Drawers
   const [isCopilotOpen, setIsCopilotOpen] = useState<boolean>(false);
@@ -60,9 +60,9 @@ export default function App() {
   };
 
   const handleToggleDemoMode = () => {
-    const next = !isDemoMode;
-    DataEngine.setDemoMode(next);
-    setIsDemoMode(next);
+    // Live official data feeds are not connected yet. Keep demo disclosure enabled.
+    DataEngine.setDemoMode(true);
+    setIsDemoMode(true);
   };
 
   const handleOpenCopilotWithPrompt = (prompt: string) => {
