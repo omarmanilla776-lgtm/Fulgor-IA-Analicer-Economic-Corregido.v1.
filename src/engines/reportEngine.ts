@@ -87,7 +87,7 @@ export class ReportEngine {
   public static generateCSV(indicators: EconomicIndicator[]): string {
     const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,DeclaredSource,DeclaredCutoffDate,DataStatus\n";
     const rows = indicators.map(i => 
-      `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","${i.provenance.cutoffDate}",${i.provenance.confidenceScore},"DEMO_DATA_NOT_VERIFIED"`
+      `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","${i.provenance.cutoffDate}","DEMO_DATA_NOT_VERIFIED"`
     ).join("\n");
     return headers + rows;
   }
