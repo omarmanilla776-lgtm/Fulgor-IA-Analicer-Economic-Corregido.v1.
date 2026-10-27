@@ -47,8 +47,6 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
   const [postTreat, setPostTreat] = useState<number>(21.6);
   const [preControl, setPreControl] = useState<number>(0.1);
   const [postControl, setPostControl] = useState<number>(0.2);
-  const [standardError, setStandardError] = useState<number>(2.45);
-  const [sampleSizeN, setSampleSizeN] = useState<number>(420);
   
   const [isExecutingOrchestrator, setIsExecutingOrchestrator] = useState<boolean>(false);
   const [orchestratedResult, setOrchestratedResult] = useState<OrchestrationPipelineResult | null>(null);
@@ -64,16 +62,14 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           countryCode,
           sector: 'Manufactura & Servicios Avanzados',
           indicatorCode: 'PROD_LIFT_DID',
-          indicatorName: 'Productividad Marginal del Trabajo',
-          period: '2026-Q1/Q2'
+          indicatorName: 'Contraste descriptivo de ejemplo',
+          period: 'DEMO — periodo no verificado'
         },
         parameters: {
           preTreat,
           postTreat,
           preControl,
           postControl,
-          se: standardError,
-          sampleSize: sampleSizeN,
           xValues: [10, 20, 30, 40, 50, 60, 70, 80],
           yValues: [12, 22, 35, 41, 56, 68, 74, 89]
         },
@@ -103,7 +99,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             Correlación vs. inferencia causal: los supuestos deben verificarse
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            Interfaz de demostración para explorar conceptos de inferencia causal. Los datos, parámetros y resultados no están calibrados ni validados; no certifica tendencias paralelas ni efectos causales.
+            Interfaz de demostración para explorar conceptos de inferencia causal. Los valores iniciales y las series OLS son sintéticos. El DiD calcula solo un contraste descriptivo; no certifica tendencias paralelas ni efectos causales.
           </p>
         </div>
 
@@ -131,7 +127,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           La Escala Epistémica de Fulgor IA Analicer Economic
         </h3>
         <p className="text-xs text-slate-400">
-          Toda afirmación económica debe clasificarse dentro de uno de los siguientes 5 niveles de certeza:
+          Toda afirmación debe clasificarse por su tipo de evidencia; la etiqueta no sustituye la verificación de fuentes:
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
@@ -232,7 +228,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
             {/* Econometric Parameters Box */}
             <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 text-xs">
               <h4 className="font-bold text-slate-200 flex items-center gap-1.5">
-                <Calculator className="w-3.5 h-3.5 text-purple-400" /> Parámetros Econométricos del Modelo
+                <Calculator className="w-3.5 h-3.5 text-purple-400" /> Estadísticas de ejemplo (no validadas)
               </h4>
               <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
@@ -273,7 +269,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                     Modelo: Difference-in-Differences (DiD)
                   </span>
                   <span className="text-xs text-slate-500">•</span>
-                  <span className="text-xs text-slate-400">{activeExperiment.targetSector}</span>
+                  <span className="text-xs text-slate-400">{activeExperiment.targetSector} — escenario simulado</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-100">
                   Trayectorias simuladas de tratamiento y control (no datos observados)
@@ -439,25 +435,20 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               {targetEngineType === 'causal' && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-slate-300 font-medium">Post-Tratamiento (% Delta)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={postTreat}
-                      onChange={(e) => setPostTreat(Number(e.target.value))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none"
-                    />
+                    <label className="text-slate-300 font-medium">Tratamiento — antes</label>
+                    <input type="number" step="any" value={preTreat} onChange={(e) => setPreTreat(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
                   </div>
-
                   <div className="space-y-1.5">
-                    <label className="text-slate-300 font-medium">Error Estándar (SE)</label>
-                    <input
-                      type="number"
-                      step="0.05"
-                      value={standardError}
-                      onChange={(e) => setStandardError(Number(e.target.value))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none"
-                    />
+                    <label className="text-slate-300 font-medium">Tratamiento — después</label>
+                    <input type="number" step="any" value={postTreat} onChange={(e) => setPostTreat(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-slate-300 font-medium">Control — antes</label>
+                    <input type="number" step="any" value={preControl} onChange={(e) => setPreControl(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-slate-300 font-medium">Control — después</label>
+                    <input type="number" step="any" value={postControl} onChange={(e) => setPostControl(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none" />
                   </div>
                 </>
               )}
