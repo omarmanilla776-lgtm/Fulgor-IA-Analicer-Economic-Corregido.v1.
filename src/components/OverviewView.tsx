@@ -93,13 +93,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <span className="font-mono text-xs font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-400" /> PRINCIPIO DE RIGOR CIENTÍFICO
             </span>
-            <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+            <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
           </div>
           <h2 className="text-base sm:text-lg font-bold text-slate-100">
             Panel macroeconómico de demostración
           </h2>
           <p className="text-xs text-slate-400 max-w-3xl">
-            La clasificación epistémica indica el tipo de resultado, no su verificación. En esta demo los valores no están conectados a fuentes en vivo. Las vistas distinguen 
+            La clasificación epistémica indica el tipo de resultado, no su verificación. El panel de World Bank consulta una fuente pública; los gráficos y rankings estáticos de los demás módulos siguen siendo ilustrativos y no están conectados a esa fuente. Las vistas distinguen 
             <strong className="text-emerald-300"> dato observado</strong>, 
             <strong className="text-amber-300"> correlación estadística</strong>, 
             <strong className="text-sky-300"> estimación modelada</strong>, 
