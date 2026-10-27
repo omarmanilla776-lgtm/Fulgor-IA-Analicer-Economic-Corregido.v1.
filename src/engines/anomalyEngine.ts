@@ -7,7 +7,7 @@ export interface AnomalyDetectionResult {
   observedDelta: number;
   thresholdZ: number;
   severity: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'INFO';
-  epistemicType: 'OBSERVED_DATA' | 'CORRELATION' | 'MODEL_ESTIMATE' | 'CAUSAL_INFERENCE' | 'PROJECTION';
+  epistemicType: 'MODEL_ESTIMATE' | 'CORRELATION' | 'MODEL_ESTIMATE' | 'CAUSAL_INFERENCE' | 'PROJECTION';
   suggestedAction: string;
 }
 
