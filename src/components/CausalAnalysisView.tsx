@@ -37,7 +37,7 @@ interface CausalAnalysisViewProps {
 }
 
 export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCopilotWithPrompt }) => {
-  const [selectedExpId, setSelectedExpId] = useState<string>(DID_EXPERIMENTS[0].id);
+  const [selectedExpId, setSelectedExpId] = useState<string>(DID_EXPERIMENTS[0]?.id ?? '');
   const [activeTab, setActiveTab] = useState<'did' | 'interactive-orchestrator'>('did');
 
   // Interactive Orchestrator State
@@ -191,7 +191,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
           {/* Left: Experiment Selection */}
           <div className="lg:col-span-4 space-y-3">
             <div className="text-xs font-semibold text-slate-400">
-              Estudios Cuasi-Experimentales Calibrados ({DID_EXPERIMENTS.length})
+              Escenarios ilustrativos — no estudios empíricos ({DID_EXPERIMENTS.length})
             </div>
 
             <div className="space-y-3">
@@ -219,9 +219,9 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                     </h4>
 
                     <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800 flex items-center justify-between">
-                      <span>Efecto Tratamiento Estimado:</span>
+                      <span>Efecto causal validado:</span>
                       <span className="font-mono font-bold text-emerald-400">
-                        +{exp.estimatedTreatmentEffect}% (95% CI)
+                        No disponible
                       </span>
                     </div>
                   </div>
@@ -237,26 +237,26 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
               <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Efecto (Beta)</span>
-                  <span className="text-emerald-400 font-bold">+{activeExperiment.estimatedTreatmentEffect}%</span>
+                  <span className="text-emerald-400 font-bold">{activeExperiment.estimatedTreatmentEffect === null ? "No validado" : `${activeExperiment.estimatedTreatmentEffect}% (no verificado)`}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Estadístico t</span>
-                  <span className="text-slate-200 font-bold">{activeExperiment.tStatistic}</span>
+                  <span className="text-slate-200 font-bold">{activeExperiment.tStatistic ?? "No calculado"}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">R² Ajustado</span>
-                  <span className="text-slate-200 font-bold">{activeExperiment.rSquared}</span>
+                  <span className="text-slate-200 font-bold">{activeExperiment.rSquared ?? "No calculado"}</span>
                 </div>
                 <div className="p-2 bg-slate-950 rounded border border-slate-800">
                   <span className="text-slate-500 block text-[9px]">Muestra Total (N)</span>
-                  <span className="text-slate-200 font-bold">{activeExperiment.sampleSize}</span>
+                  <span className="text-slate-200 font-bold">{activeExperiment.sampleSize ?? "No disponible"}</span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded bg-emerald-950/30 border border-emerald-500/30 flex items-center gap-2 text-[11px] text-emerald-300">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="p-2.5 rounded bg-amber-950/30 border border-amber-500/30 flex items-center gap-2 text-[11px] text-amber-200">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>
-                  Tendencias Paralelas Verificadas (F-test p = {activeExperiment.parallelTrendsPValue} &gt; 0.05).
+                  Tendencias paralelas NO verificadas; no se informa p-value inferencial.
                 </span>
               </div>
             </div>
@@ -276,7 +276,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                   <span className="text-xs text-slate-400">{activeExperiment.targetSector}</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-100">
-                  Trayectoria Observada vs. Contrafactual Sintético (Sin Adopción)
+                  Trayectorias simuladas de tratamiento y control (no datos observados)
                 </h3>
               </div>
 
@@ -310,7 +310,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                       <Line 
                         type="monotone" 
                         dataKey="treatmentActual" 
-                        name="Tratamiento Real (Firmas con IA)" 
+                        name="Tratamiento simulado (con IA)" 
                         stroke="#34d399" 
                         strokeWidth={3} 
                         dot={{ r: 4 }} 
@@ -318,7 +318,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                       <Line 
                         type="monotone" 
                         dataKey="treatmentCounterfactual" 
-                        name="Contrafactual Estimado (Sin IA)" 
+                        name="Contrafactual simulado (sin IA)" 
                         stroke="#f59e0b" 
                         strokeWidth={2} 
                         strokeDasharray="5 5" 
@@ -327,7 +327,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                       <Line 
                         type="monotone" 
                         dataKey="controlGroup" 
-                        name="Grupo de Control Observado" 
+                        name="Grupo de control simulado" 
                         stroke="#64748b" 
                         strokeWidth={2} 
                         dot={{ r: 3 }} 
@@ -349,7 +349,7 @@ export const CausalAnalysisView: React.FC<CausalAnalysisViewProps> = ({ onOpenCo
                 
                 <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5 text-xs">
                   <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Supuestos Clave Validados
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Supuestos no verificados
                   </span>
                   <ul className="list-disc list-inside text-slate-400 text-[11px] space-y-1 leading-relaxed">
                     {activeExperiment.assumptions.map((assump, idx) => (
