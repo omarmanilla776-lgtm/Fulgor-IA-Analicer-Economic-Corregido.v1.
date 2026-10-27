@@ -68,3 +68,9 @@ jobs:
 
           bad_simulation_status=$(curl --silent --output /tmp/fulgor-bad-simulation.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test-012345678901234567890123456789' -H 'Content-Type: application/json' -d '{"aiAdoptionDelta":1000}' http://127.0.0.1:3000/api/digital-twin/simulate)
           test "$bad_simulation_status" = "400"
+
+          bad_correlation_status=$(curl --silent --output /tmp/fulgor-bad-correlation.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test-012345678901234567890123456789' -H 'Content-Type: application/json' -d '{"x":[1,2,3],"y":[1,"bad",3]}' http://127.0.0.1:3000/api/v1/correlation)
+          test "$bad_correlation_status" = "400"
+
+          legacy_health_key_status=$(curl --silent --output /tmp/fulgor-short-key.json --write-out '%{http_code}' -H 'Authorization: Bearer ci-smoke-test' -H 'Content-Type: application/json' -d '{"prompt":"test"}' http://127.0.0.1:3000/api/copilot/chat)
+          test "$legacy_health_key_status" = "401"
