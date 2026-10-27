@@ -207,7 +207,7 @@ app.post('/api/causal/did-analysis', (req, res) => {
   const { preTreatmentDiff = 0.2, postTreatmentDiff = 21.6, standardError = 2.76 } = req.body;
   const treatmentEffect = postTreatmentDiff - preTreatmentDiff;
   const tStat = treatmentEffect / standardError;
-  const pValue = tStat > 3.29 ? 0.001 : (tStat > 2.58 ? 0.01 : (tStat > 1.96 ? 0.05 : 0.12));
+  const pValue = null;
   const ciLower = Number((treatmentEffect - 1.96 * standardError).toFixed(2));
   const ciUpper = Number((treatmentEffect + 1.96 * standardError).toFixed(2));
 
@@ -267,11 +267,11 @@ app.get('/api/v1/indicators', (req, res) => {
     timestamp: new Date().toISOString(),
     indicators: [
       { code: 'MX_GDP_Q', name: 'PIB Trimestral México', country: 'México', value: 2.1, unit: '% YoY', epistemicType: 'MODEL_ESTIMATE', source: 'INEGI' },
-      { code: 'MX_CPI_YOY', name: 'Inflación General Anual INPC', country: 'México', value: 4.42, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'INEGI / Banxico' },
-      { code: 'US_GDP_Q', name: 'US Real GDP Growth Rate', country: 'Estados Unidos', value: 2.8, unit: '% Annualized', epistemicType: 'OBSERVED_DATA', source: 'BEA / FRED' },
-      { code: 'US_CPI_CORE', name: 'US Core CPI', country: 'Estados Unidos', value: 3.1, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'BLS / FRED' },
-      { code: 'DE_GDP_Q', name: 'PIB Alemania Real Growth', country: 'Alemania', value: 0.4, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'Destatis / Eurostat' },
-      { code: 'BR_GDP_Q', name: 'PIB Brasil Crescimento', country: 'Brasil', value: 2.9, unit: '% YoY', epistemicType: 'OBSERVED_DATA', source: 'IBGE / BCB' }
+      { code: 'MX_CPI_YOY', name: 'Inflación General Anual INPC', country: 'México', value: 4.42, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'INEGI / Banxico (fuente por verificar)' },
+      { code: 'US_GDP_Q', name: 'US Real GDP Growth Rate', country: 'Estados Unidos', value: 2.8, unit: '% Annualized', epistemicType: 'DEMO_NOT_VERIFIED', source: 'BEA / FRED (fuente por verificar)' },
+      { code: 'US_CPI_CORE', name: 'US Core CPI', country: 'Estados Unidos', value: 3.1, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'BLS / FRED (fuente por verificar)' },
+      { code: 'DE_GDP_Q', name: 'PIB Alemania Real Growth', country: 'Alemania', value: 0.4, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'Destatis / Eurostat (fuente por verificar)' },
+      { code: 'BR_GDP_Q', name: 'PIB Brasil Crescimento', country: 'Brasil', value: 2.9, unit: '% YoY', epistemicType: 'DEMO_NOT_VERIFIED', source: 'IBGE / BCB (fuente por verificar)' }
     ]
   });
 });
@@ -391,10 +391,8 @@ app.get('/api/v1/forecasts', (req, res) => {
 app.get('/api/v1/anomalies', (req, res) => {
   res.json({
     version: 'v1',
-    activeAlerts: [
-      { id: 'ALT-01', indicator: 'MX_CPI_YOY', observedValue: 4.42, zScore: 2.71, severity: 'HIGH', impactArea: 'Inflación' },
-      { id: 'ALT-02', indicator: 'US_TECH_INVESTMENT', observedValue: 14.2, zScore: 3.12, severity: 'CRITICAL', impactArea: 'Productividad' }
-    ]
+    activeAlerts: [],
+    dataStatus: 'NO_LIVE_ALERTS_CONNECTED'
   });
 });
 
@@ -434,8 +432,8 @@ app.get('/api/v1/observability', (req, res) => {
     uptimeSeconds: Math.floor(process.uptime()),
     apiLatencyMs: null,
     memoryUsageMb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-    activeConnections: 148,
-    errorRate: '0.02%',
+    activeConnections: null,
+    errorRate: null,
     geminiAiReady: !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString()
   });
