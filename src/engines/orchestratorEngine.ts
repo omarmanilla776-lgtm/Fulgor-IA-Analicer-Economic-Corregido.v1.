@@ -404,13 +404,15 @@ export class EconomicIntelligenceOrchestrator {
     result: any,
     limitations: string[]
   ): string {
-    const epistemicLabel = {
-      OBSERVED_DATA: '🟢 [DATO OBSERVADO Y VERIFICADO]',
-      CORRELATION: '🔵 [CORRELACIÓN ESTADÍSTICA]',
-      MODEL_ESTIMATE: '🟠 [ESTIMACIÓN MODELADA]',
-      CAUSAL_INFERENCE: '🔴 [INFERENCIA CAUSAL CONTROLADA]',
-      PROJECTION: '🟣 [PRONÓSTICO PROBABILÍSTICO]'
-    }[epistemicType];
+    const epistemicLabel = DataEngine.getIsDemoMode()
+      ? `⚠ [DEMO — ${epistemicType} NO VERIFICADO]`
+      : ({
+          OBSERVED_DATA: '[DATO OBSERVADO]',
+          CORRELATION: '[CORRELACIÓN ESTADÍSTICA]',
+          MODEL_ESTIMATE: '[ESTIMACIÓN MODELADA]',
+          CAUSAL_INFERENCE: '[INFERENCIA CAUSAL]',
+          PROJECTION: '[PRONÓSTICO PROBABILÍSTICO]'
+        } as Record<EpistemicType, string>)[epistemicType];
 
     let body = '';
     if (engineName === 'econometric') {
@@ -422,7 +424,7 @@ export class EconomicIntelligenceOrchestrator {
     } else if (engineName === 'forecast') {
       body = `El análisis probabilístico con Fan Chart delimita la trayectoria central (P50) con conos de incertidumbre entre P10 y P90 para los próximos trimestres.`;
     } else if (engineName === 'anomaly') {
-      body = `La evaluación de desviación histórica Z-Score registra un valor de ${result.zScore} (Variación observada: ${result.observedDelta}). Clasificación: ${result.severity}.`;
+      body = `La evaluación de desviación histórica Z-Score registra un valor de ${result.zScore} (Variación de entrada: ${result.observedDelta}). Clasificación: ${result.severity}.`;
     } else if (engineName === 'faii') {
       body = `El índice compuesto FAII consolida 5 pilares estructurales para evaluar la resiliencia y el aprovechamiento de la IA en la economía.`;
     }
