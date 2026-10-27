@@ -218,8 +218,8 @@ app.post('/api/causal/did-analysis', (req, res) => {
     standardError,
     tStatistic: Number(tStat.toFixed(2)),
     pValue,
-    isStatisticallySignificant: pValue <= 0.05,
-    epistemicStatus: pValue <= 0.05 ? 'EVIDENCIA CAUSAL ROBUSTA (95% CI)' : 'EVIDENCIA INSUFICIENTE / NO SIGNIFICATIVA',
+    isStatisticallySignificant: false,
+    epistemicStatus: 'EXPLORATORIO — no se calculó un p-valor inferencial válido',
     notes: 'Requiere verificación estricta de tendencias paralelas pre-tratamiento.'
   });
 });
@@ -366,7 +366,7 @@ app.post('/api/v1/did', (req, res) => {
       parallelTrendsVerified: false,
       parallelTrendsPValue: null,
       inferenceStatus: 'EXPLORATORY_ONLY — parallel trends not tested',
-      isStatisticallySignificant: pValue <= 0.05
+      isStatisticallySignificant: false
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
