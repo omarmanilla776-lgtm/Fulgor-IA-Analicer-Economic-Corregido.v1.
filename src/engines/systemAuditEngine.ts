@@ -385,24 +385,13 @@ export class SystemAuditEngine {
       totalTestsRun: testSuiteResult.summary.total,
       testsPassed: testSuiteResult.summary.passed,
       testsFailed: testSuiteResult.summary.failed,
-      enginesOperational: [
-        'DataEngine', 'ProvenanceEngine', 'EconometricEngine', 'DigitalTwinEngine',
-        'ForecastEngine', 'FaiiEngine', 'AnomalyEngine', 'CopilotEngine',
-        'ReportEngine', 'ApiEngine', 'TelemetryEngine', 'ObservabilityEngine',
-        'EconomicIntelligenceOrchestrator'
-      ],
-      sourcesConfigured: [
-        'INEGI (BIE / ENOE)', 'Banxico (SIE API)', 'FRED (St. Louis Fed)',
-        'Eurostat (HICP / GDP)', 'OECD (AI Observatory)', 'FMI (WEO)', 'Banco Mundial (WDI)'
-      ],
-      apisOperational: [
-        '/api/v1/health', '/api/v1/indicators', '/api/v1/countries', '/api/v1/analysis',
-        '/api/v1/simulate', '/api/v1/causal', '/api/v1/alerts', '/api/v1/observability', '/api/copilot/chat'
-      ],
+      enginesOperational: [], // Runtime health has not been independently verified.
+      sourcesConfigured: [], // Catalog entries are not proof of live source connections.
+      apisOperational: [], // Endpoint operation must be verified in a running deployment.
       securityStatus: 'PENDIENTE — requiere revisión independiente de autenticación, secretos, validación de entradas y permisos.',
       observabilityStatus: 'PARCIAL — uptime y memoria del proceso pueden medirse; latencia, sesiones, tasa de error y auditoría criptográfica no están verificadas.',
       i18nStatus: 'COMPLETO — 8 idiomas (ES, EN, PT, FR, DE, IT, ZH, JA) y 5 monedas (USD, MXN, EUR, BRL, GBP) con formateo local desacoplado.',
-      documentationStatus: 'PUBLICADO — Metodología matemática interactiva, fórmulas formales, supuestos de identificación y catálogo de fuentes verificable.',
+      documentationStatus: 'DOCUMENTACIÓN EN LA APLICACIÓN; revisión metodológica y verificación de fuentes pendientes.',
       releaseBlockers: allPassed ? [] : ['Validar fuentes y fechas de datos', 'Implementar inferencia estadística y causal reproducible', 'Ejecutar pruebas de seguridad y build', 'Configurar autenticación de API y secretos en servidor', 'Conectar observabilidad real antes de publicar'],
       executiveSummary: allPassed 
         ? 'La plataforma no está certificada para publicación; las pruebas pendientes deben completarse y documentarse.'
