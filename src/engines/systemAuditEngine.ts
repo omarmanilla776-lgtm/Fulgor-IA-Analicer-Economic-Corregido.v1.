@@ -96,14 +96,14 @@ export class SystemAuditEngine {
     try {
       const did = EconometricEngine.calculateDiD(10, 30, 10, 15, 2.0, 500);
       // diffTreat = 20, diffControl = 5 -> effect = 15
-      const passed = Math.abs(did.treatmentEffect - 15) < 0.01 && did.tStat > 3 && did.pValue === null && did.parallelTrendsVerified === false && did.parallelTrendsFTestPValue === null;
+      const passed = Math.abs(did.treatmentEffect - 15) < 0.01 && did.tStat === null && did.standardError === null && did.pValue === null && did.ciLower95 === null && did.ciUpper95 === null && did.parallelTrendsVerified === false && did.parallelTrendsFTestPValue === null && did.rSquared === null && did.sampleSizeN === null;
       tests.push({
         testId: 'TEST-DID-04',
         name: 'EconometricEngine: Difference-in-Differences 2x2 & Test de Tendencias Paralelas',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.1,
-        details: `Efecto estimado: ${did.treatmentEffect}, t-stat: ${did.tStat}, tendencias paralelas verificadas: ${did.parallelTrendsVerified ? 'SÍ' : 'NO'}; inferencia no certificada.`
+        details: `Contraste descriptivo DiD: ${did.treatmentEffect}; t-stat, error estándar, intervalo, R² y tamaño muestral no reportados sin evidencia suficiente; tendencias paralelas no verificadas.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-DID-04', name: 'EconometricEngine DiD', category: 'STATISTICAL', passed: false, durationMs: 1.0, details: e.message });
