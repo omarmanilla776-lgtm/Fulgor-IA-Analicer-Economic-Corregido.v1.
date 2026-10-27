@@ -28,7 +28,7 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({ isOpen, onCl
     setTimeout(() => setCopiedKey(false), 2000);
   };
 
-  const curlCommand = `curl -X ${selectedEndpoint.method} "https://ais-dev-j2dny7ymeduidtrn5kdo6u-480113977584.us-west2.run.app${selectedEndpoint.path}" \\
+  const curlCommand = `curl -X ${selectedEndpoint.method} "${window.location.origin}${selectedEndpoint.path}" \\
   -H "Authorization: Bearer $FULGOR_API_KEY" \\
   -H "Content-Type: application/json"${selectedEndpoint.sampleRequestBody ? ` \\\n  -d '${JSON.stringify(selectedEndpoint.sampleRequestBody)}'` : ''}`;
 
