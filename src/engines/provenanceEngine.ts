@@ -12,6 +12,16 @@ export interface EpistemicVerificationSeal {
 }
 
 export const EPISTEMIC_SEALS: Record<EpistemicType, EpistemicVerificationSeal> = {
+  DEMO_DATA: {
+    sealId: 'SEAL_DEMO_00',
+    category: 'DEMO_DATA',
+    label: 'DATO ILUSTRATIVO — DEMOSTRACIÓN',
+    badgeColorHex: '#fbbf24',
+    badgeBorderHex: 'rgba(251, 191, 36, 0.4)',
+    bgHex: 'rgba(120, 53, 15, 0.2)',
+    ruleExplanation: 'Valor estático de demostración; no representa una observación económica verificada.',
+    evidenceRequirement: 'Sustituir por una observación descargada de fuente identificable y registrar serie, fecha, unidad y validación.'
+  },
   OBSERVED_DATA: {
     sealId: 'SEAL_OBS_01',
     category: 'OBSERVED_DATA',
