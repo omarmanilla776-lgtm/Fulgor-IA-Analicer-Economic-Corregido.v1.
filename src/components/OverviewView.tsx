@@ -119,6 +119,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       </div>
 
       {/* Global Macro KPI Grid */}
+      <p className="text-[11px] text-amber-300">Tarjetas y cifras de esta cuadrícula: demostración estática, no se actualizan con el panel World Bank.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {filteredCountries.slice(0, 4).map((country) => (
           <div 
@@ -134,7 +135,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   <span className="text-[10px] text-slate-400 font-mono">{country.currency}</span>
                 </div>
               </div>
-              <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+              <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 text-xs">
@@ -173,7 +174,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               Dinámica Macroeconómica & Cruce de Variables
             </h3>
             <p className="text-xs text-slate-400">
-              Series históricas armonizadas y análisis de dispersión entre penetración tecnológica y valor agregado.
+              Gráficos de demostración sin series conectadas; los puntos de dispersión son sintéticos y no acreditan una relación empírica.
             </p>
           </div>
 
@@ -184,7 +185,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 activeTabSub === 'macro' ? 'bg-slate-800 text-amber-400' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Crecimiento Histórico
+              Escenario PIB (demo)
             </button>
             <button
               onClick={() => setActiveTabSub('ai-correlation')}
@@ -210,9 +211,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400">
-                Variación porcentual anual del PIB Real (2021 - 2025)
+                Valores ilustrativos de variación anual del PIB real (2021–2025; no verificados)
               </span>
-              <EpistemicBadge type="OBSERVED_DATA" size="sm" />
+              <EpistemicBadge type="MODEL_ESTIMATE" size="sm" />
             </div>
 
             <div className="h-72 w-full">
@@ -226,7 +227,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                  <Line type="monotone" dataKey="US" name="Estados Unidos (BEA)" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="US" name="Estados Unidos (ejemplo)" stroke="#38bdf8" strokeWidth={2.5} dot={{ r: 4 }} />
                   <Line type="monotone" dataKey="MX" name="México (ejemplo)" stroke="#34d399" strokeWidth={2.5} dot={{ r: 4 }} />
                   <Line type="monotone" dataKey="ES" name="España (ejemplo)" stroke="#fbbf24" strokeWidth={2} dot={{ r: 3 }} />
                   <Line type="monotone" dataKey="DE" name="Alemania (ejemplo)" stroke="#c084fc" strokeWidth={2} dot={{ r: 3 }} />
