@@ -15,11 +15,11 @@ export const EPISTEMIC_SEALS: Record<EpistemicType, EpistemicVerificationSeal> =
   OBSERVED_DATA: {
     sealId: 'SEAL_OBS_01',
     category: 'OBSERVED_DATA',
-    label: '🟢 DATO OBSERVADO',
+    label: 'DATO DECLARADO OBSERVADO — NO VERIFICADO',
     badgeColorHex: '#10b981',
     badgeBorderHex: 'rgba(16, 185, 129, 0.4)',
     bgHex: 'rgba(16, 185, 129, 0.1)',
-    ruleExplanation: 'Registro empírico publicado por organismo oficial con metodología abierta y fecha de corte auditada.',
+    ruleExplanation: 'La etiqueta no acredita conexión, descarga ni validación independiente de una fuente oficial.'
     evidenceRequirement: 'Identificador oficial de serie, URL institucional y ficha técnica.'
   },
   CORRELATION: {
@@ -66,7 +66,9 @@ export const EPISTEMIC_SEALS: Record<EpistemicType, EpistemicVerificationSeal> =
 
 export class ProvenanceEngine {
   public static getSeal(type: EpistemicType): EpistemicVerificationSeal {
-    return EPISTEMIC_SEALS[type] || EPISTEMIC_SEALS.OBSERVED_DATA;
+    const seal = EPISTEMIC_SEALS[type];
+    if (!seal) throw new Error('No existe un sello epistemológico para el tipo solicitado.');
+    return seal;
   }
 
   public static generateCitationString(provenance: DataSourceProvenance): string {
