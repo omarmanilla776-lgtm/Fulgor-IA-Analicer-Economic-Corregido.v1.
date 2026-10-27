@@ -16,7 +16,7 @@ export const TierModal: React.FC<TierModalProps> = ({
   onSelectTier,
 }) => {
   const [copiedApiKey, setCopiedApiKey] = useState(false);
-  const mockApiKey = 'flg_sec_live_99a84b3e02f1889c09d_prod';
+  const mockApiKey = 'No hay una clave API configurada';
 
   if (!isOpen) return null;
 
@@ -225,7 +225,7 @@ export const TierModal: React.FC<TierModalProps> = ({
 
           <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-amber-400 flex items-center justify-between overflow-x-auto">
             <span>{mockApiKey}</span>
-            <span className="text-[10px] text-slate-500 ml-4 shrink-0 font-sans">Permisos: Read Indicators, Run Digital Twin</span>
+            <span className="text-[10px] text-slate-500 ml-4 shrink-0 font-sans">Demostración: no es una credencial</span>
           </div>
         </div>
 
