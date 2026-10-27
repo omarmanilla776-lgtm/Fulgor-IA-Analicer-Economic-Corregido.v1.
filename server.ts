@@ -8,7 +8,20 @@ import { GoogleGenAI } from '@google/genai';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const configuredPort = process.env.PORT === undefined ? 3000 : Number(process.env.PORT);
+if (!Number.isInteger(configuredPort) || configuredPort < 1 || configuredPort > 65535) {
+  throw new Error('PORT debe ser un entero entre 1 y 65535.');
+}
+const PORT = configuredPort;
+
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
 
 app.use(express.json({ limit: '256kb' }));
 
@@ -608,7 +621,11 @@ app.get('/api/v2/preview', (req, res) => {
 
 // Serve frontend with Vite middleware in dev or static files in production
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Endpoint API no encontrado.' });
+});
+
+if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
