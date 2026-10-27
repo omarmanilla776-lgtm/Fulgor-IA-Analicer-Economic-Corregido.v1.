@@ -79,14 +79,15 @@ export class SystemAuditEngine {
       const x = [1, 2, 3, 4, 5];
       const y = [2, 4, 6, 8, 10]; // Perfect linear relationship
       const ols = EconometricEngine.calculateOLS(x, y);
-      const passed = Math.abs(ols.slope - 2) < 0.001 && Math.abs(ols.rSquared - 1.0) < 0.001 && ols.pValue === null && !ols.isStatisticallySignificant;
+      const ranked = EconometricEngine.calculateOLS([1, 2, 3, 4, 5], [1, 4, 9, 16, 25]);
+      const passed = Math.abs(ols.slope - 2) < 0.001 && Math.abs(ols.rSquared - 1.0) < 0.001 && ols.pValue === null && !ols.isStatisticallySignificant && ranked.spearmanRho === 1 && ranked.pearsonR < 1;
       tests.push({
         testId: 'TEST-ECON-03',
-        name: 'EconometricEngine: Regresión Lineal OLS y Pearson (R² = 1.0)',
+        name: 'EconometricEngine: OLS, Pearson, Spearman por rangos y p-valor no inferido',
         category: 'STATISTICAL',
         passed,
         durationMs: 1.5,
-        details: `Pendiente: ${ols.slope}, R²: ${ols.rSquared}, p-value: ${ols.pValue ?? 'no calculado'}; significancia no declarada sin inferencia válida.`
+        details: `Pendiente: ${ols.slope}, R²: ${ols.rSquared}; Spearman monotónico: ${ranked.spearmanRho}, Pearson no lineal: ${ranked.pearsonR}; p-value: ${ols.pValue ?? 'no calculado'}; significancia no declarada sin inferencia válida.`
       });
     } catch (e: any) {
       tests.push({ testId: 'TEST-ECON-03', name: 'EconometricEngine OLS', category: 'STATISTICAL', passed: false, durationMs: 1.2, details: e.message });
