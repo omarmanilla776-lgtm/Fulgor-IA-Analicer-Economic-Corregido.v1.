@@ -13,18 +13,46 @@ export interface OLSResult {
 
 export interface DiDCalculationResult {
   treatmentEffect: number; // Beta_3
-  standardError: number;
-  tStat: number;
+  standardError: number | null;
+  tStat: number | null;
   pValue: number | null;
   ciLower95: number | null;
-  ciUpper95: number;
+  ciUpper95: number | null;
   parallelTrendsFTestPValue: number | null;
   parallelTrendsVerified: boolean;
-  rSquared: number;
-  sampleSizeN: number;
+  rSquared: number | null;
+  sampleSizeN: number | null;
 }
 
 export class EconometricEngine {
+  private static rankValues(values: number[]): number[] {
+    const sorted = values.map((value, index) => ({ value, index })).sort((a, b) => a.value - b.value);
+    const ranks = new Array<number>(values.length);
+    let start = 0;
+    while (start < sorted.length) {
+      let end = start + 1;
+      while (end < sorted.length && sorted[end].value === sorted[start].value) end++;
+      const averageRank = ((start + 1) + end) / 2;
+      for (let i = start; i < end; i++) ranks[sorted[i].index] = averageRank;
+      start = end;
+    }
+    return ranks;
+  }
+
+  private static correlation(a: number[], b: number[]): number {
+    if (a.length !== b.length || a.length < 2) return 0;
+    const meanA = a.reduce((sum, value) => sum + value, 0) / a.length;
+    const meanB = b.reduce((sum, value) => sum + value, 0) / b.length;
+    let covariance = 0, varianceA = 0, varianceB = 0;
+    for (let i = 0; i < a.length; i++) {
+      const da = a[i] - meanA, db = b[i] - meanB;
+      covariance += da * db;
+      varianceA += da * da;
+      varianceB += db * db;
+    }
+    const denominator = Math.sqrt(varianceA * varianceB);
+    return denominator > 0 ? covariance / denominator : 0;
+  }
   /**
    * Calculates Ordinary Least Squares (OLS) Linear Regression, Pearson (r), and Spearman (rho)
    */
@@ -94,7 +122,7 @@ export class EconometricEngine {
     const pValue = null;
 
     // Rank correlation (Spearman rho approximation)
-    const spearmanRho = Number(pearsonR.toFixed(3));
+    const spearmanRho = Number(this.correlation(this.rankValues(xValues.slice(0, n)), this.rankValues(yValues.slice(0, n))).toFixed(3));
 
     return {
       slope: Number(slope.toFixed(4)),
@@ -126,10 +154,12 @@ export class EconometricEngine {
     const diffControl = postControlMean - preControlMean;
     const treatmentEffect = diffTreat - diffControl;
 
-    const tStat = treatmentEffect / se;
-    // No raw panel data or validated variance estimator is available here; inferential p-value is not established.
+    // Four group means are enough for a descriptive point contrast, not inferential uncertainty.
+    // Do not report a t-statistic, standard error, confidence interval, or fit statistic without raw data
+    // and a validated variance estimator. Legacy se/sampleSize arguments are intentionally not treated as evidence.
+    const tStat = null;
+    const reportedStandardError = null;
     const pValue = null;
-    // A valid confidence interval needs a validated standard-error estimator and sampling assumptions.
     const ciLower = null;
     const ciUpper = null;
 
@@ -145,8 +175,8 @@ export class EconometricEngine {
       ciUpper95: ciUpper,
       parallelTrendsFTestPValue: parallelTrendsPValue,
       parallelTrendsVerified: false,
-      rSquared: 0.74,
-      sampleSizeN: sampleSize
+      rSquared: null,
+      sampleSizeN: null
     };
   }
 }
