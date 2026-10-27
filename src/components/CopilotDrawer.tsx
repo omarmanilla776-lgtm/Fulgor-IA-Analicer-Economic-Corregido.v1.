@@ -159,7 +159,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-slate-100 text-sm">AI Economic Copilot</h3>
                 <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800">
-                  Gemini 2.5 Pro
+                  IA · disponibilidad condicionada
                 </span>
               </div>
               <p className="text-[10px] text-slate-400">
