@@ -78,7 +78,7 @@ export const ReportStudioModal: React.FC<ReportStudioModalProps> = ({
           downloadAnchor.click();
           downloadAnchor.remove();
         } else if (reportFormat === 'csv') {
-          const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,OfficialSource\n";
+          const headers = "Code,Name,Country,CurrentValue,Unit,Category,EpistemicType,DeclaredSource,DataStatus\n";
           const rows = primaryIndicators.map(i => 
             `"${i.code}","${i.name}","${i.countryName}",${i.currentValue},"${i.unit}","${i.category}","${i.epistemicType}","${i.provenance.sourceName}","DEMO_DATA_NOT_VERIFIED"`
           ).join("\n");
