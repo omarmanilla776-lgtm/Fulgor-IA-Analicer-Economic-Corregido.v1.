@@ -1,0 +1,54 @@
+# Base44 sandbox/dev environment for FULGOR IA ANALICER ECONOMIC.
+#
+# The app is a single Node process (Express + Vite middleware in dev, see server.ts)
+# that listens on 0.0.0.0:3000. It has no database and boots without any credential:
+# GEMINI_API_KEY is optional and powers the live Copilot (without it the Copilot
+# answers from its deterministic offline engine).
+#
+# Dependencies are installed on container start from the current checkout (the repo
+# ships a bun.lock but its CI and README use npm, so npm is the pinned installer here)
+# into a named volume, so the bind mount never hides node_modules.
+name: fulgor-ia-analicer-economic
+
+services:
+  web:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    labels:
+      base44.project: "FULGOR IA ANALICER ECONOMIC"
+      base44.kind: "web"
+      base44.port: "3000"
+    command: ["sh", "-ec", "npm install --no-audit --no-fund && exec npm run dev"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - web-node-modules:/app/node_modules
+    environment:
+      # Dev server (Vite middleware), never the prebuilt production bundle.
+      - NODE_ENV=development
+      # Bare pass-throughs: the platform sets these for the sandbox preview
+      # (see AGENTS.md) — Vite appends __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS to
+      # its dev-server host allowlist.
+      - BASE44_PREVIEW_MODE
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    env_file:
+      # Platform secrets (external-service credentials) — provided out of band.
+      - /run/base44/app.env
+    restart: on-failure
+    healthcheck:
+      # Uses Node's built-in fetch (the slim image has no curl).
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 6
+
+volumes:
+  web-node-modules:
